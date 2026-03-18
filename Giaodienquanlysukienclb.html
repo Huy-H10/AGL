@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý sự kiện CLB</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI;}
+body{background:linear-gradient(135deg,#ff9a9e,#fad0c4);overflow-x:hidden}
+
+/* MENU */
+.menu-toggle{
+ position:fixed;top:15px;left:15px;
+ font-size:28px;background:#ff6a88;color:#fff;
+ padding:8px 12px;border-radius:10px;cursor:pointer;z-index:1000;
+}
+
+.menu{
+ position:fixed;top:0;left:-260px;width:230px;height:100%;
+ background:#ff6a88;padding-top:70px;
+ display:flex;flex-direction:column;gap:10px;
+ transition:.3s;
+}
+.menu.show{left:0}
+.menu button{
+ margin:0 10px;padding:10px;border:none;border-radius:10px;
+ background:#fff;cursor:pointer;
+}
+
+.page{display:none;padding-top:80px}
+
+.card{
+ background:rgba(255,255,255,.95);
+ padding:25px;border-radius:20px;
+ width:400px;margin:20px auto;
+ box-shadow:0 10px 25px rgba(255,105,180,.3);
+}
+
+h2{text-align:center;color:#e84393;margin-bottom:15px}
+
+input{
+ width:100%;padding:10px;margin:8px 0;
+ border-radius:10px;border:1px solid pink;
+}
+
+button.main{
+ width:100%;padding:10px;background:#ff6a88;color:#fff;
+ border:none;border-radius:10px;cursor:pointer;
+}
+
+/* TABLE */
+table{width:100%;margin-top:10px;border-collapse:collapse}
+th,td{padding:10px;text-align:center}
+th{background:pink} td{background:#fff}
+
+.edit{background:orange;color:#fff;border:none;padding:5px;border-radius:5px}
+.delete{background:red;color:#fff;border:none;padding:5px;border-radius:5px}
+
+/* HOA */
+.flower{
+ position:fixed;top:-50px;font-size:20px;
+ animation:fall linear infinite;pointer-events:none;
+}
+@keyframes fall{
+ 0%{transform:translateY(-50px)}
+ 100%{transform:translateY(110vh)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<div class="menu" id="menu">
+ <button onclick="go('home')">🏠 Trang chủ</button>
+ <button onclick="go('create')" class="adminOnly">➕ Tạo sự kiện</button>
+ <button onclick="go('manage')" class="adminOnly">📋 Sự kiện</button>
+ <button onclick="go('participants')" class="adminOnly">📑 Người tham gia</button>
+ <button onclick="go('join')">🙋 Tham gia</button>
+ <button onclick="go('registerUser')">👤 Đăng ký tài khoản người tham gia</button>
+ <button onclick="go('registerAdmin')">👑 Đăng ký tài khoản ban tổ chức</button>
+ <button onclick="go('login')">🔐 Đăng nhập</button>
+ <button onclick="logout()">🚪 Đăng xuất</button>
+</div>
+
+<!-- HOME -->
+<div id="home" class="page">
+<div class="card">
+<h2>🌸 Quản lý sự kiện CLB 🌸</h2>
+<p id="Welcome, chào mừng bạn đến với trang quản lý sự kiện CLB" style="text-align:center"></p>
+</div>
+</div>
+
+<!-- CREATE -->
+<div id="create" class="page">
+<div class="card">
+<h2>➕ Tạo sự kiện</h2>
+<input id="title" placeholder="Tên sự kiện">
+<input id="leader" placeholder="Người phụ trách">
+<input id="date" type="date">
+<button class="main" onclick="addEvent()">Thêm</button>
+</div>
+</div>
+
+<!-- EVENTS -->
+<div id="manage" class="page">
+<div class="card">
+<h2>📋 Sự kiện</h2>
+<table>
+<thead><tr><th>Tên</th><th>Phụ trách</th><th>Ngày</th></tr></thead>
+<tbody id="eventTable"></tbody>
+</table>
+</div>
+</div>
+
+<!-- JOIN -->
+<div id="join" class="page">
+<div class="card">
+<h2>🙋 Đăng ký tham gia</h2>
+<input id="pname" placeholder="Tên">
+<input id="pevent" placeholder="Sự kiện">
+<button class="main" onclick="addParticipant()">Đăng ký</button>
+</div>
+</div>
+
+<!-- PARTICIPANTS -->
+<div id="participants" class="page">
+<div class="card">
+<h2>📑 Người tham gia</h2>
+<button class="main" onclick="exportCSV()">📥 Xuất CSV</button>
+<table>
+<thead><tr><th>Tên</th><th>Sự kiện</th><th></th></tr></thead>
+<tbody id="pTable"></tbody>
+</table>
+</div>
+</div>
+
+<!-- REGISTER USER -->
+<div id="registerUser" class="page">
+<div class="card">
+<h2>👤 Đăng ký tài khoản người tham gia</h2>
+<input id="ru_name" placeholder="Tên">
+<input id="ru_email" placeholder="Email">
+<input id="ru_pass" type="password" placeholder="Mật khẩu">
+<button class="main" onclick="register('user')">Đăng ký</button>
+</div>
+</div>
+
+<!-- REGISTER ADMIN -->
+<div id="registerAdmin" class="page">
+<div class="card">
+<h2>👑 Đăng ký tài khoản ban tổ chức</h2>
+<input id="ra_name" placeholder="Tên">
+<input id="ra_email" placeholder="Email">
+<input id="ra_pass" type="password" placeholder="Mật khẩu">
+<button class="main" onclick="register('admin')">Đăng ký</button>
+</div>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="page">
+<div class="card">
+<h2>🔐 Đăng nhập</h2>
+<input id="login_email" placeholder="Email">
+<input id="login_pass" type="password" placeholder="Mật khẩu">
+<button class="main" onclick="login()">Đăng nhập</button>
+</div>
+</div>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let events = JSON.parse(localStorage.getItem("events")) || [];
+let participants = JSON.parse(localStorage.getItem("participants")) || [];
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+/* MENU */
+function toggleMenu(){menu.classList.toggle("show")}
+function go(p){showPage(p);menu.classList.remove("show")}
+
+/* PAGE */
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+ document.getElementById(id).style.display="block";
+}
+
+/* HOA */
+setInterval(()=>{
+ let f=document.createElement("div");
+ f.className="flower";
+ f.innerHTML="🌸";
+ f.style.left=Math.random()*100+"vw";
+ f.style.animationDuration=(3+Math.random()*5)+"s";
+ document.body.appendChild(f);
+ setTimeout(()=>f.remove(),8000);
+},200);
+
+/* REGISTER */
+function register(role){
+ let name,email,pass;
+
+ if(role==="user"){
+  name=ru_name.value; email=ru_email.value; pass=ru_pass.value;
+ }else{
+  name=ra_name.value; email=ra_email.value; pass=ra_pass.value;
+ }
+
+ if(!name||!email||!pass)return alert("Nhập đủ!");
+ if(!email.includes("@"))return alert("Email sai!");
+
+ users.push({name,email,pass,role});
+ localStorage.setItem("users",JSON.stringify(users));
+
+ alert("Đăng ký thành công!");
+}
+
+/* LOGIN */
+function login(){
+ let mail=document.getElementById("login_email").value;
+ let pw=document.getElementById("login_pass").value;
+
+ if(!mail||!pw)return alert("Nhập đủ!");
+
+ let u=users.find(x=>x.email===mail && x.pass===pw);
+ if(!u)return alert("Sai tài khoản!");
+
+ currentUser=u;
+ localStorage.setItem("currentUser",JSON.stringify(u));
+
+ alert("Xin chào "+u.name+" ("+u.role+")");
+ updateUI();
+ showPage("home");
+}
+
+/* LOGOUT */
+function logout(){
+ localStorage.removeItem("currentUser");
+ location.reload();
+}
+
+/* UI */
+function updateUI(){
+ if(!currentUser){
+  welcome.innerText="Chưa đăng nhập";
+  return;
+ }
+
+ welcome.innerText="Xin chào "+currentUser.name+" ("+currentUser.role+")";
+
+ document.querySelectorAll(".adminOnly").forEach(btn=>{
+  btn.style.display = currentUser.role==="admin" ? "block":"none";
+ });
+}
+
+/* EVENT */
+function addEvent(){
+ if(!currentUser)return alert("Chưa đăng nhập!");
+ if(currentUser.role!=="admin")return alert("Chỉ admin!");
+
+ if(!title.value||!leader.value)return alert("Nhập đủ!");
+
+ events.push({t:title.value,l:leader.value,d:date.value});
+ localStorage.setItem("events",JSON.stringify(events));
+ renderEvents();
+
+ alert("Tạo thành công!");
+}
+
+/* RENDER EVENT */
+function renderEvents(){
+ eventTable.innerHTML="";
+ events.forEach(e=>{
+  eventTable.innerHTML+=`<tr><td>${e.t}</td><td>${e.l}</td><td>${e.d}</td></tr>`;
+ });
+}
+
+/* PARTICIPANT */
+function addParticipant(){
+ if(!pname.value||!pevent.value)return alert("Nhập đủ!");
+
+ participants.push({name:pname.value,event:pevent.value});
+ localStorage.setItem("participants",JSON.stringify(participants));
+ renderParticipants();
+
+ alert("Đăng ký thành công!");
+}
+
+/* RENDER PARTICIPANT */
+function renderParticipants(){
+ pTable.innerHTML="";
+ participants.forEach((p,i)=>{
+  pTable.innerHTML+=`
+  <tr>
+   <td>${p.name}</td>
+   <td>${p.event}</td>
+   <td>
+    <button class="edit" onclick="editP(${i})">✏️</button>
+    <button class="delete" onclick="delP(${i})">🗑️</button>
+   </td>
+  </tr>`;
+ });
+}
+
+function editP(i){
+ let n=prompt("Sửa:",participants[i].name);
+ if(n)participants[i].name=n;
+ localStorage.setItem("participants",JSON.stringify(participants));
+ renderParticipants();
+}
+
+function delP(i){
+ participants.splice(i,1);
+ localStorage.setItem("participants",JSON.stringify(participants));
+ renderParticipants();
+}
+
+/* EXPORT */
+function exportCSV(){
+  let csv = "Tên;Sự kiện\n"; 
+
+  participants.forEach(p=>{
+    csv += `"${p.name}";"${p.event}"\n`;
+  });
+
+  // thêm BOM để Excel đọc UTF-8 chuẩn
+  let blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+
+  let link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "danhsach.csv";
+  link.click();
+}
+
+/* LOAD */
+renderEvents();
+renderParticipants();
+updateUI();
+showPage("home");
+</script>
+
+</body>
+</html>
