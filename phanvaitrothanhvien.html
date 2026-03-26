@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ thống Quản lý Sự kiện CLB</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; background: #f4f7f9; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #1a73e8; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f8f9fa; }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 5px; }
+        .btn-blue { background: #1a73e8; color: white; }
+        .btn-green { background: #34a853; color: white; }
+        .btn-red { background: #ea4335; color: white; }
+        .btn-gray { background: #9e9e9e; color: white; }
+        .hidden { display: none; }
+        input { padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; width: 95%; }
+        .role-badge { padding: 3px 8px; border-radius: 12px; font-size: 0.8em; color: white; }
+        .bg-admin { background: #ea4335; }
+        .bg-btc { background: #fbbc05; }
+        .bg-mem { background: #34a853; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Tài khoản: <span id="userDisplay">admin</span></h2>
+    <p>Vai trò: <span id="roleDisplay" class="role-badge bg-admin">ADMIN</span></p>
+    <button class="btn btn-blue" onclick="fakeLogin('admin', 3)">Admin</button>
+    <button class="btn btn-blue" onclick="fakeLogin('tochuc1', 2)">Ban tổ chức</button>
+    <button class="btn btn-blue" onclick="fakeLogin('member1', 1)">Thành viên</button>
+</div>
+
+<div class="card">
+    <h2>Menu</h2>
+    <button class="btn btn-green" onclick="showView('eventList')">Xem sự kiện</button>
+    <span id="btcMenu" class="">
+        <button class="btn btn-green" onclick="openAddForm()">+ Tạo sự kiện</button>
+    </span>
+</div>
+
+<div id="eventList" class="card">
+    <h2>Danh sách sự kiện</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tên sự kiện</th>
+                <th>Ngày</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody id="eventTableBody"></tbody>
+    </table>
+</div>
+
+<div id="eventForm" class="card hidden">
+    <h2 id="formTitle">Thêm sự kiện mới</h2>
+    <input type="hidden" id="editIndex">
+    <input type="text" id="inpName" placeholder="Tên sự kiện (VD: Workshop C++)">
+    <input type="date" id="inpDate">
+    <br>
+    <button class="btn btn-green" onclick="submitEvent()">Xác nhận lưu</button>
+    <button class="btn btn-gray" onclick="showView('eventList')">Hủy bỏ</button>
+</div>
+
+<script>
+    // Dữ liệu ban đầu
+    let events = [
+        { name: "Đại hội CLB", date: "2026-04-10" },
+        { name: "Teambuilding", date: "2026-05-20" }
+    ];
+    
+    let currentRole = 3; // Mặc định Admin
+
+    // 1. Hàm hiển thị danh sách
+    function renderEvents() {
+        const body = document.getElementById('eventTableBody');
+        body.innerHTML = '';
+        
+        events.forEach((ev, index) => {
+            let actions = '';
+            // Chỉ BTC (2) hoặc Admin (3) mới có quyền Sửa/Xóa
+            if (currentRole >= 2) {
+                actions = `
+                    <button class="btn btn-blue" onclick="openEditForm(${index})">Sửa</button>
+                    <button class="btn btn-red" onclick="deleteEvent(${index})">Xóa</button>
+                `;
+            } else {
+                actions = '<i>Chỉ xem</i>';
+            }
+
+            body.innerHTML += `
+                <tr>
+                    <td>${ev.name}</td>
+                    <td>${ev.date}</td>
+                    <td>${actions}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // 2. Hàm Thêm/Sửa sự kiện
+    function submitEvent() {
+        const name = document.getElementById('inpName').value;
+        const date = document.getElementById('inpDate').value;
+        const editIndex = document.getElementById('editIndex').value;
+
+        if (!name || !date) {
+            alert("Vui lòng nhập đầy đủ thông tin!");
+            return;
+        }
+
+        if (editIndex === "") {
+            // THÊM MỚI
+            events.push({ name: name, date: date });
+            alert("Đã thêm sự kiện thành công!");
+        } else {
+            // CẬP NHẬT (SỬA)
+            events[editIndex] = { name: name, date: date };
+            alert("Đã cập nhật sự kiện!");
+        }
+
+        showView('eventList');
+        renderEvents();
+    }
+
+    // 3. Hàm Xóa sự kiện
+    function deleteEvent(index) {
+        if (confirm(`Bạn có chắc muốn xóa sự kiện: ${events[index].name}?`)) {
+            events.splice(index, 1); // Xóa 1 phần tử tại vị trí index
+            renderEvents();
+        }
+    }
+
+    // 4. Điều hướng Giao diện
+    function openAddForm() {
+        document.getElementById('formTitle').innerText = "Thêm sự kiện mới";
+        document.getElementById('editIndex').value = ""; // Để trống để hiểu là thêm mới
+        document.getElementById('inpName').value = "";
+        document.getElementById('inpDate').value = "";
+        showView('eventForm');
+    }
+
+    function openEditForm(index) {
+        document.getElementById('formTitle').innerText = "Chỉnh sửa sự kiện";
+        document.getElementById('editIndex').value = index; // Lưu vị trí cần sửa
+        document.getElementById('inpName').value = events[index].name;
+        document.getElementById('inpDate').value = events[index].date;
+        showView('eventForm');
+    }
+
+    function showView(viewId) {
+        document.getElementById('eventList').classList.add('hidden');
+        document.getElementById('eventForm').classList.add('hidden');
+        document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    // 5. Hàm giả lập Đăng nhập & Phân quyền
+    function fakeLogin(user, role) {
+        currentRole = role;
+        document.getElementById('userDisplay').innerText = user;
+        
+        const badge = document.getElementById('roleDisplay');
+        badge.innerText = (role === 3) ? "ADMIN" : (role === 2 ? "BAN TỔ CHỨC" : "THÀNH VIÊN");
+        badge.className = "role-badge " + (role === 3 ? "bg-admin" : (role === 2 ? "bg-btc" : "bg-mem"));
+
+        // Ẩn hiện menu dựa trên quyền
+        document.getElementById('btcMenu').classList.toggle('hidden', role < 2);
+        
+        renderEvents();
+        showView('eventList');
+    }
+
+    // Khởi tạo bảng lần đầu
+    renderEvents();
+</script>
+
+</body>
+</html>
