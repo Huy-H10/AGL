@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Phân công Sự kiện</title>
+    <link rel="stylesheet" href="giaodien.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <nav class="menu" id="sideMenu">
+        <button onclick="showPage('listPage')"><i class="fas fa-users"></i> Danh sách phân công</button>
+        <button onclick="showPage('assignPage')" id="adminBtn"><i class="fas fa-user-plus"></i> Gán vai trò mới</button>
+    </nav>
+
+    <div id="listPage" class="page" style="display: block;">
+        <div class="card" style="max-width: 800px;">
+            <h2><i class="fas fa-clipboard-list"></i> Danh sách Phân công</h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Thành viên</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th class="admin-only">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignmentTable">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="assignPage" class="page">
+        <div class="card">
+            <h2 id="formTitle">Gán Vai trò Thành viên</h2>
+            <form id="assignmentForm">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div class="form-group">
+                    <label>Tên thành viên</label>
+                    <input type="text" id="memberName" placeholder="Nhập tên thành viên..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Vai trò</label>
+                    <select id="roleSelect" required>
+                        <option value="">-- Chọn vai trò --</option>
+                        <option value="Trưởng ban">Trưởng ban (Bắt buộc)</option>
+                        <option value="Hậu cần">Hậu cần</option>
+                        <option value="Truyền thông">Truyền thông</option>
+                        <option value="Kỹ thuật">Kỹ thuật</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Mức độ ưu tiên</label>
+                    <div class="status-options">
+                        <div class="status-tag active" onclick="setStatus(this, 'Thường')">Thường</div>
+                        <div class="status-tag" onclick="setStatus(this, 'Gấp')">Gấp</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="main">Lưu Phân công</button>
+                <button type="button" onclick="showPage('listPage')" style="margin-top:10px; background:none; color:#c0395e; border:none; width:100%; cursor:pointer;">Hủy bỏ</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        function createFlower() {
+            const flower = document.createElement('div');
+            flower.className = 'flower';
+            flower.innerHTML = '🌸';
+            flower.style.left = Math.random() * 100 + 'vw';
+            flower.style.animationDuration = Math.random() * 3 + 2 + 's';
+            document.body.appendChild(flower);
+            setTimeout(() => flower.remove(), 5000);
+        }
+        setInterval(createFlower, 500);
+    </script>
+
+    <script>
+        // --- QUẢN LÝ DỮ LIỆU & LOGIC ---
+        let assignments = [
+            { name: "Nguyễn Văn A", role: "Trưởng ban", priority: "Thường" },
+            { name: "Trần Thị B", role: "Hậu cần", priority: "Gấp" }
+        ];
+
+        // Giả lập phân quyền (true: Admin, false: Member)
+        const isAdmin = true; 
+
+        function toggleMenu() {
+            document.getElementById('sideMenu').classList.toggle('show');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById(pageId).style.display = 'block';
+            toggleMenu();
+            if(pageId === 'listPage') renderTable();
+            
+            // Kiểm tra quyền truy cập trang gán vai trò
+            if(pageId === 'assignPage' && !isAdmin) {
+                showToast("Bạn không có quyền thực hiện thao tác này!", "error");
+                showPage('listPage');
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('assignmentTable');
+            tbody.innerHTML = assignments.map((item, index) => `
+                <tr>
+                    <td><strong>${item.name}</strong></td>
+                    <td>${item.role}</td>
+                    <td><span class="status-tag active" style="padding: 2px 8px; font-size: 11px; background:${item.priority === 'Gấp' ? '#e74c3c' : '#2ecc71'}">${item.priority}</span></td>
+                    <td class="admin-only">
+                        ${isAdmin ? `
+                            <button onclick="editItem(${index})" style="color:#3498db; border:none; background:none; cursor:pointer;"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteItem(${index})" style="color:#e74c3c; border:none; background:none; cursor:pointer; margin-left:10px;"><i class="fas fa-trash"></i></button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Kiểm tra ràng buộc
+        document.getElementById('assignmentForm').onsubmit = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('memberName').value;
+            const role = document.getElementById('roleSelect').value;
+            const priority = document.querySelector('.status-tag.active').innerText;
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+
+            // 1. Kiểm tra trùng vai trò độc nhất (ví dụ: Trưởng ban)
+            if (role === "Trưởng ban") {
+                const existingLeader = assignments.find((a, idx) => a.role === "Trưởng ban" && idx !== editIndex);
+                if (existingLeader) {
+                    showToast("Sự kiện đã có Trưởng ban rồi!", "error");
+                    return;
+                }
+            }
+
+            // Lưu dữ liệu
+            if (editIndex > -1) {
+                assignments[editIndex] = { name, role, priority };
+                showToast("Cập nhật thành công!", "success");
+            } else {
+                assignments.push({ name, role, priority });
+                showToast("Gán vai trò thành công!", "success");
+            }
+
+            document.getElementById('assignmentForm').reset();
+            document.getElementById('editIndex').value = "-1";
+            showPage('listPage');
+        };
+
+        function editItem(index) {
+            const item = assignments[index];
+            document.getElementById('memberName').value = item.name;
+            document.getElementById('roleSelect').value = item.role;
+            document.getElementById('editIndex').value = index;
+            document.getElementById('formTitle').innerText = "Chỉnh sửa Phân công";
+            showPage('assignPage');
+        }
+
+        function deleteItem(index) {
+            if(confirm("Bạn có chắc chắn muốn xóa phân công này?")) {
+                assignments.splice(index, 1);
+                renderTable();
+                showToast("Đã xóa!", "success");
+            }
+        }
+
+        function setStatus(el, val) {
+            document.querySelectorAll('.status-tag').forEach(tag => tag.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        // Khởi tạo hiển thị
+        renderTable();
+        if(!isAdmin) document.getElementById('adminBtn').style.display = 'none';
+    </script>
+</body>
+</html>
