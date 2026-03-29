@@ -1,243 +1,564 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý sự kiện CLB</title>
-    <link rel="stylesheet" href="giaodien.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* Cấu trúc Layout cố định Sidebar */
-        body { display: flex; margin: 0; padding: 0; overflow: hidden; height: 100vh; }
-        
-        /* Sidebar giữ nguyên từ ảnh giao diện chính */
-        .sidebar {
-            width: 240px;
-            background: linear-gradient(180deg, #ff8fab, #ff6a88);
-            display: flex;
-            flex-direction: column;
-            padding: 20px 10px;
-            flex-shrink: 0;
-            z-index: 1000;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phụ trách nhiệm vụ sự kiện - CLB</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
 
-        .sidebar button {
-            background: white;
-            color: #ff6a88;
-            border: none;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            border-radius: 12px;
-            text-align: left;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; }
 
-        .sidebar button:hover { background: #fff0f3; }
-        .sidebar button.active { background: #ffe0ea; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
+    body {
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-        /* Vùng nội dung bên phải có thanh Top Bar cố định */
-        .main-wrapper {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            background: linear-gradient(135deg,#ff9a9e,#fad0c4);
-            overflow-y: auto;
-        }
+    /* ===== MENU (đồng bộ hoàn toàn với Giaodienquanlysukienclb.html) ===== */
+    .menu-toggle {
+      position: fixed; top: 15px; left: 15px;
+      font-size: 26px; background: #ff6a88; color: #fff;
+      padding: 8px 13px; border-radius: 12px; cursor: pointer;
+      z-index: 1000; box-shadow: 0 4px 12px rgba(255,106,136,.4);
+    }
 
-        .top-bar {
-            height: 60px;
-            background: white;
-            display: flex;
-            align-items: center;
-            padding: 0 25px;
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
+    .menu {
+      position: fixed; top: 0; left: -270px; width: 240px; height: 100%;
+      background: linear-gradient(180deg, #ff6a88, #ff8fab);
+      padding-top: 70px; display: flex; flex-direction: column;
+      gap: 8px; transition: .3s; z-index: 999;
+    }
+    .menu.show { left: 0; }
 
-        .search-container {
-            background: #fdf2f4;
-            border: 1px solid #ffe0ea;
-            padding: 8px 20px;
-            border-radius: 25px;
-            width: 500px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .menu button {
+      margin: 0 12px; padding: 11px 14px; border: none;
+      border-radius: 12px; background: rgba(255,255,255,.9);
+      cursor: pointer; text-align: left; font-weight: 600;
+      color: #c0395e; transition: .2s;
+    }
+    .menu button:hover { background: #fff; transform: translateX(4px); }
+    .menu button.current { background: #fff; border-left: 3px solid #e84393; }
 
-        .search-container input {
-            border: none; background: none; outline: none; width: 100%; padding: 0;
-        }
+    /* ===== LAYOUT ===== */
+    .page-wrapper {
+      padding: 80px 20px 40px;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-        /* Ghi đè class .page để phù hợp với layout mới */
-        .page { padding: 40px 20px; width: 100%; }
-    </style>
+    .card {
+      background: rgba(255,255,255,.97);
+      padding: 30px; border-radius: 24px;
+      max-width: 860px; margin: 0 auto;
+      box-shadow: 0 16px 48px rgba(255,105,180,.2);
+    }
+
+    h2 {
+      text-align: center; color: #e84393; margin-bottom: 6px;
+      font-family: 'Quicksand'; font-size: 22px; font-weight: 700;
+    }
+    .page-subtitle {
+      text-align: center; color: #ffaabf; font-size: 13px; margin-bottom: 26px;
+    }
+
+    /* ===== FORM ===== */
+    .form-group { margin-bottom: 14px; text-align: left; }
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 700;
+      color: #c0395e; margin-bottom: 5px;
+    }
+    .required { color: #ff4d88; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    input, select, textarea {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid #ffe0ea; border-radius: 12px;
+      background: #fff9fb; outline: none; transition: 0.2s;
+      font-family: 'Nunito', sans-serif; font-size: 14px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #ff6a88; box-shadow: 0 0 0 3px rgba(255,106,136,.1);
+    }
+    textarea { resize: vertical; min-height: 72px; }
+
+    .err-msg { font-size: 12px; color: #ff6b6b; display: none; margin-top: 4px; }
+    .err-msg.show { display: block; }
+    input.error, select.error { border-color: #ff6b6b !important; }
+
+    /* ===== CÔNG VIỆC TAGS ===== */
+    .cv-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .cv-tag {
+      padding: 7px 15px; border: 2px solid #ffe0ea; border-radius: 20px;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      background: #fff; color: #c0395e; transition: .18s; user-select: none;
+    }
+    .cv-tag:hover { border-color: #ff6a88; background: #fff0f5; }
+    .cv-tag.active { background: #ff6a88; color: #fff; border-color: #ff6a88; }
+
+    /* ===== BUTTONS ===== */
+    .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+    button.main {
+      flex: 1; padding: 13px; min-width: 140px;
+      background: linear-gradient(135deg, #ff6a88, #e84393);
+      color: #fff; border: none; border-radius: 14px;
+      font-weight: 700; cursor: pointer; transition: 0.3s;
+      font-family: 'Nunito', sans-serif; font-size: 14px;
+    }
+    button.main:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,106,136,.4); }
+
+    button.btn-reset {
+      padding: 13px 22px; background: #fff0f5; color: #e84393;
+      border: 2px solid #ffccd9; border-radius: 14px;
+      font-weight: 700; cursor: pointer; transition: 0.2s;
+      font-family: 'Nunito', sans-serif; font-size: 14px;
+    }
+    button.btn-reset:hover { background: #ffe0ea; }
+
+    /* ===== TABLE ===== */
+    .table-container { overflow-x: auto; margin-top: 15px; border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 14px; overflow: hidden; min-width: 600px; }
+    th, td { padding: 12px 14px; text-align: center; border-bottom: 1px solid #fce8f0; }
+    th { background: #ffe0ea; color: #c0395e; font-weight: 700; font-size: 13px; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fff9fb; }
+
+    /* ===== BADGES ===== */
+    .badge-cv {
+      display: inline-block; padding: 4px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 700;
+    }
+    .badge-HauCan      { background: #ffeaa7; color: #d6a600; }
+    .badge-AmThanh     { background: #dfe6e9; color: #636e72; }
+    .badge-TruyenThong { background: #a29bfe33; color: #6c5ce7; }
+    .badge-TrangTri    { background: #fd79a833; color: #e84393; }
+    .badge-LeTan       { background: #55efc433; color: #00b894; }
+    .badge-KyThuat     { background: #74b9ff33; color: #0984e3; }
+    .badge-VanNghe     { background: #fdcb6e33; color: #e17055; }
+    .badge-Khac        { background: #f0f0f0; color: #888; }
+
+    .badge-chuaxong  { background: #ffeaa7; color: #d6a600; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display:inline-block; }
+    .badge-dangxong  { background: #74b9ff33; color: #0984e3; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display:inline-block; }
+    .badge-hoanthanh { background: #55efc433; color: #00b894; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display:inline-block; }
+
+    .btn-edit { background: #ff9f43; color: #fff; border: none; padding: 5px 11px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-right: 4px; }
+    .btn-del  { background: #ff4757; color: #fff; border: none; padding: 5px 11px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+
+    /* ===== MODAL GHI CHÚ ===== */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.3); z-index: 2000;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 20px; padding: 28px;
+      width: 90%; max-width: 400px;
+      box-shadow: 0 20px 60px rgba(255,106,136,.25);
+      animation: fadeIn .25s;
+    }
+    .modal-box h3 { color: #e84393; font-family: 'Quicksand'; margin-bottom: 14px; font-size: 17px; }
+    .modal-box textarea { width: 100%; min-height: 110px; margin-bottom: 14px; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; bottom: 25px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 12px 25px; border-radius: 12px;
+      color: #fff; font-weight: 700; transition: 0.4s;
+      z-index: 10001; opacity: 0; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2ecc71; }
+    .toast.error   { background: #e74c3c; }
+
+    /* ===== HOA RƠI ===== */
+    .flower {
+      position: fixed; top: -50px; font-size: 20px;
+      animation: fall linear infinite; pointer-events: none; z-index: 0;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-50px) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
+    }
+
+    .section-divider { border: none; border-top: 2px dashed #ffe0ea; margin: 22px 0; }
+
+    .empty-state {
+      text-align: center; padding: 32px 0; color: #ffb3c6; font-size: 14px;
+    }
+    .empty-state span { display: block; font-size: 36px; margin-bottom: 8px; }
+  </style>
 </head>
 <body>
 
-    <aside class="sidebar" id="mainSidebar">
-        <div style="color: white; font-size: 24px; margin-bottom: 25px; padding-left: 10px;">
-            <i class="fas fa-bars"></i>
-        </div>
-        <button onclick="goHome()" id="btnHome"><i class="fas fa-home"></i> Trang chủ</button>
-        <button><i class="fas fa-plus"></i> Tạo sự kiện</button>
-        <button><i class="fas fa-wallet"></i> Quản lý ngân sách</button>
-        <button><i class="fas fa-calendar-alt"></i> Quản lý sự kiện</button>
-        <button onclick="showPage('listPage')" id="btnAssign"><i class="fas fa-user-tag"></i> Phân chia vai trò</button>
-        <button><i class="fas fa-users"></i> Người tham gia</button>
-        <button><i class="fas fa-search-plus"></i> Quản lý chi tiết</button>
-        <button><i class="fas fa-hand-holding-heart"></i> Tham gia</button>
-        <button><i class="fas fa-lock"></i> Đăng nhập / Đăng ký</button>
-        <button style="margin-top: auto; background: rgba(255,255,255,0.3); color: white;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
-    </aside>
+  <!-- ===== MENU TOGGLE ===== -->
+  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
 
-    <div class="main-wrapper">
-        <div class="top-bar">
-            <div class="search-container">
-                <i class="fas fa-search" style="color: #ff8fab;"></i>
-                <input type="text" placeholder="Tìm kiếm: trang, sự kiện, người tham gia...">
-            </div>
-        </div>
-
-        <main id="homePage" class="page" style="display: block;">
-            <div style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
-                <div class="card" style="text-align: center; padding: 50px; border-radius: 30px;">
-                    <h2 style="color: #ff6a88;"><i class="fas fa-flower"></i> Quản lý sự kiện CLB <i class="fas fa-flower"></i></h2>
-                    <p style="margin: 20px 0; font-size: 18px; color: #c0395e;">Xin chào <b>Minh Khôi (admin)</b></p>
-                    <p style="color: #999;">Hệ thống quản lý sự kiện dành cho thành viên CLB.</p>
-                </div>
-            </div>
-        </main>
-
-        <main id="listPage" class="page" style="display: none;">
-            <div class="card" style="max-width: 900px;">
-                <div style="margin-bottom: 20px;">
-                    <button onclick="goHome()" style="background: #fff0f3; border: 1px solid #ff6a88; color: #ff6a88; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;">
-                        <i class="fas fa-arrow-left"></i> Quay lại Trang chủ
-                    </button>
-                </div>
-
-                <h2>Phụ trách nhiệm vụ sự kiện</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Thành viên</th>
-                            <th>Phụ trách công việc</th>
-                            <th>Hạn hoàn thành</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="assignmentTable"></tbody>
-                </table>
-                <button class="main" style="margin-top: 25px;" onclick="showPage('formPage')">
-                    <i class="fas fa-plus"></i> Thêm phân công mới
-                </button>
-            </div>
-        </main>
-
-        <main id="formPage" class="page" style="display: none;">
-            <div class="card">
-                <button onclick="showPage('listPage')" style="background: none; border: none; color: #ff6a88; cursor: pointer; margin-bottom: 15px;">
-                    <i class="fas fa-chevron-left"></i> Quay lại danh sách
-                </button>
-                <h2>Phân chia nhiệm vụ</h2>
-                <div class="form-group">
-                    <label>Tên thành viên</label>
-                    <input type="text" id="memberName">
-                </div>
-                <div class="form-group">
-                    <label>Công việc phụ trách</label>
-                    <select id="taskWork">
-                        <option value="Hậu cần">Hậu cần</option>
-                        <option value="Kỹ thuật">Kỹ thuật</option>
-                        <option value="Truyền thông">Truyền thông</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Hạn hoàn thành</label>
-                    <input type="date" id="taskDeadline">
-                </div>
-                <button class="main" onclick="saveData()">Lưu thông tin</button>
-            </div>
-        </main>
+  <!-- ===== MENU (đồng bộ hoàn toàn với Giaodienquanlysukienclb.html) ===== -->
+  <div class="menu" id="menu">
+    <div style="position:fixed; top:15px; left:70px; right:15px; z-index:1000;">
+      <input
+        type="text"
+        id="globalSearch"
+        placeholder="🔍 Tìm kiếm: thành viên, công việc..."
+        style="width:100%; padding:10px 15px; border-radius:20px; border:none; outline:none; box-shadow:0 4px 12px rgba(0,0,0,0.15);"
+        oninput="globalSearchFunction()"
+      >
     </div>
+    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🏠 Trang chủ</button>
+    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">➕ Tạo sự kiện</button>
+    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">📋 Quản lý sự kiện</button>
+    <button class="current">📋 Phân chia vai trò</button>
+    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">📑 Người tham gia</button>
+    <button onclick="window.location.href='XemSuaXuatDanhSach.html'">🔍 Quản lý chi tiết</button>
+    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🙋 Tham gia</button>
+    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🔐 Đăng nhập / Đăng ký</button>
+    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🚪 Đăng xuất</button>
+  </div>
 
-    <div id="flowerContainer"></div>
-    <div id="toast" class="toast"></div>
+  <!-- ===== NỘI DUNG CHÍNH ===== -->
+  <div class="page-wrapper">
+    <div class="card">
 
-    <script>
-        let tasks = [{name: "Minh Khôi", work: "Quản lý chung", deadline: "2026-12-31"}];
+      <!-- [YC2] Tiêu đề mới -->
+      <h2>🌸 Phụ trách nhiệm vụ sự kiện 🌸</h2>
+      <p class="page-subtitle">Phân công công việc cho từng thành viên phụ trách</p>
 
-        // Hàm chuyển trang mà không làm mất Menu
-        function showPage(pageId) {
-            // Ẩn tất cả main nội dung
-            document.querySelectorAll('main.page').forEach(p => p.style.display = 'none');
-            // Hiện trang được chọn
-            document.getElementById(pageId).style.display = 'block';
+      <!-- ===== FORM THÊM / SỬA ===== -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tên thành viên <span class="required">*</span></label>
+          <input id="inp_name" type="text" placeholder="VD: Nguyễn Văn A">
+          <div class="err-msg" id="errName">Vui lòng nhập tên thành viên!</div>
+        </div>
+        <div class="form-group">
+          <label>Sự kiện <span class="required">*</span></label>
+          <select id="inp_event">
+            <option value="">-- Chọn sự kiện --</option>
+          </select>
+          <div class="err-msg" id="errEvent">Vui lòng chọn sự kiện!</div>
+        </div>
+      </div>
 
-            // Cập nhật trạng thái Active trên Sidebar
-            document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
-            if(pageId === 'homePage') document.getElementById('btnHome').classList.add('active');
-            if(pageId === 'listPage' || pageId === 'formPage') document.getElementById('btnAssign').classList.add('active');
-        }
+      <!-- [YC3] Phụ trách công việc (tags) -->
+      <div class="form-group">
+        <label>Phụ trách công việc <span class="required">*</span></label>
+        <div class="cv-tags">
+          <div class="cv-tag" data-val="Hậu cần"      onclick="chonCongViec(this)">🚚 Hậu cần</div>
+          <div class="cv-tag" data-val="Âm thanh"     onclick="chonCongViec(this)">🎵 Âm thanh</div>
+          <div class="cv-tag" data-val="Truyền thông" onclick="chonCongViec(this)">📣 Truyền thông</div>
+          <div class="cv-tag" data-val="Trang trí"    onclick="chonCongViec(this)">🎀 Trang trí</div>
+          <div class="cv-tag" data-val="Lễ tân"       onclick="chonCongViec(this)">🤝 Lễ tân</div>
+          <div class="cv-tag" data-val="Kỹ thuật"     onclick="chonCongViec(this)">🔧 Kỹ thuật</div>
+          <div class="cv-tag" data-val="Văn nghệ"     onclick="chonCongViec(this)">🎭 Văn nghệ</div>
+          <div class="cv-tag" data-val="Khác"         onclick="chonCongViec(this)">📌 Khác</div>
+        </div>
+        <div class="err-msg" id="errCongViec">Vui lòng chọn công việc phụ trách!</div>
+      </div>
 
-        // Quay lại giao diện chính (Trang Dashboard)
-        function goHome() {
-            showPage('homePage');
-        }
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hạn hoàn thành <span class="required">*</span></label>
+          <input id="inp_deadline" type="date">
+          <div class="err-msg" id="errDeadline">Vui lòng chọn hạn hoàn thành!</div>
+        </div>
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select id="inp_status">
+            <option value="Chưa xong">🟡 Chưa xong</option>
+            <option value="Đang làm">🔵 Đang làm</option>
+            <option value="Hoàn thành">🟢 Hoàn thành</option>
+          </select>
+        </div>
+      </div>
 
-        function renderTable() {
-            const tbody = document.getElementById('assignmentTable');
-            tbody.innerHTML = tasks.map((t, i) => `
-                <tr>
-                    <td><b>${t.name}</b></td>
-                    <td><span class="status-tag active">${t.work}</span></td>
-                    <td>${t.deadline}</td>
-                    <td>
-                        <i class="fas fa-trash" onclick="deleteTask(${i})" style="color:#e74c3c; cursor:pointer;"></i>
-                    </td>
-                </tr>
-            `).join('');
-        }
+      <!-- [YC4] Ghi chú nhiệm vụ — tính năng mới phù hợp -->
+      <div class="form-group">
+        <label>📝 Ghi chú nhiệm vụ</label>
+        <textarea id="inp_note" placeholder="Mô tả chi tiết công việc, yêu cầu, lưu ý cần thực hiện..."></textarea>
+      </div>
 
-        function saveData() {
-            const name = document.getElementById('memberName').value;
-            const work = document.getElementById('taskWork').value;
-            const deadline = document.getElementById('taskDeadline').value;
-            if(!name || !deadline) return alert("Vui lòng nhập đủ!");
-            
-            tasks.push({name, work, deadline});
-            renderTable();
-            showPage('listPage');
-        }
+      <div class="btn-row">
+        <button class="btn-reset" onclick="resetForm()">🔄 Nhập lại</button>
+        <button class="main" onclick="luuPhanCong()">💾 Lưu phân công</button>
+      </div>
 
-        function deleteTask(i) {
-            tasks.splice(i, 1);
-            renderTable();
-        }
+      <hr class="section-divider">
 
-        // Hiệu ứng hoa rơi
-        function createFlowers() {
-            const container = document.getElementById('flowerContainer');
-            setInterval(() => {
-                const f = document.createElement('div');
-                f.className = 'flower'; f.innerText = '🌸';
-                f.style.left = Math.random() * 100 + 'vw';
-                f.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                container.appendChild(f);
-                setTimeout(() => f.remove(), 5000);
-            }, 1000);
-        }
+      <!-- ===== BẢNG DANH SÁCH ===== -->
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <strong style="color:#c0395e; font-size:15px;">📋 Danh sách phân công</strong>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <input id="searchBox" type="text" placeholder="🔍 Tìm tên, công việc..."
+            style="padding:8px 14px; border-radius:20px; border:2px solid #ffe0ea; outline:none; font-size:13px; width:200px; background:#fff9fb;"
+            oninput="renderTable()">
+          <button onclick="xuatCSV()" style="padding:8px 16px; background:#8e44ad; color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:700; font-size:13px;">📥 Xuất CSV</button>
+        </div>
+      </div>
 
-        renderTable();
-        createFlowers();
-        goHome(); // Khởi tạo ở trang chủ
-    </script>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Thành viên</th>
+              <th>Sự kiện</th>
+              <th>Phụ trách công việc</th>
+              <th>Hạn HT</th>
+              <th>Trạng thái</th>
+              <th>Ghi chú</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="assignTable"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== MODAL XEM GHI CHÚ ===== -->
+  <div class="modal-overlay" id="modalNote">
+    <div class="modal-box">
+      <h3>📝 Ghi chú nhiệm vụ</h3>
+      <textarea id="modalNoteText" readonly style="background:#fff9fb; color:#555;"></textarea>
+      <div style="display:flex; gap:10px;">
+        <button class="main" onclick="dongModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* ===== DATA ===== */
+    let assignments = JSON.parse(localStorage.getItem('assignments')) || [];
+    let editingIdx  = -1;
+    let selectedCV  = '';
+
+    /* ===== HOA RƠI ===== */
+    setInterval(() => {
+      const f = document.createElement('div');
+      f.className = 'flower'; f.innerHTML = '🌸';
+      f.style.left = Math.random() * 100 + 'vw';
+      f.style.animationDuration = (3 + Math.random() * 5) + 's';
+      document.body.appendChild(f);
+      setTimeout(() => f.remove(), 8000);
+    }, 300);
+
+    /* ===== MENU ===== */
+    function toggleMenu() {
+      document.getElementById('menu').classList.toggle('show');
+    }
+
+    /* ===== LOAD SỰ KIỆN TỪ localStorage (đồng bộ data với trang chính) ===== */
+    function loadEvents() {
+      const events = JSON.parse(localStorage.getItem('events')) || [];
+      const sel = document.getElementById('inp_event');
+      sel.innerHTML = '<option value="">-- Chọn sự kiện --</option>';
+      events.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.t;
+        opt.textContent = e.t;
+        sel.appendChild(opt);
+      });
+    }
+
+    /* ===== CHỌN CÔNG VIỆC TAG ===== */
+    function chonCongViec(el) {
+      document.querySelectorAll('.cv-tag').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      selectedCV = el.dataset.val;
+      document.getElementById('errCongViec').classList.remove('show');
+    }
+
+    /* ===== VALIDATE & LƯU ===== */
+    function luuPhanCong() {
+      ['errName','errEvent','errCongViec','errDeadline'].forEach(id =>
+        document.getElementById(id).classList.remove('show'));
+      ['inp_name','inp_event','inp_deadline'].forEach(id =>
+        document.getElementById(id).classList.remove('error'));
+
+      const name     = document.getElementById('inp_name').value.trim();
+      const event    = document.getElementById('inp_event').value;
+      const deadline = document.getElementById('inp_deadline').value;
+      const status   = document.getElementById('inp_status').value;
+      const note     = document.getElementById('inp_note').value.trim();
+
+      let valid = true;
+      if (!name)       { document.getElementById('errName').classList.add('show');     document.getElementById('inp_name').classList.add('error');     valid = false; }
+      if (!event)      { document.getElementById('errEvent').classList.add('show');    document.getElementById('inp_event').classList.add('error');    valid = false; }
+      if (!selectedCV) { document.getElementById('errCongViec').classList.add('show'); valid = false; }
+      if (!deadline)   { document.getElementById('errDeadline').classList.add('show'); document.getElementById('inp_deadline').classList.add('error'); valid = false; }
+      if (!valid) return;
+
+      const obj = { name, event, congViec: selectedCV, deadline, status, note };
+
+      if (editingIdx >= 0) {
+        assignments[editingIdx] = obj;
+        editingIdx = -1;
+        showToast('✅ Đã cập nhật phân công!');
+      } else {
+        assignments.push(obj);
+        showToast('🎉 Phân công thành công!');
+      }
+
+      localStorage.setItem('assignments', JSON.stringify(assignments));
+      resetForm();
+      renderTable();
+    }
+
+    /* ===== RESET FORM ===== */
+    function resetForm() {
+      document.getElementById('inp_name').value     = '';
+      document.getElementById('inp_event').value    = '';
+      document.getElementById('inp_deadline').value = '';
+      document.getElementById('inp_status').value   = 'Chưa xong';
+      document.getElementById('inp_note').value     = '';
+      document.querySelectorAll('.cv-tag').forEach(t => t.classList.remove('active'));
+      selectedCV = ''; editingIdx = -1;
+      ['errName','errEvent','errCongViec','errDeadline'].forEach(id =>
+        document.getElementById(id).classList.remove('show'));
+      ['inp_name','inp_event','inp_deadline'].forEach(id =>
+        document.getElementById(id).classList.remove('error'));
+    }
+
+    /* ===== HELPER: CSS CLASS CHO BADGE ===== */
+    function cvClass(cv) {
+      const map = {
+        'Hậu cần':'HauCan','Âm thanh':'AmThanh','Truyền thông':'TruyenThong',
+        'Trang trí':'TrangTri','Lễ tân':'LeTan','Kỹ thuật':'KyThuat',
+        'Văn nghệ':'VanNghe','Khác':'Khac'
+      };
+      return map[cv] || 'Khac';
+    }
+    function statusClass(s) {
+      if (s === 'Hoàn thành') return 'hoanthanh';
+      if (s === 'Đang làm')   return 'dangxong';
+      return 'chuaxong';
+    }
+    function statusIcon(s) {
+      if (s === 'Hoàn thành') return '🟢';
+      if (s === 'Đang làm')   return '🔵';
+      return '🟡';
+    }
+
+    /* ===== RENDER BẢNG ===== */
+    function renderTable() {
+      const kw    = (document.getElementById('searchBox').value || '').toLowerCase();
+      const tbody = document.getElementById('assignTable');
+
+      const list = assignments
+        .map((a, i) => ({ ...a, _idx: i }))
+        .filter(a =>
+          a.name.toLowerCase().includes(kw) ||
+          a.congViec.toLowerCase().includes(kw) ||
+          (a.event || '').toLowerCase().includes(kw)
+        );
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8">
+          <div class="empty-state"><span>📋</span>Chưa có phân công nào. Hãy thêm mới!</div>
+        </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map((a, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="font-weight:700; color:#2c3e50;">${a.name}</td>
+          <td style="font-size:13px;">${a.event || '—'}</td>
+          <td><span class="badge-cv badge-${cvClass(a.congViec)}">${a.congViec}</span></td>
+          <td style="font-size:13px;">${a.deadline}</td>
+          <td><span class="badge-${statusClass(a.status)}">${statusIcon(a.status)} ${a.status}</span></td>
+          <td>
+            ${a.note
+              ? `<button onclick="xemGhiChu(${a._idx})" style="background:none;border:none;cursor:pointer;color:#e84393;font-size:13px;font-weight:700;padding:0;">📝 Xem</button>`
+              : '<span style="color:#ddd;font-size:12px;">—</span>'}
+          </td>
+          <td style="white-space:nowrap;">
+            <button class="btn-edit" onclick="suaPhanCong(${a._idx})">✏️</button>
+            <button class="btn-del"  onclick="xoaPhanCong(${a._idx})">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /* ===== SỬA ===== */
+    function suaPhanCong(idx) {
+      const a = assignments[idx];
+      editingIdx = idx;
+      document.getElementById('inp_name').value     = a.name;
+      document.getElementById('inp_event').value    = a.event;
+      document.getElementById('inp_deadline').value = a.deadline;
+      document.getElementById('inp_status').value   = a.status;
+      document.getElementById('inp_note').value     = a.note || '';
+      document.querySelectorAll('.cv-tag').forEach(t =>
+        t.classList.toggle('active', t.dataset.val === a.congViec));
+      selectedCV = a.congViec;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ===== XÓA ===== */
+    function xoaPhanCong(idx) {
+      if (!confirm('Xóa phân công này?')) return;
+      assignments.splice(idx, 1);
+      localStorage.setItem('assignments', JSON.stringify(assignments));
+      renderTable();
+      showToast('🗑️ Đã xóa phân công!', 'error');
+    }
+
+    /* ===== [YC4] XEM GHI CHÚ (Modal) ===== */
+    function xemGhiChu(idx) {
+      document.getElementById('modalNoteText').value = assignments[idx].note || '(Không có ghi chú)';
+      document.getElementById('modalNote').classList.add('show');
+    }
+    function dongModal() {
+      document.getElementById('modalNote').classList.remove('show');
+    }
+    document.getElementById('modalNote').addEventListener('click', function(e) {
+      if (e.target === this) dongModal();
+    });
+
+    /* ===== XUẤT CSV ===== */
+    function xuatCSV() {
+      if (assignments.length === 0) return showToast('Không có dữ liệu để xuất!', 'error');
+      let csv = '\uFEFFSTT,Thành viên,Sự kiện,Phụ trách công việc,Hạn hoàn thành,Trạng thái,Ghi chú\n';
+      assignments.forEach((a, i) => {
+        csv += `${i+1},"${a.name}","${a.event}","${a.congViec}","${a.deadline}","${a.status}","${(a.note||'').replace(/"/g,"'")}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'phan_cong_su_kien.csv';
+      link.click();
+      showToast('📥 Xuất CSV thành công!');
+    }
+
+    /* ===== GLOBAL SEARCH ===== */
+    function globalSearchFunction() {
+      const kw = document.getElementById('globalSearch').value.toLowerCase().trim();
+      document.getElementById('searchBox').value = kw;
+      renderTable();
+      document.getElementById('menu').classList.remove('show');
+    }
+
+    /* ===== TOAST ===== */
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    /* ===== INIT ===== */
+    loadEvents();
+    renderTable();
+  </script>
 </body>
 </html>
