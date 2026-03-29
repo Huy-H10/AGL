@@ -705,11 +705,11 @@
         return showToast("❌ Email phải có đuôi @gmail.com!", "error");
       }
 
-      // Kiểm tra trùng MSSV
-      if (participants.some(p => p.mssv === mssv)) {
-        return showToast("❌ MSSV đã tồn tại!", "error");
+      // Kiểm tra trùng MSSV trong cùng sự kiện
+      if (participants.some(p => p.mssv === mssv && p.event === peventSelect.value)) {
+        return showToast("❌ MSSV này đã đăng ký sự kiện này rồi!", "error");
       }
-
+      
       // Kiểm tra trùng Email
       if (participants.some(p => p.email === email)) {
         return showToast("❌ Email đã tồn tại!", "error");
