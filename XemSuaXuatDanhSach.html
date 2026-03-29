@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Sự Kiện - Lưu Trữ Nội Bộ</title>
+    <title>Hệ Thống Quản Lý Chi Tiết & Điểm Danh</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
         .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0; }
-        .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 25px; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; }
+        h2 { color: #e84393; text-align: center; border-bottom: 3px solid #ff6a88; padding-bottom: 15px; margin-top: 0; }
+        .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 25px; background: #fff5f7; padding: 20px; border-radius: 8px; border: 1px solid #ffe0ea; }
         input, select { padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 14px; outline: none; }
         .btn-group { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #fff; padding: 10px 0; position: sticky; top: 0; z-index: 10; }
         button { padding: 10px 18px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.2s; color: white; }
-        .btn-add { background-color: #27ae60; }
+        .btn-add { background-color: #ff6a88; }
         .btn-export { background-color: #8e44ad; }
+        .btn-back { background-color: #34495e; text-decoration: none; display: inline-block; text-align: center; font-size: 14px; }
         .btn-edit { background-color: #2980b9; padding: 6px 12px; font-size: 12px; }
         .btn-delete { background-color: #e74c3c; padding: 6px 12px; font-size: 12px; }
-        .table-container { overflow-x: auto; max-height: 500px; border: 1px solid #eee; }
+        .table-container { overflow-x: auto; max-height: 500px; border: 1px solid #eee; border-radius: 8px; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background-color: #34495e; color: white; position: sticky; top: 0; padding: 15px; text-align: left; }
+        th { background-color: #ff6a88; color: white; position: sticky; top: 0; padding: 15px; text-align: left; }
         td { border-bottom: 1px solid #eee; padding: 12px; font-size: 14px; }
         .status-checkin { color: #27ae60; background: #eafaf1; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
         .status-not { color: #e67e22; background: #fef5e7; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
@@ -28,28 +29,28 @@
 <body>
 
 <div class="container">
-    <h2>Quản Lý Người Tham Gia (Tự Động Lưu)</h2>
+    <h2>🔍 Quản Lý Chi Tiết & Điểm Danh</h2>
 
     <div class="form-group">
         <input type="text" id="hoTen" placeholder="Họ và tên">
-        <input type="text" id="mssv" placeholder="Mã số sinh viên (MSSV)">
-        <input type="email" id="email" placeholder="Email">
-        <input type="text" id="sdt" placeholder="Số điện thoại">
+        <input type="text" id="mssv" placeholder="MSSV">
+        <input type="text" id="event" placeholder="Tên sự kiện" readonly style="background: #eee;">
         <select id="trangThai">
             <option value="Chưa Check-in">Chưa Check-in</option>
             <option value="Đã Check-in">Đã Check-in</option>
         </select>
-        <button class="btn-add" onclick="themThanhVien()">Thêm / Cập Nhật</button>
+        <button class="btn-add" onclick="capNhatThanhVien()">Lưu Thay Đổi</button>
     </div>
 
     <div class="btn-group">
-        <input type="text" id="searchKey" placeholder="Tìm kiếm theo Tên hoặc MSSV..." oninput="filterData()">
+        <a href="Giaodienquanlysukienclb.html" class="btn-back">🏠 Quay lại trang chủ</a>
+        <input type="text" id="searchKey" placeholder="Tìm nhanh theo Tên hoặc MSSV..." oninput="filterData()">
         <select id="filterStatus" onchange="filterData()">
             <option value="All">Tất cả trạng thái</option>
             <option value="Chưa Check-in">Chưa Check-in</option>
             <option value="Đã Check-in">Đã Check-in</option>
         </select>
-        <button class="btn-export" onclick="xuatFile()">Xuất Danh Sách (CSV)</button>
+        <button class="btn-export" onclick="xuatFile()">📥 Xuất Excel (CSV)</button>
     </div>
 
     <div class="table-container">
@@ -59,8 +60,7 @@
                     <th>STT</th>
                     <th>Họ Tên</th>
                     <th>MSSV</th>
-                    <th>Email</th>
-                    <th>SĐT</th>
+                    <th>Sự kiện</th>
                     <th>Trạng Thái</th>
                     <th>Thao Tác</th>
                 </tr>
@@ -73,16 +73,10 @@
 <script>
     let danhSach = [];
     let editIndex = -1;
-    const STORAGE_KEY = 'DANH_SACH_SU_KIEN_APP';
+    // ĐÃ ĐỔI ĐỂ KHỚP VỚI FILE CHÍNH
+    const STORAGE_KEY = 'participants';
 
-    // --- CƠ CHẾ LƯU TRỮ ---
-
-    // 1. Lưu mảng danhSach vào localStorage
-    function luuVaoBoNho() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(danhSach));
-    }
-
-    // 2. Tải dữ liệu từ localStorage khi mở trang
+    // Tải dữ liệu từ LocalStorage của file chính
     function taiDuLieu() {
         const dataRaw = localStorage.getItem(STORAGE_KEY);
         if (dataRaw) {
@@ -91,64 +85,26 @@
         }
     }
 
-    // Tự động gọi hàm tải dữ liệu ngay khi trang web được nạp xong
     window.onload = taiDuLieu;
-
-    // --- CÁC HÀM XỬ LÝ NGHIỆP VỤ ---
-
-    function themThanhVien() {
-        const values = {
-            hoTen: document.getElementById('hoTen').value.trim(),
-            mssv: document.getElementById('mssv').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            sdt: document.getElementById('sdt').value.trim(),
-            trangThai: document.getElementById('trangThai').value
-        };
-
-        if (!values.hoTen || !values.mssv) {
-            alert("Vui lòng nhập Họ tên và MSSV!");
-            return;
-        }
-
-        if (editIndex === -1) {
-            danhSach.push(values);
-        } else {
-            danhSach[editIndex] = values;
-            editIndex = -1;
-            document.querySelector('.btn-add').innerText = "Thêm / Cập Nhật";
-        }
-
-        luuVaoBoNho(); // QUAN TRỌNG: Lưu lại sau khi thêm/sửa
-        clearForm();
-        filterData();
-    }
-
-    function xoaThanhVien(index) {
-        if (confirm("Bạn có chắc chắn muốn xóa?")) {
-            danhSach.splice(index, 1);
-            luuVaoBoNho(); // QUAN TRỌNG: Lưu lại sau khi xóa
-            filterData();
-        }
-    }
 
     function hienThiDanhSach(data) {
         const tableBody = document.getElementById('tableBody');
         if (data.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Trống</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Chưa có người đăng ký</td></tr>`;
             return;
         }
 
         tableBody.innerHTML = data.map((item, index) => {
-            const statusClass = (item.trangThai === 'Đã Check-in') ? 'status-checkin' : 'status-not';
-            const realIdx = danhSach.findIndex(d => d.mssv === item.mssv);
+            const statusClass = (item.status === 'Đã Check-in') ? 'status-checkin' : 'status-not';
+            // Tìm index thật trong mảng gốc để sửa/xóa chính xác
+            const realIdx = danhSach.findIndex(d => d.mssv === item.mssv && d.event === item.event);
             return `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${item.hoTen}</td>
+                    <td>${item.name || item.hoTen}</td>
                     <td>${item.mssv}</td>
-                    <td>${item.email}</td>
-                    <td>${item.sdt}</td>
-                    <td><span class="${statusClass}">${item.trangThai}</span></td>
+                    <td><small>${item.event}</small></td>
+                    <td><span class="${statusClass}">${item.status || 'Chưa Check-in'}</span></td>
                     <td>
                         <button class="btn-edit" onclick="chuanBiSua(${realIdx})">Sửa</button>
                         <button class="btn-delete" onclick="xoaThanhVien(${realIdx})">Xóa</button>
@@ -157,45 +113,74 @@
         }).join('');
     }
 
+    function chuanBiSua(index) {
+        const item = danhSach[index];
+        document.getElementById('hoTen').value = item.name || item.hoTen;
+        document.getElementById('mssv').value = item.mssv;
+        document.getElementById('event').value = item.event;
+        document.getElementById('trangThai').value = item.status || "Chưa Check-in";
+        editIndex = index;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function capNhatThanhVien() {
+        if (editIndex === -1) {
+            alert("Vui lòng nhấn nút 'Sửa' ở bảng bên dưới trước!");
+            return;
+        }
+
+        // Cập nhật thông tin vào mảng
+        danhSach[editIndex].name = document.getElementById('hoTen').value.trim();
+        danhSach[editIndex].mssv = document.getElementById('mssv').value.trim();
+        danhSach[editIndex].status = document.getElementById('trangThai').value;
+
+        // Lưu lại vào LocalStorage chung
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(danhSach));
+        
+        alert("Cập nhật thành công!");
+        editIndex = -1;
+        
+        // Reset form
+        document.getElementById('hoTen').value = "";
+        document.getElementById('mssv').value = "";
+        document.getElementById('event').value = "";
+        
+        filterData();
+    }
+
+    function xoaThanhVien(index) {
+        if (confirm("Bạn có chắc chắn muốn xóa thành viên này?")) {
+            danhSach.splice(index, 1);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(danhSach));
+            filterData();
+        }
+    }
+
     function filterData() {
         const key = document.getElementById('searchKey').value.toLowerCase();
         const status = document.getElementById('filterStatus').value;
         const ketQua = danhSach.filter(item => {
-            const matchKey = item.hoTen.toLowerCase().includes(key) || item.mssv.toLowerCase().includes(key);
-            const matchStatus = (status === "All") || (item.trangThai === status);
+            const name = (item.name || item.hoTen || "").toLowerCase();
+            const mssv = (item.mssv || "").toLowerCase();
+            const matchKey = name.includes(key) || mssv.includes(key);
+            const matchStatus = (status === "All") || (item.status === status);
             return matchKey && matchStatus;
         });
         hienThiDanhSach(ketQua);
     }
 
-    function chuanBiSua(index) {
-        const item = danhSach[index];
-        document.getElementById('hoTen').value = item.hoTen;
-        document.getElementById('mssv').value = item.mssv;
-        document.getElementById('email').value = item.email;
-        document.getElementById('sdt').value = item.sdt;
-        document.getElementById('trangThai').value = item.trangThai;
-        editIndex = index;
-        document.querySelector('.btn-add').innerText = "Lưu Thay Đổi";
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
     function xuatFile() {
-        if (danhSach.length === 0) return alert("Không có dữ liệu!");
+        if (danhSach.length === 0) return alert("Không có dữ liệu để xuất!");
         const BOM = '\uFEFF';
-        let csv = BOM + "STT,Họ Tên,MSSV,Email,SĐT,Trạng Thái\n";
+        let csv = BOM + "STT,Họ Tên,MSSV,Sự kiện,Trạng Thái\n";
         danhSach.forEach((item, i) => {
-            csv += `${i+1},"${item.hoTen}","${item.mssv}","${item.email}","${item.sdt}","${item.trangThai}"\n`;
+            csv += `${i+1},"${item.name || item.hoTen}","${item.mssv}","${item.event}","${item.status || 'Chưa Check-in'}"\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = "danh_sach.csv";
+        link.download = "danh_sach_diem_danh.csv";
         link.click();
-    }
-
-    function clearForm() {
-        ['hoTen', 'mssv', 'email', 'sdt'].forEach(id => document.getElementById(id).value = "");
     }
 </script>
 </body>
