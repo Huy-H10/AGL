@@ -6,6 +6,18 @@
     <title>Quản lý Nhiệm vụ Sự kiện</title>
     <link rel="stylesheet" href="giaodien.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Bổ sung một chút style cho nút đóng menu */
+        .close-menu {
+            align-self: flex-end;
+            margin-right: 15px;
+            margin-top: -50px;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
@@ -14,26 +26,43 @@
     </div>
 
     <nav class="menu" id="sideMenu">
+        <div class="close-menu" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        
+        <button onclick="goHome()"><i class="fas fa-home"></i> Trang chủ / Menu chính</button>
         <button onclick="showPage('listPage')"><i class="fas fa-tasks"></i> Xem phân vai</button>
-        <button onclick="showPage('assignPage')" id="adminBtn"><i class="fas fa-user-plus"></i> Gán vai trò</button>
+        <button onclick="showPage('assignPage')"><i id="lockIcon" class="fas fa-lock"></i> Gán vai trò</button>
+        
         <hr style="border: 0.5px solid rgba(255,255,255,0.3); margin: 10px 12px;">
-        <button onclick="toggleAdmin()"><i class="fas fa-shield-alt"></i> Quyền: <span id="roleStatus">User</span></button>
+        <button onclick="toggleAdmin()"><i class="fas fa-user-shield"></i> Chế độ: <span id="roleStatus">User</span></button>
     </nav>
 
-    <main id="listPage" class="page" style="display: block;">
+    <main id="homePage" class="page" style="display: block;">
+        <div class="card" style="text-align: center;">
+            <h2>Chào mừng bạn!</h2>
+            <p style="color: #c0395e; margin-bottom: 20px;">Hệ thống quản lý phụ trách nhiệm vụ sự kiện</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="main" onclick="showPage('listPage')">Xem danh sách phân công</button>
+                <button class="main" style="background: white; color: #ff6a88; border: 2px solid #ff6a88;" onclick="showPage('assignPage')">Bắt đầu phân công mới</button>
+            </div>
+        </div>
+    </main>
+
+    <main id="listPage" class="page">
         <div class="card" style="max-width: 850px;">
-            <h2><i class="fas fa-clipboard-check"></i> Phụ trách nhiệm vụ sự kiện</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button onclick="goHome()" style="background:none; border:none; color:#ff6a88; cursor:pointer;"><i class="fas fa-chevron-left"></i> Quay lại</button>
+                <h2 style="margin-bottom: 0;">Phụ trách nhiệm vụ</h2>
+                <div style="width: 50px;"></div> </div>
             <table>
                 <thead>
                     <tr>
                         <th>Thành viên</th>
-                        <th>Phụ trách công việc</th>
-                        <th>Hạn hoàn thành</th>
+                        <th>Phụ trách</th>
+                        <th>Hạn chót</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
-                <tbody id="assignmentTable">
-                    </tbody>
+                <tbody id="assignmentTable"></tbody>
             </table>
         </div>
     </main>
@@ -43,31 +72,25 @@
             <h2 id="formTitle">Phân công nhiệm vụ</h2>
             <div class="form-group">
                 <label>Tên thành viên</label>
-                <input type="text" id="memberName" placeholder="Nhập tên người thực hiện...">
+                <input type="text" id="memberName" placeholder="Nhập tên...">
             </div>
-            
             <div class="form-group">
                 <label>Phụ trách công việc</label>
                 <select id="taskWork">
                     <option value="">-- Chọn mảng phụ trách --</option>
-                    <option value="Hậu cần">Hậu cần (Sắp xếp đồ đạc, trà nước)</option>
+                    <option value="Hậu cần">Hậu cần</option>
                     <option value="Âm thanh - Ánh sáng">Âm thanh - Ánh sáng</option>
-                    <option value="Truyền thông">Truyền thông (Viết bài, chụp ảnh)</option>
-                    <option value="Nội dung">Nội dung (Kịch bản, MC)</option>
-                    <option value="Đối ngoại">Đối ngoại (Mời khách, tài trợ)</option>
+                    <option value="Truyền thông">Truyền thông</option>
+                    <option value="Nội dung">Nội dung</option>
                 </select>
             </div>
-
             <div class="form-group">
-                <label>Hạn hoàn thành (Deadline)</label>
+                <label>Hạn hoàn thành</label>
                 <input type="date" id="taskDeadline">
             </div>
-
             <input type="hidden" id="editIndex" value="-1">
-            <button class="main" onclick="saveAssignment()">
-                <i class="fas fa-save"></i> Lưu thông tin
-            </button>
-            <button onclick="showPage('listPage')" style="margin-top:10px; background:none; border:none; color:#c0395e; cursor:pointer; width:100%;">Quay lại danh sách</button>
+            <button class="main" onclick="saveAssignment()">Lưu dữ liệu</button>
+            <button onclick="goHome()" style="margin-top:10px; background:none; border:none; color:#999; cursor:pointer; width:100%;">Thoát ra Menu chính</button>
         </div>
     </main>
 
@@ -75,10 +98,8 @@
     <div id="flowerContainer"></div>
 
     <script>
-        // Khởi tạo dữ liệu mẫu
         let tasks = [
-            { name: "Nguyễn Văn A", work: "Hậu cần", deadline: "2026-04-05" },
-            { name: "Trần Thị B", work: "Nội dung", deadline: "2026-04-01" }
+            { name: "Nguyễn Văn A", work: "Hậu cần", deadline: "2026-04-05" }
         ];
         let isAdmin = false;
 
@@ -86,21 +107,30 @@
             document.getElementById('sideMenu').classList.toggle('show');
         }
 
+        // Quay lại trang chủ và reset form
+        function goHome() {
+            resetForm();
+            showPage('homePage');
+        }
+
         function showPage(pageId) {
-            // Kiểm tra quyền nếu vào trang gán vai trò
             if (pageId === 'assignPage' && !isAdmin) {
-                showToast("Bạn không có quyền gán vai trò!", "error");
+                showToast("Vui lòng bật quyền Admin để gán vai trò!", "error");
                 return;
             }
             document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
             document.getElementById(pageId).style.display = 'block';
-            if(document.getElementById('sideMenu').classList.contains('show')) toggleMenu();
+            
+            // Đóng menu nếu đang mở
+            const menu = document.getElementById('sideMenu');
+            if(menu.classList.contains('show')) menu.classList.remove('show');
         }
 
         function toggleAdmin() {
             isAdmin = !isAdmin;
             document.getElementById('roleStatus').innerText = isAdmin ? "Admin" : "User";
-            showToast(isAdmin ? "Đã mở quyền chỉnh sửa" : "Đã khóa quyền chỉnh sửa", "success");
+            document.getElementById('lockIcon').className = isAdmin ? "fas fa-user-plus" : "fas fa-lock";
+            showToast(isAdmin ? "Đã cấp quyền chỉnh sửa" : "Đã hủy quyền chỉnh sửa", "success");
             renderTable();
         }
 
@@ -108,49 +138,41 @@
             const tbody = document.getElementById('assignmentTable');
             tbody.innerHTML = tasks.map((item, index) => `
                 <tr>
-                    <td><strong>${item.name}</strong></td>
-                    <td><span class="status-tag active" style="font-size:12px">${item.work}</span></td>
+                    <td><b>${item.name}</b></td>
+                    <td><span class="status-tag active" style="font-size:11px; padding:4px 8px;">${item.work}</span></td>
                     <td>${item.deadline}</td>
                     <td>
                         ${isAdmin ? `
-                            <button onclick="editItem(${index})" style="color:#2ecc71; border:none; background:none; cursor:pointer; margin-right:10px;"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteItem(${index})" style="color:#e74c3c; border:none; background:none; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
-                        ` : '<i class="fas fa-lock" style="color:#ddd"></i>'}
+                            <i class="fas fa-edit" onclick="editItem(${index})" style="color:#2ecc71; cursor:pointer; margin-right:10px;"></i>
+                            <i class="fas fa-trash-alt" onclick="deleteItem(${index})" style="color:#e74c3c; cursor:pointer;"></i>
+                        ` : '<i class="fas fa-shield" style="color:#eee"></i>'}
                     </td>
                 </tr>
             `).join('');
         }
 
         function saveAssignment() {
-            const name = document.getElementById('memberName').value.trim();
+            const name = document.getElementById('memberName').value;
             const work = document.getElementById('taskWork').value;
             const deadline = document.getElementById('taskDeadline').value;
             const editIndex = parseInt(document.getElementById('editIndex').value);
 
             if (!name || !work || !deadline) {
-                showToast("Vui lòng nhập đủ thông tin và hạn hoàn thành!", "error");
+                showToast("Thiếu thông tin rồi bạn ơi!", "error");
                 return;
             }
 
-            // Kiểm tra ràng buộc: Một người không nên phụ trách trùng một mảng công việc đã có
-            const isDuplicate = tasks.some((t, idx) => t.work === work && idx !== editIndex);
-            if (isDuplicate && (work === "Hậu cần" || work === "Âm thanh - Ánh sáng")) {
-                if(!confirm(`Mảng ${work} đã có người phụ trách. Bạn muốn bổ sung thêm người?`)) return;
-            }
-
             const data = { name, work, deadline };
-
             if (editIndex > -1) {
                 tasks[editIndex] = data;
-                showToast("Cập nhật nhiệm vụ thành công!", "success");
+                showToast("Cập nhật thành công!", "success");
             } else {
                 tasks.push(data);
-                showToast("Phân công thành công!", "success");
+                showToast("Đã thêm phân công mới!", "success");
             }
 
-            resetForm();
             renderTable();
-            showPage('listPage');
+            goHome(); // Quay lại trang chủ sau khi lưu
         }
 
         function editItem(index) {
@@ -159,15 +181,15 @@
             document.getElementById('taskWork').value = item.work;
             document.getElementById('taskDeadline').value = item.deadline;
             document.getElementById('editIndex').value = index;
-            document.getElementById('formTitle').innerText = "Chỉnh sửa nhiệm vụ";
+            document.getElementById('formTitle').innerText = "Sửa nhiệm vụ";
             showPage('assignPage');
         }
 
         function deleteItem(index) {
-            if (confirm("Bạn chắc chắn muốn xóa phân công này?")) {
+            if (confirm("Xóa dòng này nhé?")) {
                 tasks.splice(index, 1);
                 renderTable();
-                showToast("Đã xóa nhiệm vụ!", "success");
+                showToast("Đã xóa!", "success");
             }
         }
 
@@ -183,22 +205,20 @@
             const toast = document.getElementById('toast');
             toast.innerText = msg;
             toast.className = `toast show ${type}`;
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        // Hiệu ứng hoa rơi từ CSS cũ
         function createFlowers() {
             const container = document.getElementById('flowerContainer');
-            const icons = ['🌸', '✨', '🌷'];
             setInterval(() => {
                 const flower = document.createElement('div');
                 flower.className = 'flower';
-                flower.innerText = icons[Math.floor(Math.random() * icons.length)];
+                flower.innerText = '🌸';
                 flower.style.left = Math.random() * 100 + 'vw';
                 flower.style.animationDuration = (Math.random() * 3 + 2) + 's';
                 container.appendChild(flower);
                 setTimeout(() => flower.remove(), 5000);
-            }, 600);
+            }, 800);
         }
 
         renderTable();
