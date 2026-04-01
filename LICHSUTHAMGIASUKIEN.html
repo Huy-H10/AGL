@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý sự kiện CLB</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #ff9a9e, #fecfef);
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.box {
+    width: 350px;
+    background: rgba(255,255,255,0.95);
+    padding: 15px;
+    border-radius: 15px;
+    margin: 10px;
+}
+
+h2 {
+    text-align: center;
+    color: #ff4d88;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    border-radius: 8px;
+}
+
+button {
+    background: #ff4d88;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #e6005c;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 6px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background: #ffb6c1;
+}
+
+.status {
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- FORM ĐĂNG KÝ -->
+<div class="box">
+<h2>🌸 Đăng ký sự kiện</h2>
+
+<input type="text" id="hoten" placeholder="Họ tên">
+<input type="text" id="mssv" placeholder="MSSV">
+<input type="email" id="email" placeholder="Email">
+
+<select id="khoa">
+<option value="">--Chọn khóa--</option>
+<option>K48</option>
+<option>K49</option>
+<option>K50</option>
+</select>
+
+<select id="sukien">
+<option value="">--Chọn sự kiện--</option>
+<option>Workshop AI</option>
+<option>Hackathon</option>
+<option>Talkshow IT</option>
+</select>
+
+<button onclick="dangKy()">Đăng ký</button>
+<p id="tb"></p>
+</div>
+
+<!-- DANH SÁCH -->
+<div class="box">
+<h2>📋 Danh sách đăng ký</h2>
+<table>
+<thead>
+<tr>
+<th>Họ tên</th>
+<th>Sự kiện</th>
+<th>Trạng thái</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="ds"></tbody>
+</table>
+</div>
+
+<!-- LỊCH SỬ -->
+<div class="box">
+<h2>📜 Lịch sử tham gia</h2>
+<table>
+<thead>
+<tr>
+<th>Họ tên</th>
+<th>Sự kiện</th>
+<th>Trạng thái</th>
+<th>Chi tiết</th>
+</tr>
+</thead>
+<tbody id="history"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+let danhSach = JSON.parse(localStorage.getItem("dsSuKien")) || [];
+
+function hienThi() {
+    let html = "";
+    danhSach.forEach((sv, i) => {
+        html += `
+        <tr>
+            <td>${sv.hoten}</td>
+            <td>${sv.sukien}</td>
+            <td class="status">${sv.trangthai}</td>
+            <td>
+                <button onclick="capNhat(${i},'Đã tham gia')">✔</button>
+                <button onclick="capNhat(${i},'Vắng mặt')">❌</button>
+                <button onclick="capNhat(${i},'Đã hủy')">🚫</button>
+            </td>
+        </tr>`;
+    });
+    document.getElementById("ds").innerHTML = html;
+
+    hienThiHistory();
+}
+
+function hienThiHistory() {
+    let html = "";
+    danhSach.forEach(sv => {
+        html += `
+        <tr>
+            <td>${sv.hoten}</td>
+            <td>${sv.sukien}</td>
+            <td>${sv.trangthai}</td>
+            <td><button onclick="chiTiet('${sv.hoten}','${sv.sukien}','${sv.trangthai}')">Xem</button></td>
+        </tr>`;
+    });
+    document.getElementById("history").innerHTML = html;
+}
+
+function dangKy() {
+    let hoten = hotenInput.value.trim();
+    let mssv = mssvInput.value.trim();
+    let email = emailInput.value.trim();
+    let khoa = khoaInput.value;
+    let sukien = sukienInput.value;
+
+    if (!hoten || !mssv || !email || !khoa || !sukien) {
+        tb.innerText = "❌ Nhập đầy đủ!";
+        return;
+    }
+
+    let sv = {
+        hoten, mssv, email, khoa,
+        sukien,
+        trangthai: "Đã đăng ký"
+    };
+
+    danhSach.push(sv);
+    localStorage.setItem("dsSuKien", JSON.stringify(danhSach));
+    hienThi();
+
+    tb.innerText = "✅ Thành công!";
+}
+
+function capNhat(i, tt) {
+    danhSach[i].trangthai = tt;
+    localStorage.setItem("dsSuKien", JSON.stringify(danhSach));
+    hienThi();
+}
+
+function chiTiet(hoten, sukien, tt) {
+    alert(`👤 ${hoten}\n📌 ${sukien}\n📊 Trạng thái: ${tt}`);
+}
+
+// shortcut
+const hotenInput = document.getElementById("hoten");
+const mssvInput = document.getElementById("mssv");
+const emailInput = document.getElementById("email");
+const khoaInput = document.getElementById("khoa");
+const sukienInput = document.getElementById("sukien");
+const tb = document.getElementById("tb");
+
+hienThi();
+</script>
+
+</body>
+</html>
