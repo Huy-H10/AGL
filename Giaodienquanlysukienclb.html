@@ -333,6 +333,7 @@
     <button onclick="go('join')">🙋 Tham gia</button>
     <button onclick="go('login')">🔐 Đăng nhập / Đăng ký</button>
     <button onclick="logout()">🚪 Đăng xuất</button>
+    <button onclick="go('reminder'); renderReminders()">🔔 Nhắc hẹn</button>
     <button onclick="go('checkin')" class="adminOnly">📷 Check-in</button>
     <button onclick="go('dashboard')" class="adminOnly">📊 Thống kê</button>
     <button onclick="window.location.href='thongKeSoLuongNguoiThamGia.html'" class="adminOnly">📊 Thống kê người tham gia</button>
@@ -429,6 +430,14 @@
 </div>
   <div class="toast" id="toast"></div>
 
+  <div id="reminder" class="page">
+  <div class="card" style="max-width:700px;">
+    <h2>🔔 Sự kiện sắp diễn ra</h2>
+
+    <div id="reminderList"></div>
+
+  </div>
+</div>
 
 
   <div id="manage" class="page">
@@ -549,6 +558,8 @@
     let events = JSON.parse(localStorage.getItem("events")) || [];
     let participants = JSON.parse(localStorage.getItem("participants")) || [];
     let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    let notifyEnabled = JSON.parse(localStorage.getItem("notifyEnabled"));
+    if (notifyEnabled === null) notifyEnabled = true;
     let isLoginMode = true;
     let selectedStatus = "Mở";
 
@@ -755,15 +766,19 @@
   // LƯU
   let qrData = mssv + "|" + eventName;
 
-  participants.push({
-    name: hoten,
-    mssv,
-    email,
-    khoa,
-    event: eventName,
-    checkedIn: false,
-    qr: qrData
-  });
+let qrLink = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" 
+              + encodeURIComponent(qrData);
+
+participants.push({
+  name: hoten,
+  mssv,
+  email,
+  khoa,
+  event: eventName,
+  checkedIn: false,
+  qr: qrData,
+  qrLink: qrLink // 
+});
 
   localStorage.setItem("participants", JSON.stringify(participants));
 
@@ -970,6 +985,94 @@ function renderDashboard() {
   });
 
   document.getElementById("eventStats").innerHTML = html;
+}
+// ===== BẬT/TẮT =====
+function toggleNotify() {
+  notifyEnabled = !notifyEnabled;
+  localStorage.setItem("notifyEnabled", notifyEnabled);
+  updateNotifyUI();
+  showToast(notifyEnabled ? "🔔 Đã bật" : "🔕 Đã tắt");
+}
+
+function updateNotifyUI() {
+  let el = document.getElementById("notifyStatus");
+  if (el) el.innerText = notifyEnabled ? "ON" : "OFF";
+}
+updateNotifyUI();
+
+// ===== TẠO NỘI DUNG =====
+function buildMessage(event, p) {
+  return `📢 ${event.t}
+⏰ ${event.d} ${event.time}
+📍 ${event.location}
+🎟 Vé: ${p.qrLink}`;
+}
+
+// ===== NHẮC LỊCH =====
+let notified = JSON.parse(localStorage.getItem("notified")) || {};
+
+setInterval(() => {
+  let now = new Date();
+
+  participants.forEach(p => {
+    let event = events.find(e => e.t === p.event);
+    if (!event) return;
+
+    let eventTime = new Date(event.d + "T" + (event.time || "00:00"));
+    let diff = eventTime - now;
+    let hours = diff / 3600000;
+
+    let key24 = p.mssv + "_" + event.t + "_24";
+    let key1 = p.mssv + "_" + event.t + "_1";
+
+    let msg = buildMessage(event, p);
+
+    //  TEST NHANH 
+    if (hours <= 24 && hours > 23.5) {
+      showToast("⏳ Sắp diễn ra:\n" + msg);
+      notified[key24] = true;
+    }
+
+    if (hours <= 1 && hours > 0.5) {
+      showToast("⚠️ Còn 1 phút:\n" + msg);
+      notified[key1] = true;
+    }
+  });
+
+  localStorage.setItem("notified", JSON.stringify(notified));
+
+}, 30000);
+
+function renderReminders() {
+  let now = new Date();
+  let html = "";
+
+  participants.forEach(p => {
+    let event = events.find(e => e.t === p.event);
+    if (!event) return;
+
+    let eventTime = new Date(event.d + "T" + (event.time || "00:00"));
+    let diff = eventTime - now;
+    let hours = diff / 3600000;
+
+    // chỉ lấy sự kiện sắp diễn ra (trong 24h)
+    if (hours > 0 && hours <= 24) {
+      html += `
+        <div style="background:#fff0f6; padding:15px; border-radius:12px; margin-bottom:10px;">
+          <b>📢 ${event.t}</b><br>
+          ⏰ ${event.d} ${event.time}<br>
+          📍 ${event.location}<br>
+          🎟 <a href="${p.qrLink}" target="_blank">Xem vé QR</a>
+        </div>
+      `;
+    }
+  });
+
+  if (!html) {
+    html = "<p style='text-align:center'>❌ Không có sự kiện sắp diễn ra</p>";
+  }
+
+  document.getElementById("reminderList").innerHTML = html;
 }
   </script>
   <script src="xemVaChinhSuaThongTinSuKien.js"></script>
