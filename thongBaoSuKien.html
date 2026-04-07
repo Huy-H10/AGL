@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông báo sự kiện</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(255, 106, 136, 0.95);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(255,106,136,0.3);
+    }
+
+    .back-btn {
+      background: rgba(255,255,255,0.25);
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 10px;
+      padding: 6px 12px;
+      transition: 0.2s;
+    }
+
+    .back-btn:hover { background: rgba(255,255,255,0.4); }
+
+    .header-title {
+      color: #fff;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      margin-left: auto;
+      gap: 6px;
+    }
+
+    .tab-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: rgba(255,255,255,0.9);
+      color: #e84393;
+    }
+
+    /* CONTENT */
+    .content {
+      padding: 90px 20px 40px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* CARD */
+    .card {
+      background: rgba(255,255,255,0.97);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 28px rgba(255,105,180,0.15);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card h3 {
+      color: #e84393;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* FORM */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #c0395e;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid #ffe0ea;
+      border-radius: 12px;
+      background: #fff9fb;
+      outline: none;
+      font-size: 14px;
+      transition: 0.2s;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: #ff6a88;
+      box-shadow: 0 0 0 3px rgba(255,106,136,0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* RECIPIENT INFO */
+    .recipient-info {
+      background: #fff0f5;
+      border: 1.5px solid #ffe0ea;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #c0395e;
+    }
+
+    .recipient-info b { color: #e84393; font-size: 18px; }
+
+    /* TOGGLE EMAIL */
+    .toggle-email {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #fff0f5;
+      border: 1.5px solid #ffe0ea;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      cursor: pointer;
+    }
+
+    .toggle-email input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #e84393;
+      cursor: pointer;
+    }
+
+    .toggle-email span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c0395e;
+    }
+
+    .toggle-email .sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: #aaa;
+      display: block;
+    }
+
+    /* BUTTONS */
+    .btn-send {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #ff6a88, #e84393);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn-send:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255,106,136,0.4);
+    }
+
+    .btn-send:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* NOTIFICATION LIST */
+    .notif-item {
+      background: rgba(255,255,255,0.97);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 16px rgba(255,105,180,0.12);
+      border-left: 4px solid #ff6a88;
+      position: relative;
+      animation: slideIn 0.3s ease;
+    }
+
+    .notif-item.unread {
+      border-left-color: #e84393;
+      background: #fff5f9;
+    }
+
+    .notif-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .notif-title {
+      font-weight: 700;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .notif-time {
+      font-size: 11px;
+      color: #bbb;
+      white-space: nowrap;
+      margin-left: 10px;
+    }
+
+    .notif-event {
+      font-size: 12px;
+      color: #ff6a88;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .notif-body {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .notif-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .email-badge {
+      font-size: 11px;
+      background: #d4f7e7;
+      color: #27ae60;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      background: #e84393;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .btn-del-notif {
+      background: none;
+      border: none;
+      color: #ddd;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: 0.2s;
+    }
+
+    .btn-del-notif:hover { color: #ff4757; background: #fff0f0; }
+
+    /* MARK ALL READ */
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .section-label {
+      color: #fff;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-mark-all {
+      background: rgba(255,255,255,0.3);
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-mark-all:hover { background: rgba(255,255,255,0.5); }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      background: rgba(255,255,255,0.97);
+      border-radius: 20px;
+    }
+
+    .empty-state .icon { font-size: 52px; margin-bottom: 12px; }
+    .empty-state p { color: #bbb; font-weight: 600; }
+
+    /* PROGRESS */
+    .send-progress {
+      display: none;
+      margin-top: 10px;
+      background: #fff0f5;
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+
+    .send-progress.show { display: block; }
+
+    .progress-bar-bg {
+      background: #ffe0ea;
+      border-radius: 999px;
+      height: 8px;
+      margin: 8px 0;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6a88, #e84393);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: #c0395e;
+      font-weight: 700;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 12px 25px;
+      border-radius: 12px;
+      color: #fff;
+      font-weight: 700;
+      transition: 0.4s;
+      z-index: 10001;
+      opacity: 0;
+      text-align: center;
+      max-width: 90vw;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2ecc71; }
+    .toast.error   { background: #e74c3c; }
+    .toast.info    { background: #3498db; }
+
+    /* FLOWER */
+    .flower {
+      position: fixed;
+      top: -50px;
+      font-size: 20px;
+      animation: fall linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes fall {
+      0%   { transform: translateY(-50px) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <div class="header-title">🔔 Thông báo sự kiện</div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('send', this)">📢 Gửi</button>
+      <button class="tab-btn" onclick="switchTab('inbox', this)">📬 Trung tâm</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- GỬI THÔNG BÁO (Admin) -->
+    <div id="section-send" class="section active">
+      <div class="card">
+        <h3>📢 Gửi thông báo đến người tham gia</h3>
+
+        <div class="form-group">
+          <label>Chọn sự kiện</label>
+          <select id="selectEvent" onchange="updateRecipientCount()">
+            <option value="">-- Tất cả sự kiện --</option>
+          </select>
+        </div>
+
+        <div class="recipient-info" id="recipientInfo">
+          👥 Sẽ gửi đến: <b id="recipientCount">0</b> người đăng ký
+        </div>
+
+        <div class="form-group">
+          <label>Tiêu đề thông báo ⭐</label>
+          <input type="text" id="notifTitle" placeholder="VD: Thay đổi địa điểm tổ chức">
+        </div>
+
+        <div class="form-group">
+          <label>Nội dung thông báo</label>
+          <textarea id="notifMessage" placeholder="Nhập nội dung thông báo gửi đến người tham gia..."></textarea>
+        </div>
+
+        <!-- GỬI EMAIL -->
+        <label class="toggle-email">
+          <input type="checkbox" id="sendEmail" checked>
+          <div>
+            <span>📧 Gửi kèm Email</span>
+            <span class="sub">Gửi email thật đến từng người đăng ký</span>
+          </div>
+        </label>
+
+        <button class="btn-send" id="btnSend" onclick="sendNotification()">
+          🚀 Gửi thông báo
+        </button>
+
+        <!-- PROGRESS -->
+        <div class="send-progress" id="sendProgress">
+          <div class="progress-text" id="progressText">Đang gửi... 0/0</div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRUNG TÂM THÔNG BÁO -->
+    <div id="section-inbox" class="section">
+      <div class="top-actions">
+        <div class="section-label">📬 Thông báo của bạn</div>
+        <button class="btn-mark-all" onclick="markAllRead()">✅ Đánh dấu đã đọc</button>
+      </div>
+      <div id="notifList"></div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- EMAILJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <script>
+    // ===== CONFIG EMAILJS =====
+    const EMAILJS_SERVICE_ID  = 'service_lzo2lnw';
+    const EMAILJS_TEMPLATE_ID = 'template_sp70x7i';
+    const EMAILJS_PUBLIC_KEY  = 'sG_TiXIGwxdu_0RRx';
+
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+
+    // ===== DATA =====
+    let events       = JSON.parse(localStorage.getItem('events'))       || [];
+    let participants = JSON.parse(localStorage.getItem('participants')) || [];
+    let notifications= JSON.parse(localStorage.getItem('notifications'))|| [];
+    let currentUser  = JSON.parse(localStorage.getItem('currentUser'));
+
+    // ===== TABS =====
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('section-' + tab).classList.add('active');
+      btn.classList.add('active');
+      if (tab === 'inbox') renderInbox();
+    }
+
+    // ===== INIT =====
+    function init() {
+      // Populate event dropdown
+      const sel = document.getElementById('selectEvent');
+      events.forEach(e => {
+        let opt = document.createElement('option');
+        opt.value = e.t;
+        opt.textContent = e.t;
+        sel.appendChild(opt);
+      });
+      updateRecipientCount();
+    }
+
+    function updateRecipientCount() {
+      const eventName = document.getElementById('selectEvent').value;
+      const targets = eventName
+        ? participants.filter(p => p.event === eventName)
+        : participants;
+      document.getElementById('recipientCount').textContent = targets.length;
+    }
+
+    // ===== SEND NOTIFICATION =====
+    async function sendNotification() {
+      const eventName = document.getElementById('selectEvent').value;
+      const title     = document.getElementById('notifTitle').value.trim();
+      const message   = document.getElementById('notifMessage').value.trim();
+      const doEmail   = document.getElementById('sendEmail').checked;
+
+      if (!title) return showToast('❌ Vui lòng nhập tiêu đề!', 'error');
+      if (!message) return showToast('❌ Vui lòng nhập nội dung!', 'error');
+
+      // Lấy danh sách người nhận
+      const targets = eventName
+        ? participants.filter(p => p.event === eventName)
+        : participants;
+
+      if (targets.length === 0) {
+        return showToast('❌ Không có người đăng ký nào!', 'error');
+      }
+
+      // Lưu thông báo vào localStorage (Notification Center)
+      const notif = {
+        id: Date.now(),
+        title,
+        message,
+        event: eventName || 'Tất cả sự kiện',
+        time: new Date().toISOString(),
+        sentBy: currentUser ? currentUser.name : 'Ban tổ chức',
+        emailSent: doEmail,
+        read: false
+      };
+
+      notifications.unshift(notif);
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+
+      // Gửi email nếu được chọn
+      if (doEmail) {
+        const btn = document.getElementById('btnSend');
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang gửi...';
+
+        const progress = document.getElementById('sendProgress');
+        progress.classList.add('show');
+
+        let sent = 0;
+        let failed = 0;
+
+        for (let i = 0; i < targets.length; i++) {
+          const p = targets[i];
+          const pct = Math.round((i / targets.length) * 100);
+
+          document.getElementById('progressText').textContent =
+            `Đang gửi... ${i}/${targets.length} (${failed > 0 ? failed + ' lỗi' : 'OK'})`;
+          document.getElementById('progressFill').style.width = pct + '%';
+
+          if (p.email) {
+            try {
+              await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                to_email:  p.email,
+                subject:   title,
+                message:   message,
+                from_name: currentUser ? currentUser.name : 'Ban tổ chức AGL'
+              });
+              sent++;
+            } catch (err) {
+              console.error('Lỗi gửi email:', p.email, err);
+              failed++;
+            }
+          } else {
+            failed++;
+          }
+
+          // Delay nhỏ tránh spam
+          await delay(300);
+        }
+
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressText').textContent =
+          `✅ Hoàn tất! Đã gửi: ${sent} | Lỗi/Không có email: ${failed}`;
+
+        btn.disabled = false;
+        btn.textContent = '🚀 Gửi thông báo';
+
+        showToast(`🎉 Gửi xong! ${sent}/${targets.length} email thành công`, 'success');
+
+      } else {
+        showToast('🔔 Đã lưu thông báo vào Trung tâm!', 'success');
+      }
+
+      // Reset form
+      document.getElementById('notifTitle').value = '';
+      document.getElementById('notifMessage').value = '';
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ===== INBOX =====
+    function renderInbox() {
+      notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+      const container = document.getElementById('notifList');
+
+      if (notifications.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📭</div>
+            <p>Chưa có thông báo nào</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = notifications.map((n, i) => `
+        <div class="notif-item ${n.read ? '' : 'unread'}">
+          <div class="notif-header">
+            <div class="notif-title">
+              ${n.read ? '' : '<span class="unread-dot"></span>'}${n.title}
+            </div>
+            <div class="notif-time">${formatTime(n.time)}</div>
+          </div>
+          <div class="notif-event">📌 ${n.event}</div>
+          <div class="notif-body">${n.message}</div>
+          <div class="notif-footer">
+            <div>
+              ${n.emailSent ? '<span class="email-badge">📧 Đã gửi email</span>' : ''}
+              <span style="font-size:11px; color:#bbb; margin-left:6px;">
+                Bởi: ${n.sentBy || 'Ban tổ chức'}
+              </span>
+            </div>
+            <div style="display:flex; gap:6px;">
+              ${!n.read ? `<button class="btn-del-notif" onclick="markRead(${i})" title="Đánh dấu đã đọc">✓</button>` : ''}
+              <button class="btn-del-notif" onclick="deleteNotif(${i})" title="Xóa">🗑️</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function markRead(i) {
+      notifications[i].read = true;
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+      renderInbox();
+    }
+
+    function markAllRead() {
+      notifications = notifications.map(n => ({ ...n, read: true }));
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+      renderInbox();
+      showToast('✅ Đã đánh dấu tất cả đã đọc!', 'success');
+    }
+
+    function deleteNotif(i) {
+      notifications.splice(i, 1);
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+      renderInbox();
+    }
+
+    function formatTime(iso) {
+      const d = new Date(iso);
+      return d.toLocaleString('vi-VN', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    // ===== TOAST =====
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ===== FLOWER =====
+    setInterval(() => {
+      let f = document.createElement('div');
+      f.className = 'flower';
+      f.innerHTML = '🌸';
+      f.style.left = Math.random() * 100 + 'vw';
+      f.style.animationDuration = (3 + Math.random() * 5) + 's';
+      document.body.appendChild(f);
+      setTimeout(() => f.remove(), 8000);
+    }, 300);
+
+    // ===== START =====
+    init();
+  </script>
+</body>
+</html>
