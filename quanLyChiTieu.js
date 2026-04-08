@@ -304,16 +304,6 @@ function deleteBudget(index) {
 // 10. INJECT HTML MODAL + TRANG VÀO DOM
 // -------------------------------------------------------
 function injectBudgetPage() {
-  // Thêm menu item
-  const menu = document.getElementById("menu");
-  if (menu && !document.getElementById("menuBudget")) {
-    const btn = document.createElement("button");
-    btn.id = "menuBudget";
-    btn.className = "adminOnly";
-    btn.setAttribute("onclick", "go('budget')");
-    btn.innerHTML = "💰 Quản lý ngân sách";
-    menu.insertBefore(btn, menu.children[3]);
-  }
 
   // Thêm trang budget vào body
   if (!document.getElementById("budget")) {
