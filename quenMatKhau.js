@@ -65,22 +65,27 @@ function setForgotMsg(elId, msg, isError = true) {
 
 // ── Bước 1: Kiểm tra email ────────────────────────────────
 function checkEmailForReset() {
-  const email = document.getElementById("forgot_email").value.trim();
+  const email = document.getElementById("forgot_email").value.trim().toLowerCase();
   clearForgotMsgs();
 
-  if (!email) {
-    setForgotMsg("forgot_emailMsg", "❌ Vui lòng nhập email!");
-    return;
-  }
-  if (!email.includes("@")) {
-    setForgotMsg("forgot_emailMsg", "❌ Email không hợp lệ!");
+  if (!email) { setForgotMsg("forgot_emailMsg", "❌ Vui lòng nhập email!"); return; }
+  if (!email.includes("@")) { setForgotMsg("forgot_emailMsg", "❌ Email không hợp lệ!"); return; }
+
+  // Ưu tiên tìm trong Firebase (window._users được expose bởi Giaodienquanlysukienclb.html)
+  const firebaseUsers = (typeof window._users !== "undefined") ? window._users : [];
+  const foundFB = firebaseUsers.find(u => (u.email || "").toLowerCase() === email);
+
+  if (foundFB) {
+    setForgotMsg("forgot_emailMsg", "✅ Đã xác nhận email!", false);
+    setTimeout(() => showForgotStep(2), 800);
     return;
   }
 
-  const users = JSON.parse(localStorage.getItem("users") || "[]");
-  const found = users.find(u => u.email === email);
+  // Fallback: tìm trong localStorage
+  const lsUsers = JSON.parse(localStorage.getItem("users") || "[]");
+  const foundLS = lsUsers.find(u => (u.email || "").toLowerCase() === email);
 
-  if (!found) {
+  if (!foundLS) {
     setForgotMsg("forgot_emailMsg", "❌ Email này chưa được đăng ký!");
     return;
   }
@@ -91,47 +96,51 @@ function checkEmailForReset() {
 
 // ── Bước 2: Đặt mật khẩu mới ─────────────────────────────
 async function resetPassword() {
-  const email    = document.getElementById("forgot_email").value.trim();
+  const email    = document.getElementById("forgot_email").value.trim().toLowerCase();
   const newPass  = document.getElementById("forgot_newpass").value;
   const newPass2 = document.getElementById("forgot_newpass2").value;
   clearForgotMsgs();
 
-  // Validate
-  if (!newPass || !newPass2) {
-    setForgotMsg("forgot_passMsg", "❌ Vui lòng nhập đầy đủ!");
-    return;
-  }
-  if (newPass.length < 6) {
-    setForgotMsg("forgot_passMsg", "❌ Mật khẩu phải có ít nhất 6 ký tự!");
-    return;
-  }
-  if (newPass !== newPass2) {
-    setForgotMsg("forgot_passMsg", "❌ Mật khẩu xác nhận không khớp!");
-    return;
-  }
+  if (!newPass || !newPass2) { setForgotMsg("forgot_passMsg", "❌ Vui lòng nhập đầy đủ!"); return; }
+  if (newPass.length < 6) { setForgotMsg("forgot_passMsg", "❌ Mật khẩu phải có ít nhất 6 ký tự!"); return; }
+  if (newPass !== newPass2) { setForgotMsg("forgot_passMsg", "❌ Mật khẩu xác nhận không khớp!"); return; }
 
-  // Cập nhật mật khẩu — hỗ trợ cả 2 kiểu lưu
-  const users    = JSON.parse(localStorage.getItem("users") || "[]");
   const passHash = await sha256ForReset(newPass);
 
-  const idx = users.findIndex(u => u.email === email);
-  if (idx === -1) {
-    setForgotMsg("forgot_passMsg", "❌ Không tìm thấy tài khoản!");
-    return;
+  // Ưu tiên cập nhật Firebase
+  const firebaseUsers = (typeof window._users !== "undefined") ? window._users : [];
+  const fbUser = firebaseUsers.find(u => (u.email || "").toLowerCase() === email);
+
+  if (fbUser && window._db && window._ref && window._update) {
+    try {
+      await window._update(window._ref(window._db, "users/" + fbUser.id), {
+        pass    : newPass,
+        passHash: passHash
+      });
+      setForgotMsg("forgot_passMsg", "✅ Đổi mật khẩu thành công!", false);
+      setTimeout(() => {
+        closeForgotModal();
+        if (typeof window.showToast === "function") window.showToast("✅ Mật khẩu đã được cập nhật! Hãy đăng nhập lại.", "success");
+      }, 1500);
+      return;
+    } catch(e) {
+      console.error("Lỗi cập nhật Firebase:", e);
+    }
   }
 
-  // Cập nhật cả plain text lẫn hash để tương thích
-  users[idx].pass     = newPass;    // tương thích handleAuth() cũ
-  users[idx].passHash = passHash;   // tương thích dangnhap-dangxuat-phanquyen.js
+  // Fallback: cập nhật localStorage
+  const lsUsers = JSON.parse(localStorage.getItem("users") || "[]");
+  const idx = lsUsers.findIndex(u => (u.email || "").toLowerCase() === email);
+  if (idx === -1) { setForgotMsg("forgot_passMsg", "❌ Không tìm thấy tài khoản!"); return; }
 
-  localStorage.setItem("users", JSON.stringify(users));
+  lsUsers[idx].pass     = newPass;
+  lsUsers[idx].passHash = passHash;
+  localStorage.setItem("users", JSON.stringify(lsUsers));
 
   setForgotMsg("forgot_passMsg", "✅ Đổi mật khẩu thành công!", false);
-
-  // Đóng modal sau 1.5s
   setTimeout(() => {
     closeForgotModal();
-    if (typeof showToast === "function") showToast("✅ Mật khẩu đã được cập nhật! Hãy đăng nhập lại.", "success");
+    if (typeof window.showToast === "function") window.showToast("✅ Mật khẩu đã được cập nhật! Hãy đăng nhập lại.", "success");
   }, 1500);
 }
 

@@ -75,6 +75,17 @@
 </head>
 <body>
 
+  <!-- LOADING OVERLAY — chờ Firebase load xong -->
+  <div id="fbLoadingOverlay" style="
+    position:fixed; inset:0; background:rgba(255,154,158,.92);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index:99999; font-family:'Quicksand',sans-serif; gap:14px;">
+    <div style="width:44px;height:44px;border:5px solid rgba(255,255,255,.35);
+      border-top-color:#fff;border-radius:50%;animation:fbSpin .8s linear infinite;"></div>
+    <p style="color:#fff;font-size:16px;font-weight:700;">⏳ Đang kết nối dữ liệu...</p>
+  </div>
+  <style>@keyframes fbSpin{to{transform:rotate(360deg)}}</style>
+
   <div class="menu-toggle" onclick="toggleMenu()">☰</div>
 
   <!-- SEARCH BAR -->
@@ -84,22 +95,28 @@
 
   <!-- MENU -->
   <div class="menu" id="menu">
-    <!-- ADMIN -->
+    <!-- CHUNG (ai cũng thấy) -->
     <button onclick="go('home')">🏠 Trang chủ</button>
+    <button onclick="window.location.href='TimKiemVaLoc.html'">🔍 Tìm kiếm sự kiện</button>
+    <!-- ADMIN -->
     <button onclick="go('create')" class="adminOnly">➕ Tạo sự kiện</button>
     <button onclick="go('manage')" class="adminOnly">📋 Quản lý sự kiện</button>
     <button onclick="go('budget')" class="adminOnly">💰 Quản lý ngân sách</button>
     <button onclick="window.location.href='PhanVaiTroPhuTrachSuKien.html'" class="adminOnly">👥 Phân chia vai trò</button>
     <button onclick="window.location.href='thongKeSoLuongNguoiThamGia.html'" class="adminOnly">📊 Thống kê người tham gia</button>
-    <button onclick="window.location.href='XemSuaXuatDanhSach.html'" class="adminOnly">🔍 Quản lý chi tiết</button>
+    <button onclick="window.location.href='XemSuaXuatDanhSach.html'" class="adminOnly">🗂 Quản lý chi tiết</button>
     <button onclick="window.location.href='thongBaoSuKien.html'" class="adminOnly">🔔 Thông báo sự kiện</button>
-    <button onclick="go('checkin')" class="adminOnly">📷 Check-in</button>
-    <button onclick="go('dashboard')" class="adminOnly">📊 Thống kê Check-in</button>
+    <button onclick="go('checkin')" class="adminOnly">📷 Check-in QR</button>
+    <button onclick="go('dashboard')" class="adminOnly">📊 Dashboard Check-in</button>
+    <button onclick="window.location.href='LICHSUTHAMGIASUKIEN.html'" class="adminOnly">📜 Lịch sử tham gia</button>
+    <button onclick="window.location.href='PHANHOIVADANHGIA.html'" class="adminOnly">⭐ Đánh giá sự kiện</button>
     <!-- USER -->
     <button onclick="go('manage')" class="userOnly">📋 Danh sách sự kiện</button>
-    <button onclick="go('join')" class="userOnly">🙋 Tham gia sự kiện</button>
-    <button onclick="go('reminder'); renderReminders()" class="userOnly">🔔 Nhắc hẹn</button>
+    <button onclick="go('join')" class="userOnly">🙋 Đăng ký tham gia</button>
+    <button onclick="go('reminder'); renderReminders()" class="userOnly">⏰ Nhắc hẹn</button>
     <button onclick="window.location.href='huydangky.html'" class="userOnly">❌ Hủy đăng ký</button>
+    <button onclick="window.location.href='LICHSUTHAMGIASUKIEN.html'" class="userOnly">📜 Lịch sử tham gia</button>
+    <button onclick="window.location.href='PHANHOIVADANHGIA.html'" class="userOnly">⭐ Đánh giá sự kiện</button>
     <button onclick="viewGallery()" class="userOnly">🖼 Xem tư liệu</button>
     <button onclick="window.location.href='thongBaoSuKien.html'" class="userOnly">🔔 Thông báo</button>
     <!-- AUTH -->
@@ -309,27 +326,40 @@
     let selectedStatus = "Mở";
     let notified     = JSON.parse(localStorage.getItem("notified")) || {};
 
+    // ── fbReady — đảm bảo Firebase load xong trước khi login ──
+    // Dùng Set để mỗi node chỉ được đếm 1 lần (tránh onValue bắn nhiều lần)
+    const _fbLoadedNodes = new Set();
+    const _FB_NODES = ["users", "events", "participants"];
+    function _fbNodeLoaded(nodeName) {
+      _fbLoadedNodes.add(nodeName);
+      if (_fbLoadedNodes.size >= _FB_NODES.length) {
+        const ov = document.getElementById("fbLoadingOverlay");
+        if (ov) ov.style.display = "none";
+      }
+    }
+
     // ── Firebase Listeners ─────────────────────────────────
     onValue(ref(db, "users"), snapshot => {
       users = [];
       snapshot.forEach(child => users.push({ id: child.key, ...child.val() }));
+      _fbNodeLoaded("users");
     });
 
     onValue(ref(db, "events"), snapshot => {
       events = [];
       snapshot.forEach(child => events.push({ id: child.key, ...child.val() }));
-      // Sync to localStorage so other pages can use it
       localStorage.setItem("events", JSON.stringify(events));
       if (document.getElementById("eventTable")?.offsetParent !== null) renderEvents();
       updateEventDropdown();
+      _fbNodeLoaded("events");
     });
 
     onValue(ref(db, "participants"), snapshot => {
       participants = [];
       snapshot.forEach(child => participants.push({ id: child.key, ...child.val() }));
-      // Sync to localStorage so checkin.html, thongKe pages can use it
       localStorage.setItem("participants", JSON.stringify(participants));
       if (document.getElementById("pTable")?.offsetParent !== null) renderParticipants();
+      _fbNodeLoaded("participants");
     });
 
     // ── Flower Effect ──────────────────────────────────────
@@ -359,44 +389,145 @@
       if (id === "dashboard")  renderDashboard();
     }
 
-    // ── Auth ───────────────────────────────────────────────
+    // ── FIX 2: handleAuth đã sửa ─────────────────────────
+    // - Kiểm tra Firebase đã load chưa (tránh race condition)
+    // - Hỗ trợ cả pass (plain text) lẫn passHash (SHA-256)
+    // - Yêu cầu mật khẩu hợp lý: ≥6 ký tự + có chữ + có số
+    // ──────────────────────────────────────────────────────
+    async function sha256(text) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+    }
+
+    function handleAuth() {
+      const email = document.getElementById("auth_email").value.trim().toLowerCase();
+      const pass  = document.getElementById("auth_pass").value;
+      const msgEl = document.getElementById("login_msg");
+      msgEl.style.display = "none";
+
+      // Kiểm tra Firebase đã load chưa
+      if (_fbLoadedNodes.size < _FB_NODES.length) {
+        showMsg(msgEl, "⏳ Đang kết nối dữ liệu, vui lòng thử lại sau vài giây!", false);
+        return;
+      }
+
+      if (isLoginMode) {
+        if (!email || !pass) { showMsg(msgEl, "❌ Vui lòng nhập email và mật khẩu!", true); return; }
+        if (!email.includes("@")) { showMsg(msgEl, "❌ Email không hợp lệ!", true); return; }
+
+        // Tìm trong Firebase (mảng users được sync từ onValue)
+        // Nếu không thấy trong Firebase, thử fallback localStorage (tương thích trang cũ)
+        let u = users.find(x => x.email?.toLowerCase() === email);
+
+        if (!u) {
+          // Fallback: tìm trong localStorage (tương thích với dangkitaikhoan.html, dangnhap-dangxuat-phanquyen.js)
+          const lsUsers = JSON.parse(localStorage.getItem("users") || "[]");
+          const lsUser  = lsUsers.find(x => (x.email || x.Email || "").toLowerCase() === email);
+          if (lsUser) {
+            // Migrate tài khoản localStorage lên Firebase
+            sha256(lsUser.pass || lsUser.password || "").then(hash => {
+              const migratedUser = {
+                name    : lsUser.name || lsUser.hoten || lsUser.fullname || "Người dùng",
+                email   : email,
+                pass    : lsUser.pass || lsUser.password || "",
+                passHash: hash,
+                role    : lsUser.role || "user",
+                chucvu  : lsUser.chucvu || ""
+              };
+              push(ref(db, "users"), migratedUser).then(ref => {
+                const newUser = { id: ref.key, ...migratedUser };
+                // Xóa khỏi localStorage để tránh lần sau lại migrate
+                const updated = lsUsers.filter(x => (x.email || "").toLowerCase() !== email);
+                localStorage.setItem("users", JSON.stringify(updated));
+                // Kiểm tra mật khẩu sau khi migrate
+                const inputPass = lsUser.pass || lsUser.password || "";
+                if (inputPass === pass || hash === hash) {
+                  _doLogin(newUser);
+                } else {
+                  showMsg(msgEl, "❌ Mật khẩu không đúng!", true);
+                }
+              });
+            });
+            return;
+          }
+          showMsg(msgEl, "❌ Email này chưa được đăng ký!", true);
+          return;
+        }
+
+        // Hỗ trợ cả plain text (pass) lẫn SHA-256 hash (passHash)
+        if (u.passHash) {
+          sha256(pass).then(hash => {
+            if (hash === u.passHash || u.pass === pass) {
+              _doLogin(u);
+            } else {
+              showMsg(msgEl, "❌ Mật khẩu không đúng!", true);
+            }
+          });
+          return;
+        }
+        // Tài khoản dùng plain text
+        if (u.pass !== pass) { showMsg(msgEl, "❌ Mật khẩu không đúng!", true); return; }
+        _doLogin(u);
+
+      } else {
+        // ── ĐĂNG KÝ ──
+        const name   = document.getElementById("auth_name").value.trim();
+        const chucvu = document.getElementById("auth_chucvu").value.trim();
+        const role   = document.getElementById("auth_role").value;
+
+        if (!name)  { showMsg(msgEl, "❌ Vui lòng nhập họ tên!", true); return; }
+        if (!email) { showMsg(msgEl, "❌ Vui lòng nhập email!", true); return; }
+        if (!pass)  { showMsg(msgEl, "❌ Vui lòng nhập mật khẩu!", true); return; }
+
+        if (!(email.endsWith("@gmail.com") || email.endsWith("@student.hcmue.edu.vn")))
+          { showMsg(msgEl, "❌ Email phải là @gmail.com hoặc @student.hcmue.edu.vn!", true); return; }
+
+        if (pass.length < 6)
+          { showMsg(msgEl, "❌ Mật khẩu phải có ít nhất 6 ký tự!", true); return; }
+        if (!/[a-zA-Z]/.test(pass))
+          { showMsg(msgEl, "❌ Mật khẩu phải có ít nhất 1 chữ cái!", true); return; }
+        if (!/[0-9]/.test(pass))
+          { showMsg(msgEl, "❌ Mật khẩu phải có ít nhất 1 chữ số!", true); return; }
+
+        // Kiểm tra email trùng — tìm cả Firebase lẫn localStorage
+        const emailExistsFirebase = users.find(u => u.email?.toLowerCase() === email);
+        const lsUsers2 = JSON.parse(localStorage.getItem("users") || "[]");
+        const emailExistsLS = lsUsers2.find(u => (u.email || "").toLowerCase() === email);
+        if (emailExistsFirebase || emailExistsLS)
+          { showMsg(msgEl, "❌ Email này đã được đăng ký!", true); return; }
+
+        // Lưu email đã normalize (lowercase) vào Firebase
+        sha256(pass).then(hash => {
+          push(ref(db, "users"), {
+            name,
+            email,   // đã lowercase từ đầu hàm
+            pass,
+            passHash: hash,
+            role,
+            chucvu,
+            createdAt: new Date().toISOString()
+          });
+          showToast("🎉 Đăng ký thành công! Hãy đăng nhập.");
+          document.getElementById("auth_email").value = email;
+          document.getElementById("auth_pass").value  = "";
+          toggleAuthMode();
+        });
+      }
+    }
+
+    function _doLogin(u) {
+      currentUser = u;
+      localStorage.setItem("currentUser", JSON.stringify(u));
+      showToast("🎉 Chào mừng " + u.name + "!");
+      updateUI();
+      go("home");
+    }
+
     function toggleAuthMode() {
       isLoginMode = !isLoginMode;
       document.getElementById("authTitle").innerText = isLoginMode ? "🔐 Đăng nhập" : "👤 Đăng ký";
       document.getElementById("regFields").style.display = isLoginMode ? "none" : "block";
       document.getElementById("btnAuth").innerText = isLoginMode ? "Đăng nhập" : "Tạo tài khoản";
-    }
-
-    function handleAuth() {
-      const email = document.getElementById("auth_email").value.trim().toLowerCase();
-      const pass  = document.getElementById("auth_pass").value.trim();
-      const msgEl = document.getElementById("login_msg");
-      msgEl.style.display = "none";
-
-      if (isLoginMode) {
-        if (!email || !pass) { showMsg(msgEl, "❌ Vui lòng nhập email và mật khẩu!", true); return; }
-        const u = users.find(x => x.email?.toLowerCase() === email && x.pass === pass);
-        if (!u) { showMsg(msgEl, "❌ Email hoặc mật khẩu không đúng!", true); return; }
-        currentUser = u;
-        localStorage.setItem("currentUser", JSON.stringify(u));
-        showToast("🎉 Chào mừng " + u.name + "!");
-        updateUI();
-        go("home");
-      } else {
-        const name   = document.getElementById("auth_name").value.trim();
-        const chucvu = document.getElementById("auth_chucvu").value.trim();
-        const role   = document.getElementById("auth_role").value;
-        if (!name || !email || !pass || !chucvu) { showMsg(msgEl, "❌ Vui lòng nhập đầy đủ thông tin!", true); return; }
-        if (!(email.endsWith("@gmail.com") || email.endsWith("@student.hcmue.edu.vn")))
-          { showMsg(msgEl, "❌ Email phải là @gmail.com hoặc @student.hcmue.edu.vn!", true); return; }
-        if (pass.length < 6 || !/[a-zA-Z]/.test(pass) || !/[0-9]/.test(pass) || !/^[A-Z]/.test(pass) || !/[!@#$%^&*(),.?":{}|<>]/.test(pass))
-          { showMsg(msgEl, "❌ Mật khẩu ≥6 ký tự, chữ+số+ký tự đặc biệt+viết hoa chữ đầu!", true); return; }
-        if (users.find(u => u.email?.toLowerCase() === email))
-          { showMsg(msgEl, "❌ Email này đã được đăng ký!", true); return; }
-        push(ref(db, "users"), { name, email, pass, role, chucvu });
-        showToast("🎉 Đăng ký thành công! Hãy đăng nhập.");
-        toggleAuthMode();
-      }
     }
 
     function showMsg(el, msg, isError) {
@@ -753,6 +884,7 @@
       if (!newPass || newPass.length < 6) { showToast("❌ Mật khẩu không hợp lệ!", "error"); return; }
       update(ref(db, "users/" + user.id), { pass: newPass });
       showToast("✅ Đổi mật khẩu thành công! Hãy đăng nhập lại.");
+      location.reload();
       document.getElementById("auth_pass").value = "";
     }
 

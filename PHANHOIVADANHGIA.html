@@ -2,127 +2,176 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Phản hồi & Đánh giá</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phản hồi & Đánh giá - CLB</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Nunito',sans-serif; }
-  body { background:linear-gradient(135deg,#ff9a9e,#fad0c4); min-height:100vh; padding:40px 20px; }
-  h2,h3 { text-align:center; color:#e84393; margin-bottom:20px; font-family:'Quicksand'; }
-  .card { background:rgba(255,255,255,.97); padding:30px; border-radius:24px; max-width:520px; margin:0 auto 30px; box-shadow:0 16px 48px rgba(255,105,180,.2); }
-  input,textarea,select { width:100%; padding:12px; border:2px solid #ffe0ea; border-radius:12px; background:#fff9fb; outline:none; margin-bottom:12px; }
-  input:focus,textarea:focus { border-color:#ff6a88; }
-  button.main { width:100%; padding:13px; background:linear-gradient(135deg,#ff6a88,#e84393); color:#fff; border:none; border-radius:14px; font-weight:700; cursor:pointer; margin-top:5px; }
-  button.main:hover { transform:translateY(-2px); box-shadow:0 5px 15px rgba(255,106,136,.4); }
-  .review { background:#fff0f5; padding:12px; margin-top:10px; border-radius:12px; text-align:left; border-left:4px solid #ff6a88; }
-  .back { display:inline-block; margin-bottom:20px; color:#e84393; cursor:pointer; font-weight:700; }
-  .stars { font-size:20px; color:#f39c12; }
-  .toast { position:fixed; bottom:25px; left:50%; transform:translateX(-50%) translateY(100px); padding:12px 25px; border-radius:12px; color:#fff; font-weight:700; transition:0.4s; z-index:9999; opacity:0; }
-  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-  .toast.success { background:#2ecc71; }
-  .toast.error { background:#e74c3c; }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Nunito',sans-serif;}
+  body{background:linear-gradient(135deg,#ff9a9e,#fad0c4);min-height:100vh;padding:40px 20px;}
+  h2,h3{text-align:center;color:#e84393;margin-bottom:20px;font-family:'Quicksand';}
+  .card{background:rgba(255,255,255,.97);padding:30px;border-radius:24px;max-width:560px;margin:0 auto 30px;box-shadow:0 16px 48px rgba(255,105,180,.2);}
+  input,textarea,select{width:100%;padding:12px;border:2px solid #ffe0ea;border-radius:12px;background:#fff9fb;outline:none;margin-bottom:12px;font-family:'Nunito';font-size:14px;}
+  input:focus,textarea:focus,select:focus{border-color:#ff6a88;}
+  button.main{width:100%;padding:13px;background:linear-gradient(135deg,#ff6a88,#e84393);color:#fff;border:none;border-radius:14px;font-weight:700;cursor:pointer;margin-top:5px;font-family:'Nunito';}
+  button.main:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(255,106,136,.4);}
+  .review{background:#fff0f5;padding:14px;margin-top:10px;border-radius:12px;text-align:left;border-left:4px solid #ff6a88;}
+  .review .rev-meta{font-size:12px;color:#aaa;margin-top:6px;}
+  .back{display:inline-block;margin-bottom:20px;color:#e84393;cursor:pointer;font-weight:700;}
+  .stars{color:#f39c12;font-size:18px;}
+  .toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(100px);padding:12px 25px;border-radius:12px;color:#fff;font-weight:700;transition:.4s;z-index:9999;opacity:0;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.success{background:#2ecc71;} .toast.error{background:#e74c3c;}
+  .star-input{display:flex;gap:6px;margin-bottom:12px;font-size:30px;cursor:pointer;}
+  .star-input span{transition:.1s;color:#ddd;}
+  .star-input span.active{color:#f39c12;}
+  .avg-rating{text-align:center;font-size:14px;color:#888;margin-bottom:12px;}
+  #loadingOverlay{position:fixed;inset:0;background:rgba(255,154,158,.8);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;font-weight:700;color:#fff;font-family:'Quicksand';}
+  #loadingOverlay.hidden{display:none;}
+  .flower{position:fixed;top:-50px;font-size:20px;animation:fall linear infinite;pointer-events:none;z-index:0;}
+  @keyframes fall{0%{transform:translateY(-50px) rotate(0)}100%{transform:translateY(110vh) rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<div style="max-width:520px; margin:0 auto;">
+<div id="loadingOverlay">⏳ Đang kết nối Firebase...</div>
+
+<div style="max-width:560px;margin:0 auto;">
   <p class="back" onclick="window.location.href='Giaodienquanlysukienclb.html'">← Quay về trang chủ</p>
 
   <div class="card">
     <h2>📝 Đánh giá sự kiện</h2>
     <input type="email" id="email" placeholder="Nhập email của bạn">
     <select id="sukien"><option value="">-- Chọn sự kiện --</option></select>
-    <input type="number" id="rating" placeholder="Điểm đánh giá (1-5)" min="1" max="5">
+
+    <!-- Star rating UI -->
+    <div>
+      <label style="font-size:13px;font-weight:700;color:#c0395e;display:block;margin-bottom:4px;">Điểm đánh giá</label>
+      <div class="star-input" id="starInput">
+        <span data-val="1">★</span>
+        <span data-val="2">★</span>
+        <span data-val="3">★</span>
+        <span data-val="4">★</span>
+        <span data-val="5">★</span>
+      </div>
+    </div>
+
     <textarea id="comment" placeholder="Nhận xét của bạn..." rows="4"></textarea>
-    <button class="main" onclick="guiDanhGia()">Gửi đánh giá</button>
+    <button class="main" onclick="guiDanhGia()">📤 Gửi đánh giá</button>
   </div>
 
   <div class="card">
     <h3>📊 Phản hồi từ người tham gia</h3>
-    <div id="danhsach"></div>
+    <div class="avg-rating" id="avgRating"></div>
+    <div id="danhsach"><p style="text-align:center;color:#aaa">Đang tải...</p></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { db, ref, push, onValue } from "./firebase.js";
+import { FS } from "./firebase-sync.js";
 
-let participants = [];
-let reviews = [];
-let events = [];
+// Hoa rơi
+setInterval(()=>{
+  const f=document.createElement('div');f.className='flower';f.innerHTML='🌸';
+  f.style.left=Math.random()*100+'vw';f.style.animationDuration=(3+Math.random()*5)+'s';
+  document.body.appendChild(f);setTimeout(()=>f.remove(),8000);
+},400);
 
-// Load events vào dropdown
-onValue(ref(db, "events"), snapshot => {
-  events = [];
-  let sel = document.getElementById("sukien");
-  sel.innerHTML = '<option value="">-- Chọn sự kiện --</option>';
-  snapshot.forEach(child => {
-    let e = child.val();
-    events.push(e);
-    sel.innerHTML += `<option value="${e.t}">${e.t}</option>`;
+// Star rating
+let selectedRating = 0;
+document.querySelectorAll('#starInput span').forEach(star => {
+  star.addEventListener('mouseover', () => highlightStars(+star.dataset.val));
+  star.addEventListener('mouseout',  () => highlightStars(selectedRating));
+  star.addEventListener('click', () => {
+    selectedRating = +star.dataset.val;
+    highlightStars(selectedRating);
   });
 });
+function highlightStars(n) {
+  document.querySelectorAll('#starInput span').forEach((s,i) =>
+    s.classList.toggle('active', i < n));
+}
 
-// Load participants để kiểm tra check-in
-onValue(ref(db, "participants"), snapshot => {
-  participants = [];
-  snapshot.forEach(child => participants.push({ id: child.key, ...child.val() }));
-});
+// Chờ Firebase
+await FS.ready;
+document.getElementById('loadingOverlay').classList.add('hidden');
 
-// Load reviews
-onValue(ref(db, "reviews"), snapshot => {
-  reviews = [];
-  snapshot.forEach(child => reviews.push({ id: child.key, ...child.val() }));
-  hienThiDanhGia();
-});
+// Listeners
+window.addEventListener('fs:events',  populateDropdown);
+window.addEventListener('fs:reviews', renderReviews);
 
-window.guiDanhGia = function() {
-  let email = document.getElementById("email").value.trim();
-  let sukien = document.getElementById("sukien").value;
-  let rating = parseInt(document.getElementById("rating").value);
-  let comment = document.getElementById("comment").value.trim();
+populateDropdown();
+renderReviews();
 
-  if (!email || !sukien || !rating || !comment)
-    return showToast("❌ Vui lòng nhập đầy đủ!", "error");
+function populateDropdown() {
+  const sel = document.getElementById('sukien');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- Chọn sự kiện --</option>';
+  FS.getEvents().forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.t; opt.textContent = e.t;
+    if (e.t === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
 
-  if (rating < 1 || rating > 5)
-    return showToast("❌ Điểm phải từ 1 đến 5!", "error");
+window.guiDanhGia = async () => {
+  const email   = document.getElementById('email').value.trim();
+  const sukien  = document.getElementById('sukien').value;
+  const comment = document.getElementById('comment').value.trim();
 
-  // Kiểm tra đã đăng ký sự kiện chưa
-  let daThamGia = participants.some(p => p.email === email && p.event === sukien);
-  if (!daThamGia)
-    return showToast("❌ Bạn chưa đăng ký sự kiện này!", "error");
+  if (!email)           return showToast('❌ Vui lòng nhập email!', 'error');
+  if (!sukien)          return showToast('❌ Vui lòng chọn sự kiện!', 'error');
+  if (!selectedRating)  return showToast('❌ Vui lòng chọn điểm!', 'error');
+  if (!comment)         return showToast('❌ Vui lòng nhập nhận xét!', 'error');
+
+  // Kiểm tra đã đăng ký chưa
+  const daThamGia = FS.getParticipants().some(p => p.email===email && p.event===sukien);
+  if (!daThamGia) return showToast('❌ Bạn chưa đăng ký sự kiện này!', 'error');
 
   // Kiểm tra đã đánh giá chưa
-  let daDanhGia = reviews.some(r => r.email === email && r.sukien === sukien);
-  if (daDanhGia)
-    return showToast("❌ Bạn đã đánh giá sự kiện này rồi!", "error");
+  const daDanhGia = FS.getReviews().some(r => r.email===email && r.sukien===sukien);
+  if (daDanhGia) return showToast('❌ Bạn đã đánh giá sự kiện này rồi!', 'error');
 
-  push(ref(db, "reviews"), { email, sukien, rating, comment });
-  showToast("🎉 Gửi đánh giá thành công!");
+  await FS.addReview({ email, sukien, rating: selectedRating, comment, createdAt: new Date().toISOString() });
+  showToast('🎉 Gửi đánh giá thành công!');
 
-  document.getElementById("email").value = "";
-  document.getElementById("rating").value = "";
-  document.getElementById("comment").value = "";
+  document.getElementById('email').value  = '';
+  document.getElementById('comment').value = '';
+  selectedRating = 0;
+  highlightStars(0);
+};
+
+function renderReviews() {
+  const reviews = FS.getReviews();
+  const stars = n => '⭐'.repeat(n);
+  const el = document.getElementById('danhsach');
+  const avg = document.getElementById('avgRating');
+
+  if (!reviews.length) {
+    el.innerHTML = `<p style="text-align:center;color:#aaa">Chưa có đánh giá nào</p>`;
+    avg.textContent = '';
+    return;
+  }
+
+  const avgScore = (reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1);
+  avg.innerHTML = `⭐ Điểm trung bình: <strong style="color:#e84393">${avgScore}/5</strong> (${reviews.length} đánh giá)`;
+
+  el.innerHTML = reviews.slice().reverse().map(r => `
+    <div class="review">
+      <div style="font-weight:700;color:#333;">${r.sukien}</div>
+      <div class="stars">${stars(r.rating)}</div> ${r.rating}/5
+      <div style="margin-top:6px;color:#555;">💬 ${r.comment}</div>
+      <div class="rev-meta">📧 ${r.email} · ${r.createdAt?new Date(r.createdAt).toLocaleDateString('vi-VN'):''}</div>
+    </div>
+  `).join('');
 }
 
-function hienThiDanhGia() {
-  let stars = r => "⭐".repeat(r);
-  document.getElementById("danhsach").innerHTML = reviews.length === 0
-    ? "<p style='text-align:center;color:#aaa'>Chưa có đánh giá nào</p>"
-    : reviews.map(r => `
-        <div class="review">
-          📧 ${r.email}<br>
-          📌 ${r.sukien}<br>
-          <span class="stars">${stars(r.rating)}</span> ${r.rating}/5<br>
-          💬 ${r.comment}
-        </div>`).join("");
-}
-
-function showToast(msg, type="success") {
-  const t = document.getElementById("toast");
-  t.innerText = msg; t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove("show"), 3000);
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 </script>
 </body>

@@ -6,559 +6,419 @@
   <title>Phụ trách nhiệm vụ sự kiện - CLB</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Nunito',sans-serif; }
+    body { background:linear-gradient(135deg,#ff9a9e,#fad0c4); min-height:100vh; overflow-x:hidden; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; }
+    .menu-toggle { position:fixed; top:15px; left:15px; font-size:26px; background:#ff6a88; color:#fff; padding:8px 13px; border-radius:12px; cursor:pointer; z-index:1000; box-shadow:0 4px 12px rgba(255,106,136,.4); }
+    .menu { position:fixed; top:0; left:-270px; width:240px; height:100%; background:linear-gradient(180deg,#ff6a88,#ff8fab); padding-top:70px; display:flex; flex-direction:column; gap:8px; transition:.3s; z-index:999; overflow-y:auto; }
+    .menu.show { left:0; }
+    .menu button { margin:0 12px; padding:11px 14px; border:none; border-radius:12px; background:rgba(255,255,255,.9); cursor:pointer; text-align:left; font-weight:600; color:#c0395e; transition:.2s; }
+    .menu button:hover { background:#fff; transform:translateX(4px); }
+    .menu button.current { background:#fff; border-left:3px solid #e84393; }
 
-    body {
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    .page-wrapper { padding:80px 20px 40px; animation:fadeIn 0.5s; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-    /* ===== MENU (đồng bộ hoàn toàn với Giaodienquanlysukienclb.html) ===== */
-    .menu-toggle {
-      position: fixed; top: 15px; left: 15px;
-      font-size: 26px; background: #ff6a88; color: #fff;
-      padding: 8px 13px; border-radius: 12px; cursor: pointer;
-      z-index: 1000; box-shadow: 0 4px 12px rgba(255,106,136,.4);
-    }
+    .card { background:rgba(255,255,255,.97); padding:30px; border-radius:24px; max-width:900px; margin:0 auto; box-shadow:0 16px 48px rgba(255,105,180,.2); }
+    h2 { text-align:center; color:#e84393; margin-bottom:6px; font-family:'Quicksand'; font-size:22px; font-weight:700; }
+    .page-subtitle { text-align:center; color:#ffaabf; font-size:13px; margin-bottom:26px; }
 
-    .menu {
-      position: fixed; top: 0; left: -270px; width: 240px; height: 100%;
-      background: linear-gradient(180deg, #ff6a88, #ff8fab);
-      padding-top: 70px; display: flex; flex-direction: column;
-      gap: 8px; transition: .3s; z-index: 999;
-    }
-    .menu.show { left: 0; }
+    .form-group { margin-bottom:14px; text-align:left; }
+    .form-group label { display:block; font-size:13px; font-weight:700; color:#c0395e; margin-bottom:5px; }
+    .required { color:#ff4d88; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    input, select, textarea { width:100%; padding:11px 14px; border:2px solid #ffe0ea; border-radius:12px; background:#fff9fb; outline:none; transition:0.2s; font-family:'Nunito',sans-serif; font-size:14px; }
+    input:focus, select:focus, textarea:focus { border-color:#ff6a88; box-shadow:0 0 0 3px rgba(255,106,136,.1); }
+    textarea { resize:vertical; min-height:72px; }
+    .err-msg { font-size:12px; color:#ff6b6b; display:none; margin-top:4px; }
+    .err-msg.show { display:block; }
+    input.error, select.error { border-color:#ff6b6b !important; }
 
-    .menu button {
-      margin: 0 12px; padding: 11px 14px; border: none;
-      border-radius: 12px; background: rgba(255,255,255,.9);
-      cursor: pointer; text-align: left; font-weight: 600;
-      color: #c0395e; transition: .2s;
-    }
-    .menu button:hover { background: #fff; transform: translateX(4px); }
-    .menu button.current { background: #fff; border-left: 3px solid #e84393; }
+    .cv-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+    .cv-tag { padding:7px 15px; border:2px solid #ffe0ea; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; background:#fff; color:#c0395e; transition:.18s; user-select:none; }
+    .cv-tag:hover { border-color:#ff6a88; background:#fff0f5; }
+    .cv-tag.active { background:#ff6a88; color:#fff; border-color:#ff6a88; }
 
-    /* ===== LAYOUT ===== */
-    .page-wrapper {
-      padding: 80px 20px 40px;
-      animation: fadeIn 0.5s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    .btn-row { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+    button.main { flex:1; padding:13px; min-width:140px; background:linear-gradient(135deg,#ff6a88,#e84393); color:#fff; border:none; border-radius:14px; font-weight:700; cursor:pointer; transition:0.3s; font-family:'Nunito',sans-serif; font-size:14px; }
+    button.main:hover { transform:translateY(-2px); box-shadow:0 5px 15px rgba(255,106,136,.4); }
+    button.btn-reset { padding:13px 22px; background:#fff0f5; color:#e84393; border:2px solid #ffccd9; border-radius:14px; font-weight:700; cursor:pointer; transition:0.2s; font-family:'Nunito',sans-serif; font-size:14px; }
+    button.btn-reset:hover { background:#ffe0ea; }
 
-    .card {
-      background: rgba(255,255,255,.97);
-      padding: 30px; border-radius: 24px;
-      max-width: 860px; margin: 0 auto;
-      box-shadow: 0 16px 48px rgba(255,105,180,.2);
-    }
+    .table-container { overflow-x:auto; margin-top:15px; border-radius:14px; }
+    table { width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; min-width:600px; }
+    th, td { padding:12px 14px; text-align:center; border-bottom:1px solid #fce8f0; }
+    th { background:#ffe0ea; color:#c0395e; font-weight:700; font-size:13px; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:#fff9fb; }
 
-    h2 {
-      text-align: center; color: #e84393; margin-bottom: 6px;
-      font-family: 'Quicksand'; font-size: 22px; font-weight: 700;
-    }
-    .page-subtitle {
-      text-align: center; color: #ffaabf; font-size: 13px; margin-bottom: 26px;
-    }
+    .badge-cv { display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; }
+    .badge-HauCan      { background:#ffeaa7; color:#d6a600; }
+    .badge-AmThanh     { background:#dfe6e9; color:#636e72; }
+    .badge-TruyenThong { background:#a29bfe33; color:#6c5ce7; }
+    .badge-TrangTri    { background:#fd79a833; color:#e84393; }
+    .badge-LeTan       { background:#55efc433; color:#00b894; }
+    .badge-KyThuat     { background:#74b9ff33; color:#0984e3; }
+    .badge-VanNghe     { background:#fdcb6e33; color:#e17055; }
+    .badge-Khac        { background:#f0f0f0; color:#888; }
+    .badge-chuaxong    { background:#ffeaa7; color:#d6a600; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; display:inline-block; }
+    .badge-dangxong    { background:#74b9ff33; color:#0984e3; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; display:inline-block; }
+    .badge-hoanthanh   { background:#55efc433; color:#00b894; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; display:inline-block; }
+    .btn-edit { background:#ff9f43; color:#fff; border:none; padding:5px 11px; border-radius:8px; cursor:pointer; font-size:13px; margin-right:4px; }
+    .btn-del  { background:#ff4757; color:#fff; border:none; padding:5px 11px; border-radius:8px; cursor:pointer; font-size:13px; }
 
-    /* ===== FORM ===== */
-    .form-group { margin-bottom: 14px; text-align: left; }
-    .form-group label {
-      display: block; font-size: 13px; font-weight: 700;
-      color: #c0395e; margin-bottom: 5px;
-    }
-    .required { color: #ff4d88; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:2000; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal-box { background:#fff; border-radius:20px; padding:28px; width:90%; max-width:400px; box-shadow:0 20px 60px rgba(255,106,136,.25); animation:fadeIn .25s; }
+    .modal-box h3 { color:#e84393; font-family:'Quicksand'; margin-bottom:14px; font-size:17px; }
+    .modal-box textarea { width:100%; min-height:110px; margin-bottom:14px; }
 
-    input, select, textarea {
-      width: 100%; padding: 11px 14px;
-      border: 2px solid #ffe0ea; border-radius: 12px;
-      background: #fff9fb; outline: none; transition: 0.2s;
-      font-family: 'Nunito', sans-serif; font-size: 14px;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: #ff6a88; box-shadow: 0 0 0 3px rgba(255,106,136,.1);
-    }
-    textarea { resize: vertical; min-height: 72px; }
+    .toast { position:fixed; bottom:25px; left:50%; transform:translateX(-50%) translateY(100px); padding:12px 25px; border-radius:12px; color:#fff; font-weight:700; transition:0.4s; z-index:10001; opacity:0; pointer-events:none; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.success { background:#2ecc71; }
+    .toast.error   { background:#e74c3c; }
 
-    .err-msg { font-size: 12px; color: #ff6b6b; display: none; margin-top: 4px; }
-    .err-msg.show { display: block; }
-    input.error, select.error { border-color: #ff6b6b !important; }
+    .flower { position:fixed; top:-50px; font-size:20px; animation:fall linear infinite; pointer-events:none; z-index:0; }
+    @keyframes fall { 0%{transform:translateY(-50px) rotate(0deg)} 100%{transform:translateY(110vh) rotate(360deg)} }
+    .section-divider { border:none; border-top:2px dashed #ffe0ea; margin:22px 0; }
+    .empty-state { text-align:center; padding:32px 0; color:#ffb3c6; font-size:14px; }
+    .empty-state span { display:block; font-size:36px; margin-bottom:8px; }
 
-    /* ===== CÔNG VIỆC TAGS ===== */
-    .cv-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-    .cv-tag {
-      padding: 7px 15px; border: 2px solid #ffe0ea; border-radius: 20px;
-      font-size: 12px; font-weight: 700; cursor: pointer;
-      background: #fff; color: #c0395e; transition: .18s; user-select: none;
-    }
-    .cv-tag:hover { border-color: #ff6a88; background: #fff0f5; }
-    .cv-tag.active { background: #ff6a88; color: #fff; border-color: #ff6a88; }
-
-    /* ===== BUTTONS ===== */
-    .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-
-    button.main {
-      flex: 1; padding: 13px; min-width: 140px;
-      background: linear-gradient(135deg, #ff6a88, #e84393);
-      color: #fff; border: none; border-radius: 14px;
-      font-weight: 700; cursor: pointer; transition: 0.3s;
-      font-family: 'Nunito', sans-serif; font-size: 14px;
-    }
-    button.main:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,106,136,.4); }
-
-    button.btn-reset {
-      padding: 13px 22px; background: #fff0f5; color: #e84393;
-      border: 2px solid #ffccd9; border-radius: 14px;
-      font-weight: 700; cursor: pointer; transition: 0.2s;
-      font-family: 'Nunito', sans-serif; font-size: 14px;
-    }
-    button.btn-reset:hover { background: #ffe0ea; }
-
-    /* ===== TABLE ===== */
-    .table-container { overflow-x: auto; margin-top: 15px; border-radius: 14px; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 14px; overflow: hidden; min-width: 600px; }
-    th, td { padding: 12px 14px; text-align: center; border-bottom: 1px solid #fce8f0; }
-    th { background: #ffe0ea; color: #c0395e; font-weight: 700; font-size: 13px; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fff9fb; }
-
-    /* ===== BADGES ===== */
-    .badge-cv {
-      display: inline-block; padding: 4px 12px; border-radius: 20px;
-      font-size: 12px; font-weight: 700;
-    }
-    .badge-HauCan      { background: #ffeaa7; color: #d6a600; }
-    .badge-AmThanh     { background: #dfe6e9; color: #636e72; }
-    .badge-TruyenThong { background: #a29bfe33; color: #6c5ce7; }
-    .badge-TrangTri    { background: #fd79a833; color: #e84393; }
-    .badge-LeTan       { background: #55efc433; color: #00b894; }
-    .badge-KyThuat     { background: #74b9ff33; color: #0984e3; }
-    .badge-VanNghe     { background: #fdcb6e33; color: #e17055; }
-    .badge-Khac        { background: #f0f0f0; color: #888; }
-
-    .badge-chuaxong  { background: #ffeaa7; color: #d6a600; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display:inline-block; }
-    .badge-dangxong  { background: #74b9ff33; color: #0984e3; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display:inline-block; }
-    .badge-hoanthanh { background: #55efc433; color: #00b894; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display:inline-block; }
-
-    .btn-edit { background: #ff9f43; color: #fff; border: none; padding: 5px 11px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-right: 4px; }
-    .btn-del  { background: #ff4757; color: #fff; border: none; padding: 5px 11px; border-radius: 8px; cursor: pointer; font-size: 13px; }
-
-    /* ===== MODAL GHI CHÚ ===== */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.3); z-index: 2000;
-      align-items: center; justify-content: center;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal-box {
-      background: #fff; border-radius: 20px; padding: 28px;
-      width: 90%; max-width: 400px;
-      box-shadow: 0 20px 60px rgba(255,106,136,.25);
-      animation: fadeIn .25s;
-    }
-    .modal-box h3 { color: #e84393; font-family: 'Quicksand'; margin-bottom: 14px; font-size: 17px; }
-    .modal-box textarea { width: 100%; min-height: 110px; margin-bottom: 14px; }
-
-    /* ===== TOAST ===== */
-    .toast {
-      position: fixed; bottom: 25px; left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      padding: 12px 25px; border-radius: 12px;
-      color: #fff; font-weight: 700; transition: 0.4s;
-      z-index: 10001; opacity: 0; pointer-events: none;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.success { background: #2ecc71; }
-    .toast.error   { background: #e74c3c; }
-
-    /* ===== HOA RƠI ===== */
-    .flower {
-      position: fixed; top: -50px; font-size: 20px;
-      animation: fall linear infinite; pointer-events: none; z-index: 0;
-    }
-    @keyframes fall {
-      0%   { transform: translateY(-50px) rotate(0deg); }
-      100% { transform: translateY(110vh) rotate(360deg); }
-    }
-
-    .section-divider { border: none; border-top: 2px dashed #ffe0ea; margin: 22px 0; }
-
-    .empty-state {
-      text-align: center; padding: 32px 0; color: #ffb3c6; font-size: 14px;
-    }
-    .empty-state span { display: block; font-size: 36px; margin-bottom: 8px; }
+    /* Loading overlay */
+    #loadingOverlay { position:fixed; inset:0; background:rgba(255,154,158,.7); display:flex; align-items:center; justify-content:center; z-index:9999; font-size:18px; font-weight:700; color:#fff; font-family:'Quicksand'; }
+    #loadingOverlay.hidden { display:none; }
   </style>
 </head>
 <body>
 
-  <!-- ===== MENU TOGGLE ===== -->
-  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+<!-- Loading -->
+<div id="loadingOverlay">⏳ Đang kết nối Firebase...</div>
 
-  <!-- ===== MENU (đồng bộ hoàn toàn với Giaodienquanlysukienclb.html) ===== -->
-  <div class="menu" id="menu">
-    <div style="position:fixed; top:15px; left:70px; right:15px; z-index:1000;">
-      <input
-        type="text"
-        id="globalSearch"
-        placeholder="🔍 Tìm kiếm: thành viên, công việc..."
-        style="width:100%; padding:10px 15px; border-radius:20px; border:none; outline:none; box-shadow:0 4px 12px rgba(0,0,0,0.15);"
-        oninput="globalSearchFunction()"
-      >
-    </div>
-    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🏠 Trang chủ</button>
-    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">➕ Tạo sự kiện</button>
-    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">📋 Quản lý sự kiện</button>
-    <button class="current">📋 Phân chia vai trò</button>
-    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">📑 Người tham gia</button>
-    <button onclick="window.location.href='XemSuaXuatDanhSach.html'">🔍 Quản lý chi tiết</button>
-    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🙋 Tham gia</button>
-    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🔐 Đăng nhập / Đăng ký</button>
-    <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🚪 Đăng xuất</button>
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+<div class="menu" id="menu">
+  <div style="position:relative; margin:0 12px 4px;">
+    <input type="text" id="globalSearch" placeholder="🔍 Tìm kiếm..." style="width:100%;padding:9px 14px;border-radius:20px;border:none;outline:none;font-size:13px;" oninput="globalSearchFunction()">
   </div>
+  <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🏠 Trang chủ</button>
+  <button onclick="window.location.href='Giaodienquanlysukienclb.html'">➕ Tạo sự kiện</button>
+  <button onclick="window.location.href='Giaodienquanlysukienclb.html'">📋 Quản lý sự kiện</button>
+  <button class="current">📋 Phân chia vai trò</button>
+  <button onclick="window.location.href='thongKeSoLuongNguoiThamGia.html'">📊 Thống kê</button>
+  <button onclick="window.location.href='XemSuaXuatDanhSach.html'">🔍 Quản lý chi tiết</button>
+  <button onclick="window.location.href='thongBaoSuKien.html'">🔔 Thông báo</button>
+  <button onclick="window.location.href='Giaodienquanlysukienclb.html'">🔐 Đăng nhập / Đăng ký</button>
+</div>
 
-  <!-- ===== NỘI DUNG CHÍNH ===== -->
-  <div class="page-wrapper">
-    <div class="card">
+<div class="page-wrapper">
+  <div class="card">
+    <h2>🌸 Phụ trách nhiệm vụ sự kiện 🌸</h2>
+    <p class="page-subtitle">Phân công công việc cho từng thành viên phụ trách</p>
 
-      <!-- [YC2] Tiêu đề mới -->
-      <h2>🌸 Phụ trách nhiệm vụ sự kiện 🌸</h2>
-      <p class="page-subtitle">Phân công công việc cho từng thành viên phụ trách</p>
-
-      <!-- ===== FORM THÊM / SỬA ===== -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>Tên thành viên <span class="required">*</span></label>
-          <input id="inp_name" type="text" placeholder="VD: Nguyễn Văn A">
-          <div class="err-msg" id="errName">Vui lòng nhập tên thành viên!</div>
-        </div>
-        <div class="form-group">
-          <label>Sự kiện <span class="required">*</span></label>
-          <select id="inp_event">
-            <option value="">-- Chọn sự kiện --</option>
-          </select>
-          <div class="err-msg" id="errEvent">Vui lòng chọn sự kiện!</div>
-        </div>
-      </div>
-
-      <!-- [YC3] Phụ trách công việc (tags) -->
+    <div class="form-row">
       <div class="form-group">
-        <label>Phụ trách công việc <span class="required">*</span></label>
-        <div class="cv-tags">
-          <div class="cv-tag" data-val="Hậu cần"      onclick="chonCongViec(this)">🚚 Hậu cần</div>
-          <div class="cv-tag" data-val="Âm thanh"     onclick="chonCongViec(this)">🎵 Âm thanh</div>
-          <div class="cv-tag" data-val="Truyền thông" onclick="chonCongViec(this)">📣 Truyền thông</div>
-          <div class="cv-tag" data-val="Trang trí"    onclick="chonCongViec(this)">🎀 Trang trí</div>
-          <div class="cv-tag" data-val="Lễ tân"       onclick="chonCongViec(this)">🤝 Lễ tân</div>
-          <div class="cv-tag" data-val="Kỹ thuật"     onclick="chonCongViec(this)">🔧 Kỹ thuật</div>
-          <div class="cv-tag" data-val="Văn nghệ"     onclick="chonCongViec(this)">🎭 Văn nghệ</div>
-          <div class="cv-tag" data-val="Khác"         onclick="chonCongViec(this)">📌 Khác</div>
-        </div>
-        <div class="err-msg" id="errCongViec">Vui lòng chọn công việc phụ trách!</div>
+        <label>Tên thành viên <span class="required">*</span></label>
+        <input id="inp_name" type="text" placeholder="VD: Nguyễn Văn A">
+        <div class="err-msg" id="errName">Vui lòng nhập tên thành viên!</div>
       </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Hạn hoàn thành <span class="required">*</span></label>
-          <input id="inp_deadline" type="date">
-          <div class="err-msg" id="errDeadline">Vui lòng chọn hạn hoàn thành!</div>
-        </div>
-        <div class="form-group">
-          <label>Trạng thái</label>
-          <select id="inp_status">
-            <option value="Chưa xong">🟡 Chưa xong</option>
-            <option value="Đang làm">🔵 Đang làm</option>
-            <option value="Hoàn thành">🟢 Hoàn thành</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- [YC4] Ghi chú nhiệm vụ — tính năng mới phù hợp -->
       <div class="form-group">
-        <label>📝 Ghi chú nhiệm vụ</label>
-        <textarea id="inp_note" placeholder="Mô tả chi tiết công việc, yêu cầu, lưu ý cần thực hiện..."></textarea>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-reset" onclick="resetForm()">🔄 Nhập lại</button>
-        <button class="main" onclick="luuPhanCong()">💾 Lưu phân công</button>
-      </div>
-
-      <hr class="section-divider">
-
-      <!-- ===== BẢNG DANH SÁCH ===== -->
-      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
-        <strong style="color:#c0395e; font-size:15px;">📋 Danh sách phân công</strong>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <input id="searchBox" type="text" placeholder="🔍 Tìm tên, công việc..."
-            style="padding:8px 14px; border-radius:20px; border:2px solid #ffe0ea; outline:none; font-size:13px; width:200px; background:#fff9fb;"
-            oninput="renderTable()">
-          <button onclick="xuatCSV()" style="padding:8px 16px; background:#8e44ad; color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:700; font-size:13px;">📥 Xuất CSV</button>
-        </div>
-      </div>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Thành viên</th>
-              <th>Sự kiện</th>
-              <th>Phụ trách công việc</th>
-              <th>Hạn HT</th>
-              <th>Trạng thái</th>
-              <th>Ghi chú</th>
-              <th>Hành động</th>
-            </tr>
-          </thead>
-          <tbody id="assignTable"></tbody>
-        </table>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ===== MODAL XEM GHI CHÚ ===== -->
-  <div class="modal-overlay" id="modalNote">
-    <div class="modal-box">
-      <h3>📝 Ghi chú nhiệm vụ</h3>
-      <textarea id="modalNoteText" readonly style="background:#fff9fb; color:#555;"></textarea>
-      <div style="display:flex; gap:10px;">
-        <button class="main" onclick="dongModal()">Đóng</button>
+        <label>Sự kiện <span class="required">*</span></label>
+        <select id="inp_event">
+          <option value="">-- Chọn sự kiện --</option>
+        </select>
+        <div class="err-msg" id="errEvent">Vui lòng chọn sự kiện!</div>
       </div>
     </div>
+
+    <div class="form-group">
+      <label>Phụ trách công việc <span class="required">*</span></label>
+      <div class="cv-tags">
+        <div class="cv-tag" data-val="Hậu cần"      onclick="chonCongViec(this)">🚚 Hậu cần</div>
+        <div class="cv-tag" data-val="Âm thanh"     onclick="chonCongViec(this)">🎵 Âm thanh</div>
+        <div class="cv-tag" data-val="Truyền thông" onclick="chonCongViec(this)">📣 Truyền thông</div>
+        <div class="cv-tag" data-val="Trang trí"    onclick="chonCongViec(this)">🎀 Trang trí</div>
+        <div class="cv-tag" data-val="Lễ tân"       onclick="chonCongViec(this)">🤝 Lễ tân</div>
+        <div class="cv-tag" data-val="Kỹ thuật"     onclick="chonCongViec(this)">🔧 Kỹ thuật</div>
+        <div class="cv-tag" data-val="Văn nghệ"     onclick="chonCongViec(this)">🎭 Văn nghệ</div>
+        <div class="cv-tag" data-val="Khác"         onclick="chonCongViec(this)">📌 Khác</div>
+      </div>
+      <div class="err-msg" id="errCongViec">Vui lòng chọn công việc phụ trách!</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Hạn hoàn thành <span class="required">*</span></label>
+        <input id="inp_deadline" type="date">
+        <div class="err-msg" id="errDeadline">Vui lòng chọn hạn hoàn thành!</div>
+      </div>
+      <div class="form-group">
+        <label>Trạng thái</label>
+        <select id="inp_status">
+          <option value="Chưa xong">🟡 Chưa xong</option>
+          <option value="Đang làm">🔵 Đang làm</option>
+          <option value="Hoàn thành">🟢 Hoàn thành</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>📝 Ghi chú nhiệm vụ</label>
+      <textarea id="inp_note" placeholder="Mô tả chi tiết công việc, yêu cầu, lưu ý..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-reset" onclick="resetForm()">🔄 Nhập lại</button>
+      <button class="main" onclick="luuPhanCong()">💾 Lưu phân công</button>
+    </div>
+
+    <hr class="section-divider">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+      <strong style="color:#c0395e;font-size:15px;">📋 Danh sách phân công</strong>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input id="searchBox" type="text" placeholder="🔍 Tìm tên, công việc..."
+          style="padding:8px 14px;border-radius:20px;border:2px solid #ffe0ea;outline:none;font-size:13px;width:200px;background:#fff9fb;"
+          oninput="renderTable()">
+        <button onclick="xuatCSV()" style="padding:8px 16px;background:#8e44ad;color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:13px;">📥 Xuất CSV</button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th><th>Thành viên</th><th>Sự kiện</th>
+            <th>Phụ trách</th><th>Hạn HT</th><th>Trạng thái</th>
+            <th>Ghi chú</th><th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="assignTable"></tbody>
+      </table>
+    </div>
   </div>
+</div>
 
-  <div class="toast" id="toast"></div>
+<!-- Modal ghi chú -->
+<div class="modal-overlay" id="modalNote">
+  <div class="modal-box">
+    <h3>📝 Ghi chú nhiệm vụ</h3>
+    <textarea id="modalNoteText" readonly style="background:#fff9fb;color:#555;"></textarea>
+    <button class="main" onclick="dongModal()">Đóng</button>
+  </div>
+</div>
 
-  <script>
-    /* ===== DATA ===== */
-    let assignments = JSON.parse(localStorage.getItem('assignments')) || [];
-    let editingIdx  = -1;
-    let selectedCV  = '';
+<div class="toast" id="toast"></div>
 
-    /* ===== HOA RƠI ===== */
-    setInterval(() => {
-      const f = document.createElement('div');
-      f.className = 'flower'; f.innerHTML = '🌸';
-      f.style.left = Math.random() * 100 + 'vw';
-      f.style.animationDuration = (3 + Math.random() * 5) + 's';
-      document.body.appendChild(f);
-      setTimeout(() => f.remove(), 8000);
-    }, 300);
+<script type="module">
+import { FS } from "./firebase-sync.js";
 
-    /* ===== MENU ===== */
-    function toggleMenu() {
-      document.getElementById('menu').classList.toggle('show');
+// ── State ──
+let editingId  = null; // Firebase key của assignment đang sửa
+let selectedCV = '';
+
+// ── Hoa rơi ──
+setInterval(() => {
+  const f = document.createElement('div');
+  f.className = 'flower'; f.innerHTML = '🌸';
+  f.style.left = Math.random() * 100 + 'vw';
+  f.style.animationDuration = (3 + Math.random() * 5) + 's';
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 8000);
+}, 400);
+
+// ── Menu ──
+window.toggleMenu = () => document.getElementById('menu').classList.toggle('show');
+
+// ── Chờ Firebase sẵn sàng ──
+await FS.ready;
+document.getElementById('loadingOverlay').classList.add('hidden');
+
+// ── Load sự kiện vào dropdown ──
+function loadEvents() {
+  const events = FS.getEvents();
+  const sel = document.getElementById('inp_event');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- Chọn sự kiện --</option>';
+  events.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.t || e.id;
+    opt.textContent = e.t || e.id;
+    if (opt.value === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Lắng nghe thay đổi real-time ──
+window.addEventListener('fs:events',      () => { loadEvents(); });
+window.addEventListener('fs:assignments', () => renderTable());
+
+loadEvents();
+renderTable();
+
+// ── Chọn công việc ──
+window.chonCongViec = (el) => {
+  document.querySelectorAll('.cv-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  selectedCV = el.dataset.val;
+  document.getElementById('errCongViec').classList.remove('show');
+};
+
+// ── Lưu phân công ──
+window.luuPhanCong = async () => {
+  ['errName','errEvent','errCongViec','errDeadline'].forEach(id =>
+    document.getElementById(id).classList.remove('show'));
+  ['inp_name','inp_event','inp_deadline'].forEach(id =>
+    document.getElementById(id).classList.remove('error'));
+
+  const name     = document.getElementById('inp_name').value.trim();
+  const event    = document.getElementById('inp_event').value;
+  const deadline = document.getElementById('inp_deadline').value;
+  const status   = document.getElementById('inp_status').value;
+  const note     = document.getElementById('inp_note').value.trim();
+
+  let valid = true;
+  if (!name)       { document.getElementById('errName').classList.add('show');     document.getElementById('inp_name').classList.add('error');     valid=false; }
+  if (!event)      { document.getElementById('errEvent').classList.add('show');    document.getElementById('inp_event').classList.add('error');    valid=false; }
+  if (!selectedCV) { document.getElementById('errCongViec').classList.add('show'); valid=false; }
+  if (!deadline)   { document.getElementById('errDeadline').classList.add('show'); document.getElementById('inp_deadline').classList.add('error'); valid=false; }
+  if (!valid) return;
+
+  const obj = { name, event, congViec: selectedCV, deadline, status, note, updatedAt: new Date().toISOString() };
+
+  try {
+    if (editingId) {
+      await FS.updateAssignment(editingId, obj);
+      showToast('✅ Đã cập nhật phân công!');
+      editingId = null;
+    } else {
+      obj.createdAt = new Date().toISOString();
+      await FS.addAssignment(obj);
+      showToast('🎉 Phân công thành công!');
     }
+    resetForm();
+  } catch (err) {
+    showToast('❌ Lỗi: ' + err.message, 'error');
+  }
+};
 
-    /* ===== LOAD SỰ KIỆN TỪ localStorage (đồng bộ data với trang chính) ===== */
-    function loadEvents() {
-      const events = JSON.parse(localStorage.getItem('events')) || [];
-      const sel = document.getElementById('inp_event');
-      sel.innerHTML = '<option value="">-- Chọn sự kiện --</option>';
-      events.forEach(e => {
-        const opt = document.createElement('option');
-        opt.value = e.t;
-        opt.textContent = e.t;
-        sel.appendChild(opt);
-      });
-    }
+// ── Reset form ──
+window.resetForm = () => {
+  document.getElementById('inp_name').value     = '';
+  document.getElementById('inp_event').value    = '';
+  document.getElementById('inp_deadline').value = '';
+  document.getElementById('inp_status').value   = 'Chưa xong';
+  document.getElementById('inp_note').value     = '';
+  document.querySelectorAll('.cv-tag').forEach(t => t.classList.remove('active'));
+  selectedCV = ''; editingId = null;
+  ['errName','errEvent','errCongViec','errDeadline'].forEach(id =>
+    document.getElementById(id).classList.remove('show'));
+  ['inp_name','inp_event','inp_deadline'].forEach(id =>
+    document.getElementById(id).classList.remove('error'));
+};
 
-    /* ===== CHỌN CÔNG VIỆC TAG ===== */
-    function chonCongViec(el) {
-      document.querySelectorAll('.cv-tag').forEach(t => t.classList.remove('active'));
-      el.classList.add('active');
-      selectedCV = el.dataset.val;
-      document.getElementById('errCongViec').classList.remove('show');
-    }
+// ── Helper badge ──
+function cvClass(cv) {
+  const map = { 'Hậu cần':'HauCan','Âm thanh':'AmThanh','Truyền thông':'TruyenThong','Trang trí':'TrangTri','Lễ tân':'LeTan','Kỹ thuật':'KyThuat','Văn nghệ':'VanNghe','Khác':'Khac' };
+  return map[cv] || 'Khac';
+}
+function statusClass(s) { return s==='Hoàn thành'?'hoanthanh':s==='Đang làm'?'dangxong':'chuaxong'; }
+function statusIcon(s)  { return s==='Hoàn thành'?'🟢':s==='Đang làm'?'🔵':'🟡'; }
 
-    /* ===== VALIDATE & LƯU ===== */
-    function luuPhanCong() {
-      ['errName','errEvent','errCongViec','errDeadline'].forEach(id =>
-        document.getElementById(id).classList.remove('show'));
-      ['inp_name','inp_event','inp_deadline'].forEach(id =>
-        document.getElementById(id).classList.remove('error'));
+// ── Render bảng ──
+function renderTable() {
+  const kw    = (document.getElementById('searchBox')?.value || '').toLowerCase();
+  const tbody = document.getElementById('assignTable');
+  if (!tbody) return;
 
-      const name     = document.getElementById('inp_name').value.trim();
-      const event    = document.getElementById('inp_event').value;
-      const deadline = document.getElementById('inp_deadline').value;
-      const status   = document.getElementById('inp_status').value;
-      const note     = document.getElementById('inp_note').value.trim();
+  const list = FS.getAssignments().filter(a =>
+    (a.name||'').toLowerCase().includes(kw) ||
+    (a.congViec||'').toLowerCase().includes(kw) ||
+    (a.event||'').toLowerCase().includes(kw)
+  );
 
-      let valid = true;
-      if (!name)       { document.getElementById('errName').classList.add('show');     document.getElementById('inp_name').classList.add('error');     valid = false; }
-      if (!event)      { document.getElementById('errEvent').classList.add('show');    document.getElementById('inp_event').classList.add('error');    valid = false; }
-      if (!selectedCV) { document.getElementById('errCongViec').classList.add('show'); valid = false; }
-      if (!deadline)   { document.getElementById('errDeadline').classList.add('show'); document.getElementById('inp_deadline').classList.add('error'); valid = false; }
-      if (!valid) return;
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><span>📋</span>Chưa có phân công nào.</div></td></tr>`;
+    return;
+  }
 
-      const obj = { name, event, congViec: selectedCV, deadline, status, note };
+  tbody.innerHTML = list.map((a, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td style="font-weight:700;color:#2c3e50;">${a.name||''}</td>
+      <td style="font-size:13px;">${a.event||'—'}</td>
+      <td><span class="badge-cv badge-${cvClass(a.congViec)}">${a.congViec||''}</span></td>
+      <td style="font-size:13px;">${a.deadline||''}</td>
+      <td><span class="badge-${statusClass(a.status)}">${statusIcon(a.status)} ${a.status||''}</span></td>
+      <td>${a.note?`<button onclick="xemGhiChu('${a.id}')" style="background:none;border:none;cursor:pointer;color:#e84393;font-size:13px;font-weight:700;padding:0;">📝 Xem</button>`:'<span style="color:#ddd;font-size:12px;">—</span>'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn-edit" onclick="suaPhanCong('${a.id}')">✏️</button>
+        <button class="btn-del"  onclick="xoaPhanCong('${a.id}')">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+}
+window.renderTable = renderTable;
 
-      if (editingIdx >= 0) {
-        assignments[editingIdx] = obj;
-        editingIdx = -1;
-        showToast('✅ Đã cập nhật phân công!');
-      } else {
-        assignments.push(obj);
-        showToast('🎉 Phân công thành công!');
-      }
+// ── Sửa ──
+window.suaPhanCong = (id) => {
+  const a = FS.getAssignments().find(x => x.id === id);
+  if (!a) return;
+  editingId = id;
+  document.getElementById('inp_name').value     = a.name || '';
+  document.getElementById('inp_event').value    = a.event || '';
+  document.getElementById('inp_deadline').value = a.deadline || '';
+  document.getElementById('inp_status').value   = a.status || 'Chưa xong';
+  document.getElementById('inp_note').value     = a.note || '';
+  document.querySelectorAll('.cv-tag').forEach(t => t.classList.toggle('active', t.dataset.val === a.congViec));
+  selectedCV = a.congViec || '';
+  window.scrollTo({ top:0, behavior:'smooth' });
+};
 
-      localStorage.setItem('assignments', JSON.stringify(assignments));
-      resetForm();
-      renderTable();
-    }
+// ── Xóa ──
+window.xoaPhanCong = async (id) => {
+  if (!confirm('Xóa phân công này?')) return;
+  await FS.deleteAssignment(id);
+  showToast('🗑️ Đã xóa phân công!', 'error');
+};
 
-    /* ===== RESET FORM ===== */
-    function resetForm() {
-      document.getElementById('inp_name').value     = '';
-      document.getElementById('inp_event').value    = '';
-      document.getElementById('inp_deadline').value = '';
-      document.getElementById('inp_status').value   = 'Chưa xong';
-      document.getElementById('inp_note').value     = '';
-      document.querySelectorAll('.cv-tag').forEach(t => t.classList.remove('active'));
-      selectedCV = ''; editingIdx = -1;
-      ['errName','errEvent','errCongViec','errDeadline'].forEach(id =>
-        document.getElementById(id).classList.remove('show'));
-      ['inp_name','inp_event','inp_deadline'].forEach(id =>
-        document.getElementById(id).classList.remove('error'));
-    }
+// ── Xem ghi chú ──
+window.xemGhiChu = (id) => {
+  const a = FS.getAssignments().find(x => x.id === id);
+  document.getElementById('modalNoteText').value = a?.note || '(Không có ghi chú)';
+  document.getElementById('modalNote').classList.add('show');
+};
+window.dongModal = () => document.getElementById('modalNote').classList.remove('show');
+document.getElementById('modalNote').addEventListener('click', e => { if (e.target === document.getElementById('modalNote')) window.dongModal(); });
 
-    /* ===== HELPER: CSS CLASS CHO BADGE ===== */
-    function cvClass(cv) {
-      const map = {
-        'Hậu cần':'HauCan','Âm thanh':'AmThanh','Truyền thông':'TruyenThong',
-        'Trang trí':'TrangTri','Lễ tân':'LeTan','Kỹ thuật':'KyThuat',
-        'Văn nghệ':'VanNghe','Khác':'Khac'
-      };
-      return map[cv] || 'Khac';
-    }
-    function statusClass(s) {
-      if (s === 'Hoàn thành') return 'hoanthanh';
-      if (s === 'Đang làm')   return 'dangxong';
-      return 'chuaxong';
-    }
-    function statusIcon(s) {
-      if (s === 'Hoàn thành') return '🟢';
-      if (s === 'Đang làm')   return '🔵';
-      return '🟡';
-    }
+// ── Xuất CSV ──
+window.xuatCSV = () => {
+  const list = FS.getAssignments();
+  if (!list.length) return showToast('Không có dữ liệu!', 'error');
+  let csv = '\uFEFFSTT,Thành viên,Sự kiện,Phụ trách,Hạn hoàn thành,Trạng thái,Ghi chú\n';
+  list.forEach((a,i) => {
+    csv += `${i+1},"${a.name}","${a.event}","${a.congViec}","${a.deadline}","${a.status}","${(a.note||'').replace(/"/g,"'")}"\n`;
+  });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8;' }));
+  link.download = 'phan_cong_su_kien.csv';
+  link.click();
+  showToast('📥 Xuất CSV thành công!');
+};
 
-    /* ===== RENDER BẢNG ===== */
-    function renderTable() {
-      const kw    = (document.getElementById('searchBox').value || '').toLowerCase();
-      const tbody = document.getElementById('assignTable');
+// ── Global search ──
+window.globalSearchFunction = () => {
+  const kw = document.getElementById('globalSearch').value.toLowerCase().trim();
+  document.getElementById('searchBox').value = kw;
+  renderTable();
+  document.getElementById('menu').classList.remove('show');
+};
 
-      const list = assignments
-        .map((a, i) => ({ ...a, _idx: i }))
-        .filter(a =>
-          a.name.toLowerCase().includes(kw) ||
-          a.congViec.toLowerCase().includes(kw) ||
-          (a.event || '').toLowerCase().includes(kw)
-        );
-
-      if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8">
-          <div class="empty-state"><span>📋</span>Chưa có phân công nào. Hãy thêm mới!</div>
-        </td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = list.map((a, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td style="font-weight:700; color:#2c3e50;">${a.name}</td>
-          <td style="font-size:13px;">${a.event || '—'}</td>
-          <td><span class="badge-cv badge-${cvClass(a.congViec)}">${a.congViec}</span></td>
-          <td style="font-size:13px;">${a.deadline}</td>
-          <td><span class="badge-${statusClass(a.status)}">${statusIcon(a.status)} ${a.status}</span></td>
-          <td>
-            ${a.note
-              ? `<button onclick="xemGhiChu(${a._idx})" style="background:none;border:none;cursor:pointer;color:#e84393;font-size:13px;font-weight:700;padding:0;">📝 Xem</button>`
-              : '<span style="color:#ddd;font-size:12px;">—</span>'}
-          </td>
-          <td style="white-space:nowrap;">
-            <button class="btn-edit" onclick="suaPhanCong(${a._idx})">✏️</button>
-            <button class="btn-del"  onclick="xoaPhanCong(${a._idx})">🗑️</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    /* ===== SỬA ===== */
-    function suaPhanCong(idx) {
-      const a = assignments[idx];
-      editingIdx = idx;
-      document.getElementById('inp_name').value     = a.name;
-      document.getElementById('inp_event').value    = a.event;
-      document.getElementById('inp_deadline').value = a.deadline;
-      document.getElementById('inp_status').value   = a.status;
-      document.getElementById('inp_note').value     = a.note || '';
-      document.querySelectorAll('.cv-tag').forEach(t =>
-        t.classList.toggle('active', t.dataset.val === a.congViec));
-      selectedCV = a.congViec;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    /* ===== XÓA ===== */
-    function xoaPhanCong(idx) {
-      if (!confirm('Xóa phân công này?')) return;
-      assignments.splice(idx, 1);
-      localStorage.setItem('assignments', JSON.stringify(assignments));
-      renderTable();
-      showToast('🗑️ Đã xóa phân công!', 'error');
-    }
-
-    /* ===== [YC4] XEM GHI CHÚ (Modal) ===== */
-    function xemGhiChu(idx) {
-      document.getElementById('modalNoteText').value = assignments[idx].note || '(Không có ghi chú)';
-      document.getElementById('modalNote').classList.add('show');
-    }
-    function dongModal() {
-      document.getElementById('modalNote').classList.remove('show');
-    }
-    document.getElementById('modalNote').addEventListener('click', function(e) {
-      if (e.target === this) dongModal();
-    });
-
-    /* ===== XUẤT CSV ===== */
-    function xuatCSV() {
-      if (assignments.length === 0) return showToast('Không có dữ liệu để xuất!', 'error');
-      let csv = '\uFEFFSTT,Thành viên,Sự kiện,Phụ trách công việc,Hạn hoàn thành,Trạng thái,Ghi chú\n';
-      assignments.forEach((a, i) => {
-        csv += `${i+1},"${a.name}","${a.event}","${a.congViec}","${a.deadline}","${a.status}","${(a.note||'').replace(/"/g,"'")}"\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'phan_cong_su_kien.csv';
-      link.click();
-      showToast('📥 Xuất CSV thành công!');
-    }
-
-    /* ===== GLOBAL SEARCH ===== */
-    function globalSearchFunction() {
-      const kw = document.getElementById('globalSearch').value.toLowerCase().trim();
-      document.getElementById('searchBox').value = kw;
-      renderTable();
-      document.getElementById('menu').classList.remove('show');
-    }
-
-    /* ===== TOAST ===== */
-    function showToast(msg, type = 'success') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = `toast ${type} show`;
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    /* ===== INIT ===== */
-    loadEvents();
-    renderTable();
-  </script>
+// ── Toast ──
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
 </body>
 </html>

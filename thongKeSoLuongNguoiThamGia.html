@@ -1,739 +1,250 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thống kê số lượng người tham gia</title>
-
+  <title>Thống kê người tham gia - CLB</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    body {
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* HEADER */
-    .header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      background: rgba(255, 106, 136, 0.95);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 2px 12px rgba(255, 106, 136, 0.3);
-    }
-
-    .back-btn {
-      background: rgba(255,255,255,0.25);
-      border: none;
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      border-radius: 10px;
-      padding: 6px 12px;
-      transition: 0.2s;
-    }
-
-    .back-btn:hover {
-      background: rgba(255,255,255,0.4);
-    }
-
-    .header-title {
-      color: #fff;
-      font-family: 'Quicksand', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    .refresh-btn {
-      margin-left: auto;
-      background: rgba(255,255,255,0.25);
-      border: none;
-      color: #fff;
-      font-size: 16px;
-      padding: 6px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .refresh-btn:hover {
-      background: rgba(255,255,255,0.4);
-    }
-
-    /* CONTENT */
-    .content {
-      padding: 90px 20px 40px;
-      max-width: 860px;
-      margin: 0 auto;
-    }
-
-    /* SUMMARY CARDS */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    @media (max-width: 480px) {
-      .summary-grid { grid-template-columns: 1fr; }
-    }
-
-    .summary-card {
-      background: rgba(255,255,255,0.97);
-      border-radius: 20px;
-      padding: 22px 16px;
-      text-align: center;
-      box-shadow: 0 8px 28px rgba(255,105,180,0.18);
-    }
-
-    .summary-card .icon {
-      font-size: 32px;
-      margin-bottom: 8px;
-    }
-
-    .summary-card .number {
-      font-size: 36px;
-      font-weight: 700;
-      color: #e84393;
-      font-family: 'Quicksand', sans-serif;
-    }
-
-    .summary-card .label {
-      font-size: 12px;
-      color: #999;
-      margin-top: 4px;
-      font-weight: 600;
-    }
-
-    /* FILTER BAR */
-    .filter-bar {
-      background: rgba(255,255,255,0.97);
-      border-radius: 18px;
-      padding: 18px 20px;
-      margin-bottom: 18px;
-      box-shadow: 0 8px 28px rgba(255,105,180,0.13);
-    }
-
-    .filter-bar h3 {
-      color: #e84393;
-      font-size: 14px;
-      margin-bottom: 12px;
-      font-weight: 700;
-    }
-
-    .filter-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .filter-row label {
-      font-size: 12px;
-      color: #c0395e;
-      font-weight: 700;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .filter-group {
-      flex: 1;
-      min-width: 140px;
-    }
-
-    .filter-row input,
-    .filter-row select {
-      width: 100%;
-      padding: 9px 12px;
-      border: 2px solid #ffe0ea;
-      border-radius: 10px;
-      background: #fff9fb;
-      outline: none;
-      font-size: 13px;
-      transition: 0.2s;
-    }
-
-    .filter-row input:focus,
-    .filter-row select:focus {
-      border-color: #ff6a88;
-    }
-
-    .btn-filter {
-      align-self: flex-end;
-      padding: 9px 20px;
-      background: linear-gradient(135deg, #ff6a88, #e84393);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 13px;
-      transition: 0.2s;
-      white-space: nowrap;
-    }
-
-    .btn-filter:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255,106,136,0.4);
-    }
-
-    .btn-reset-filter {
-      align-self: flex-end;
-      padding: 9px 16px;
-      background: #f1f1f1;
-      color: #888;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 13px;
-      transition: 0.2s;
-    }
-
-    .btn-reset-filter:hover {
-      background: #e0e0e0;
-    }
-
-    /* EVENT STATS LIST */
-    .section-title {
-      color: #fff;
-      font-family: 'Quicksand', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      margin-bottom: 12px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-
-    .event-card {
-      background: rgba(255,255,255,0.97);
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 14px;
-      box-shadow: 0 8px 24px rgba(255,105,180,0.15);
-      animation: slideIn 0.4s ease;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .event-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 14px;
-      gap: 10px;
-    }
-
-    .event-name {
-      font-weight: 700;
-      color: #333;
-      font-size: 15px;
-    }
-
-    .event-meta {
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 3px;
-    }
-
-    .event-badge {
-      background: linear-gradient(135deg, #ff6a88, #e84393);
-      color: #fff;
-      font-weight: 700;
-      font-size: 22px;
-      padding: 6px 14px;
-      border-radius: 12px;
-      font-family: 'Quicksand', sans-serif;
-      white-space: nowrap;
-    }
-
-    .event-badge span {
-      font-size: 12px;
-      font-weight: 600;
-      opacity: 0.9;
-    }
-
-    /* PROGRESS BAR */
-    .progress-wrap {
-      margin-bottom: 10px;
-    }
-
-    .progress-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #aaa;
-      margin-bottom: 5px;
-    }
-
-    .progress-bar-bg {
-      background: #ffe0ea;
-      border-radius: 999px;
-      height: 8px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #ff6a88, #e84393);
-      border-radius: 999px;
-      transition: width 0.6s ease;
-    }
-
-    /* PARTICIPANT MINI LIST */
-    .toggle-list-btn {
-      background: none;
-      border: 1.5px solid #ffe0ea;
-      color: #e84393;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 5px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: 0.2s;
-    }
-
-    .toggle-list-btn:hover {
-      background: #fff0f5;
-    }
-
-    .mini-table-wrap {
-      display: none;
-      margin-top: 12px;
-      border-top: 1px solid #ffe0ea;
-      padding-top: 10px;
-    }
-
-    .mini-table-wrap.open { display: block; }
-
-    .mini-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    .mini-table th {
-      background: #ffe0ea;
-      color: #c0395e;
-      padding: 7px 10px;
-      text-align: left;
-      font-weight: 700;
-    }
-
-    .mini-table td {
-      padding: 7px 10px;
-      border-bottom: 1px solid #f5f5f5;
-      color: #444;
-    }
-
-    .mini-table tr:last-child td { border-bottom: none; }
-
-    .checked-badge {
-      background: #d4f7e7;
-      color: #27ae60;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .not-checked-badge {
-      background: #fff3cd;
-      color: #e67e22;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    /* EMPTY STATE */
-    .empty-state {
-      background: rgba(255,255,255,0.97);
-      border-radius: 20px;
-      padding: 50px 30px;
-      text-align: center;
-      box-shadow: 0 8px 28px rgba(255,105,180,0.13);
-    }
-
-    .empty-state .empty-icon { font-size: 52px; margin-bottom: 14px; }
-    .empty-state p { color: #bbb; font-weight: 600; font-size: 15px; }
-
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 25px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      padding: 12px 25px;
-      border-radius: 12px;
-      color: #fff;
-      font-weight: 700;
-      transition: 0.4s;
-      z-index: 10001;
-      opacity: 0;
-    }
-
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.success { background: #2ecc71; }
-    .toast.info { background: #3498db; }
-
-    /* FLOWER DECO */
-    .flower {
-      position: fixed;
-      top: -50px;
-      font-size: 20px;
-      animation: fall linear infinite;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    @keyframes fall {
-      0%   { transform: translateY(-50px) rotate(0deg); }
-      100% { transform: translateY(110vh) rotate(360deg); }
-    }
-
-    /* LAST UPDATE */
-    .last-update {
-      text-align: center;
-      font-size: 12px;
-      color: rgba(255,255,255,0.8);
-      margin-bottom: 16px;
-    }
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Nunito',sans-serif;}
+    body{background:linear-gradient(135deg,#ff9a9e,#fad0c4);min-height:100vh;overflow-x:hidden;}
+    .header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(255,106,136,.95);backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(255,106,136,.3);}
+    .back-btn{background:rgba(255,255,255,.25);border:none;color:#fff;font-size:20px;cursor:pointer;border-radius:10px;padding:6px 12px;transition:.2s;}
+    .back-btn:hover{background:rgba(255,255,255,.4);}
+    .header-title{color:#fff;font-family:'Quicksand';font-weight:700;font-size:18px;}
+    .refresh-btn{margin-left:auto;background:rgba(255,255,255,.25);border:none;color:#fff;font-size:16px;padding:6px 14px;border-radius:10px;cursor:pointer;font-weight:600;transition:.2s;}
+    .refresh-btn:hover{background:rgba(255,255,255,.4);}
+    .content{padding:90px 20px 40px;max-width:860px;margin:0 auto;}
+    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+    @media(max-width:480px){.summary-grid{grid-template-columns:1fr;}}
+    .summary-card{background:rgba(255,255,255,.97);border-radius:20px;padding:22px 16px;text-align:center;box-shadow:0 8px 28px rgba(255,105,180,.18);transition:.3s;}
+    .summary-card:hover{transform:translateY(-3px);}
+    .summary-card .icon{font-size:32px;margin-bottom:8px;}
+    .summary-card .number{font-size:36px;font-weight:700;color:#e84393;font-family:'Quicksand';}
+    .summary-card .label{font-size:12px;color:#999;margin-top:4px;font-weight:600;}
+    .filter-bar{background:rgba(255,255,255,.97);border-radius:18px;padding:18px 20px;margin-bottom:18px;box-shadow:0 8px 28px rgba(255,105,180,.13);}
+    .filter-bar h3{color:#e84393;font-size:14px;margin-bottom:12px;font-weight:700;}
+    .filter-row{display:flex;gap:10px;flex-wrap:wrap;}
+    .filter-group{flex:1;min-width:140px;}
+    .filter-group label{font-size:12px;color:#c0395e;font-weight:700;display:block;margin-bottom:4px;}
+    .filter-row input,.filter-row select{width:100%;padding:9px 12px;border:2px solid #ffe0ea;border-radius:10px;background:#fff9fb;outline:none;font-size:13px;transition:.2s;}
+    .btn-filter{align-self:flex-end;padding:9px 20px;background:linear-gradient(135deg,#ff6a88,#e84393);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;}
+    .btn-reset-filter{align-self:flex-end;padding:9px 16px;background:#f1f1f1;color:#888;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;}
+    .section-title{color:#fff;font-family:'Quicksand';font-weight:700;font-size:16px;margin-bottom:12px;text-shadow:0 2px 6px rgba(0,0,0,.15);}
+    .event-card{background:rgba(255,255,255,.97);border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 8px 24px rgba(255,105,180,.15);animation:slideIn .4s ease;}
+    @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .event-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:10px;}
+    .event-name{font-weight:700;color:#333;font-size:15px;}
+    .event-meta{font-size:12px;color:#aaa;margin-top:3px;}
+    .event-badge{background:linear-gradient(135deg,#ff6a88,#e84393);color:#fff;font-weight:700;font-size:22px;padding:6px 14px;border-radius:12px;font-family:'Quicksand';white-space:nowrap;}
+    .event-badge span{font-size:12px;font-weight:600;opacity:.9;}
+    .progress-wrap{margin-bottom:10px;}
+    .progress-labels{display:flex;justify-content:space-between;font-size:12px;color:#aaa;margin-bottom:5px;}
+    .progress-bar-bg{background:#ffe0ea;border-radius:999px;height:8px;overflow:hidden;}
+    .progress-bar-fill{height:100%;background:linear-gradient(90deg,#ff6a88,#e84393);border-radius:999px;transition:width .6s ease;}
+    .toggle-list-btn{background:none;border:1.5px solid #ffe0ea;color:#e84393;font-size:12px;font-weight:700;padding:5px 14px;border-radius:8px;cursor:pointer;margin-top:8px;}
+    .mini-table-wrap{display:none;margin-top:12px;border-top:1px solid #ffe0ea;padding-top:10px;}
+    .mini-table-wrap.open{display:block;}
+    .mini-table{width:100%;border-collapse:collapse;font-size:13px;}
+    .mini-table th{background:#ffe0ea;color:#c0395e;padding:7px 10px;text-align:left;font-weight:700;}
+    .mini-table td{padding:7px 10px;border-bottom:1px solid #f5f5f5;color:#444;}
+    .checked-badge{background:#d4f7e7;color:#27ae60;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;}
+    .not-checked-badge{background:#fff3cd;color:#e67e22;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;}
+    .empty-state{background:rgba(255,255,255,.97);border-radius:20px;padding:50px 30px;text-align:center;box-shadow:0 8px 28px rgba(255,105,180,.13);}
+    .empty-state .empty-icon{font-size:52px;margin-bottom:14px;} .empty-state p{color:#bbb;font-weight:600;font-size:15px;}
+    .toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(100px);padding:12px 25px;border-radius:12px;color:#fff;font-weight:700;transition:.4s;z-index:10001;opacity:0;}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    .toast.success{background:#2ecc71;} .toast.info{background:#3498db;}
+    .flower{position:fixed;top:-50px;font-size:20px;animation:fall linear infinite;pointer-events:none;z-index:0;}
+    @keyframes fall{0%{transform:translateY(-50px) rotate(0)}100%{transform:translateY(110vh) rotate(360deg)}}
+    .last-update{text-align:center;font-size:12px;color:rgba(255,255,255,.8);margin-bottom:16px;}
+    #loadingOverlay{position:fixed;inset:0;background:rgba(255,154,158,.8);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;font-weight:700;color:#fff;font-family:'Quicksand';}
+    #loadingOverlay.hidden{display:none;}
+    .live-badge{display:inline-block;background:#2ecc71;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
   </style>
 </head>
-
 <body>
 
-  <!-- HEADER -->
-  <div class="header">
-    <button class="back-btn" onclick="history.back()">←</button>
-    <div class="header-title">📊 Thống kê người tham gia</div>
-    <button class="refresh-btn" onclick="refreshData()">🔄 Làm mới</button>
+<div id="loadingOverlay">⏳ Đang kết nối Firebase...</div>
+
+<div class="header">
+  <button class="back-btn" onclick="history.back()">←</button>
+  <div class="header-title">📊 Thống kê người tham gia <span class="live-badge">LIVE</span></div>
+  <button class="refresh-btn" onclick="renderAll()">🔄 Làm mới</button>
+</div>
+
+<div class="content">
+  <div class="summary-grid">
+    <div class="summary-card"><div class="icon">📅</div><div class="number" id="totalEvents">0</div><div class="label">Tổng sự kiện</div></div>
+    <div class="summary-card"><div class="icon">👥</div><div class="number" id="totalRegistered">0</div><div class="label">Tổng người đăng ký</div></div>
+    <div class="summary-card"><div class="icon">✅</div><div class="number" id="totalCheckedIn">0</div><div class="label">Đã tham gia (check-in)</div></div>
   </div>
 
-  <!-- CONTENT -->
-  <div class="content">
-
-    <!-- SUMMARY CARDS -->
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="icon">📅</div>
-        <div class="number" id="totalEvents">0</div>
-        <div class="label">Tổng sự kiện</div>
-      </div>
-      <div class="summary-card">
-        <div class="icon">👥</div>
-        <div class="number" id="totalRegistered">0</div>
-        <div class="label">Tổng người đăng ký</div>
-      </div>
-      <div class="summary-card">
-        <div class="icon">✅</div>
-        <div class="number" id="totalCheckedIn">0</div>
-        <div class="label">Đã tham gia (check-in)</div>
-      </div>
+  <div class="filter-bar">
+    <h3>🔍 Lọc dữ liệu</h3>
+    <div class="filter-row">
+      <div class="filter-group"><label>Từ ngày</label><input type="date" id="filterFrom"></div>
+      <div class="filter-group"><label>Đến ngày</label><input type="date" id="filterTo"></div>
+      <div class="filter-group"><label>Sự kiện</label><select id="filterEvent"><option value="">-- Tất cả --</option></select></div>
+      <button class="btn-filter" onclick="applyFilter()">🔍 Lọc</button>
+      <button class="btn-reset-filter" onclick="resetFilter()">↩ Reset</button>
     </div>
-
-    <!-- FILTER -->
-    <div class="filter-bar">
-      <h3>🔍 Lọc theo thời gian đăng ký</h3>
-      <div class="filter-row">
-        <div class="filter-group">
-          <label>Từ ngày</label>
-          <input type="date" id="filterFrom">
-        </div>
-        <div class="filter-group">
-          <label>Đến ngày</label>
-          <input type="date" id="filterTo">
-        </div>
-        <div class="filter-group">
-          <label>Sự kiện</label>
-          <select id="filterEvent">
-            <option value="">-- Tất cả --</option>
-          </select>
-        </div>
-        <button class="btn-filter" onclick="applyFilter()">🔍 Lọc</button>
-        <button class="btn-reset-filter" onclick="resetFilter()">↩ Reset</button>
-      </div>
-    </div>
-
-    <!-- LAST UPDATE -->
-    <div class="last-update" id="lastUpdate"></div>
-
-    <!-- SECTION TITLE -->
-    <div class="section-title">📋 Chi tiết theo từng sự kiện</div>
-
-    <!-- EVENT LIST -->
-    <div id="eventList"></div>
-
   </div>
 
-  <div class="toast" id="toast"></div>
+  <div class="last-update" id="lastUpdate"></div>
+  <div class="section-title">📋 Chi tiết theo từng sự kiện</div>
+  <div id="eventList"></div>
+</div>
 
-  <script>
-    // ===== DATA =====
-    let events = [];
-    let participants = [];
-    let filteredParticipants = [];
-    let openCards = {};
+<div class="toast" id="toast"></div>
 
-    function loadData() {
-      events = JSON.parse(localStorage.getItem('events')) || [];
-      participants = JSON.parse(localStorage.getItem('participants')) || [];
-      filteredParticipants = [...participants];
+<script type="module">
+import { FS } from "./firebase-sync.js";
+
+let filteredParticipants = [];
+let openCards = {};
+
+// Hoa rơi
+setInterval(()=>{
+  const f=document.createElement('div');f.className='flower';f.innerHTML='🌸';
+  f.style.left=Math.random()*100+'vw';f.style.animationDuration=(3+Math.random()*5)+'s';
+  document.body.appendChild(f);setTimeout(()=>f.remove(),8000);
+},400);
+
+// Chờ Firebase
+await FS.ready;
+document.getElementById('loadingOverlay').classList.add('hidden');
+
+// Real-time listeners
+window.addEventListener('fs:events',       () => { populateDropdown(); renderAll(); });
+window.addEventListener('fs:participants', () => { filteredParticipants = FS.getParticipants(); renderAll(); });
+
+filteredParticipants = FS.getParticipants();
+populateDropdown();
+renderAll();
+
+function populateDropdown() {
+  const sel = document.getElementById('filterEvent');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- Tất cả --</option>';
+  FS.getEvents().forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.t; opt.textContent = e.t;
+    if (e.t === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+window.applyFilter = () => {
+  const from  = document.getElementById('filterFrom').value;
+  const to    = document.getElementById('filterTo').value;
+  const evName= document.getElementById('filterEvent').value;
+  filteredParticipants = FS.getParticipants().filter(p => {
+    if (evName && p.event !== evName) return false;
+    if (p.registeredAt) {
+      const d = p.registeredAt.substring(0,10);
+      if (from && d < from) return false;
+      if (to   && d > to)   return false;
     }
+    return true;
+  });
+  renderAll();
+};
 
-    // ===== INIT =====
-    function init() {
-      loadData();
-      populateEventDropdown();
-      renderSummary();
-      renderEventList();
-      updateLastUpdate();
-    }
+window.resetFilter = () => {
+  ['filterFrom','filterTo'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('filterEvent').value='';
+  filteredParticipants = FS.getParticipants();
+  renderAll();
+};
 
-    // ===== REFRESH (auto-cập nhật dữ liệu) =====
-    function refreshData() {
-      loadData();
-      applyFilter();
-      showToast('🔄 Đã cập nhật dữ liệu mới nhất!', 'info');
-      updateLastUpdate();
-    }
+function renderAll() {
+  renderSummary();
+  renderEventList();
+  document.getElementById('lastUpdate').textContent =
+    `🔴 Cập nhật lúc: ${new Date().toLocaleTimeString('vi-VN')} ngày ${new Date().toLocaleDateString('vi-VN')}`;
+}
+window.renderAll = renderAll;
 
-    // Tự động refresh mỗi 30 giây
-    setInterval(refreshData, 30000);
+function renderSummary() {
+  const selEv = document.getElementById('filterEvent').value;
+  const evs = selEv ? FS.getEvents().filter(e=>e.t===selEv) : FS.getEvents();
+  document.getElementById('totalEvents').textContent    = evs.length;
+  document.getElementById('totalRegistered').textContent= filteredParticipants.length;
+  document.getElementById('totalCheckedIn').textContent = filteredParticipants.filter(p=>p.checkedIn).length;
+}
 
-    function updateLastUpdate() {
-      const now = new Date();
-      document.getElementById('lastUpdate').textContent =
-        `Cập nhật lúc: ${now.toLocaleTimeString('vi-VN')} ngày ${now.toLocaleDateString('vi-VN')}`;
-    }
+function sanitizeId(s){ return s.replace(/[^a-zA-Z0-9]/g,'_'); }
 
-    // ===== DROPDOWN =====
-    function populateEventDropdown() {
-      const sel = document.getElementById('filterEvent');
-      sel.innerHTML = '<option value="">-- Tất cả --</option>';
-      events.forEach(e => {
-        let opt = document.createElement('option');
-        opt.value = e.t;
-        opt.textContent = e.t;
-        sel.appendChild(opt);
-      });
-    }
+function renderEventList() {
+  const container = document.getElementById('eventList');
+  const selEv = document.getElementById('filterEvent').value;
+  const evs = selEv ? FS.getEvents().filter(e=>e.t===selEv) : FS.getEvents();
+  if (!evs.length) {
+    container.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>Chưa có sự kiện nào để thống kê</p></div>`;
+    return;
+  }
+  container.innerHTML = evs.map(ev => {
+    const evP    = filteredParticipants.filter(p=>p.event===ev.t);
+    const total  = evP.length;
+    const checked= evP.filter(p=>p.checkedIn).length;
+    const maxS   = ev.max || 0;
+    const pct    = maxS>0 ? Math.min(100,Math.round(total/maxS*100)) : 0;
+    const isOpen = openCards[ev.t];
+    const rows = evP.length>0
+      ? evP.map((p,i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td>${p.name||'—'}</td>
+          <td>${p.mssv||'—'}</td>
+          <td>${p.khoa||'—'}</td>
+          <td>${p.registeredAt?new Date(p.registeredAt).toLocaleDateString('vi-VN'):'—'}</td>
+          <td>${p.checkedIn?`<span class="checked-badge">✅ Đã tham gia</span>`:`<span class="not-checked-badge">⏳ Chưa</span>`}</td>
+        </tr>`).join('')
+      : `<tr><td colspan="6" style="text-align:center;color:#bbb;padding:16px;">Chưa có người đăng ký</td></tr>`;
+    return `
+      <div class="event-card">
+        <div class="event-header">
+          <div>
+            <div class="event-name">📌 ${ev.t}</div>
+            <div class="event-meta">📅 ${ev.d||'—'} &nbsp;|&nbsp; 📍 ${ev.location||'—'} &nbsp;|&nbsp; 👤 ${ev.l||'—'}</div>
+          </div>
+          <div class="event-badge">${total} <span>người</span></div>
+        </div>
+        ${maxS>0?`<div class="progress-wrap">
+          <div class="progress-labels"><span>Đã đăng ký: ${total}</span><span>Tối đa: ${maxS}</span></div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+        </div>`:''}
+        <div style="font-size:13px;color:#777;margin-bottom:4px;">
+          ✅ Check-in: <b style="color:#27ae60">${checked}</b> &nbsp;
+          ⏳ Chưa: <b style="color:#e67e22">${total-checked}</b>
+        </div>
+        <button class="toggle-list-btn" onclick="toggleCard('${ev.t}',this)">
+          ${isOpen?'🔼 Ẩn danh sách':'🔽 Xem danh sách'}
+        </button>
+        <div class="mini-table-wrap ${isOpen?'open':''}" id="card-${sanitizeId(ev.t)}">
+          <table class="mini-table">
+            <thead><tr><th>#</th><th>Họ tên</th><th>MSSV</th><th>Khóa</th><th>Ngày ĐK</th><th>Trạng thái</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('');
+}
 
-    // ===== FILTER =====
-    function applyFilter() {
-      loadData();
-      const from = document.getElementById('filterFrom').value;
-      const to = document.getElementById('filterTo').value;
-      const eventName = document.getElementById('filterEvent').value;
+window.toggleCard = (evName, btn) => {
+  openCards[evName] = !openCards[evName];
+  const wrap = document.getElementById('card-'+sanitizeId(evName));
+  if (openCards[evName]) { wrap.classList.add('open'); btn.textContent='🔼 Ẩn danh sách'; }
+  else { wrap.classList.remove('open'); btn.textContent='🔽 Xem danh sách'; }
+};
 
-      filteredParticipants = participants.filter(p => {
-        // Filter by event name
-        if (eventName && p.event !== eventName) return false;
-
-        // Filter by registration date
-        if (p.registeredAt) {
-          const regDate = p.registeredAt.substring(0, 10);
-          if (from && regDate < from) return false;
-          if (to   && regDate > to)   return false;
-        }
-
-        return true;
-      });
-
-      renderSummary();
-      renderEventList();
-      updateLastUpdate();
-    }
-
-    function resetFilter() {
-      document.getElementById('filterFrom').value = '';
-      document.getElementById('filterTo').value = '';
-      document.getElementById('filterEvent').value = '';
-      filteredParticipants = [...participants];
-      renderSummary();
-      renderEventList();
-    }
-
-    // ===== SUMMARY =====
-    function renderSummary() {
-      const eventsInFilter = eventName => {
-        const sel = document.getElementById('filterEvent').value;
-        return !sel || sel === eventName;
-      };
-
-      const relevantEvents = events.filter(e => eventsInFilter(e.t));
-      const total = filteredParticipants.length;
-      const checked = filteredParticipants.filter(p => p.checkedIn).length;
-
-      document.getElementById('totalEvents').textContent = relevantEvents.length;
-      document.getElementById('totalRegistered').textContent = total;
-      document.getElementById('totalCheckedIn').textContent = checked;
-    }
-
-    // ===== RENDER EVENT LIST =====
-    function renderEventList() {
-      const container = document.getElementById('eventList');
-      const selectedEvent = document.getElementById('filterEvent').value;
-
-      // Which events to show
-      const eventsToShow = selectedEvent
-        ? events.filter(e => e.t === selectedEvent)
-        : events;
-
-      if (eventsToShow.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">📭</div>
-            <p>Chưa có sự kiện nào để thống kê</p>
-          </div>`;
-        return;
-      }
-
-      let html = '';
-      eventsToShow.forEach(ev => {
-        const evParticipants = filteredParticipants.filter(p => p.event === ev.t);
-        const total = evParticipants.length;
-        const checked = evParticipants.filter(p => p.checkedIn).length;
-        const maxSlots = ev.max || 0;
-        const fillPct = maxSlots > 0 ? Math.min(100, Math.round(total / maxSlots * 100)) : 0;
-
-        const isOpen = openCards[ev.t];
-
-        const participantRows = evParticipants.length > 0
-          ? evParticipants.map((p, idx) => `
-            <tr>
-              <td>${idx + 1}</td>
-              <td>${p.name || '—'}</td>
-              <td>${p.mssv || '—'}</td>
-              <td>${p.khoa || '—'}</td>
-              <td>${p.registeredAt ? new Date(p.registeredAt).toLocaleDateString('vi-VN') : '—'}</td>
-              <td>
-                ${p.checkedIn
-                  ? '<span class="checked-badge">✅ Đã tham gia</span>'
-                  : '<span class="not-checked-badge">⏳ Chưa tham gia</span>'}
-              </td>
-            </tr>`).join('')
-          : `<tr><td colspan="6" style="text-align:center; color:#bbb; padding:16px;">
-              Chưa có người đăng ký tham gia
-             </td></tr>`;
-
-        html += `
-          <div class="event-card">
-            <div class="event-header">
-              <div>
-                <div class="event-name">📌 ${ev.t}</div>
-                <div class="event-meta">
-                  📅 ${ev.d || '—'} &nbsp;|&nbsp; 📍 ${ev.location || '—'} &nbsp;|&nbsp; 👤 ${ev.l || '—'}
-                </div>
-              </div>
-              <div class="event-badge">
-                ${total} <span>người</span>
-              </div>
-            </div>
-
-            ${maxSlots > 0 ? `
-            <div class="progress-wrap">
-              <div class="progress-labels">
-                <span>Đã đăng ký: ${total}</span>
-                <span>Tối đa: ${maxSlots}</span>
-              </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width:${fillPct}%"></div>
-              </div>
-            </div>` : ''}
-
-            <div style="font-size:13px; color:#777; margin-bottom:4px;">
-              ✅ Đã check-in: <b style="color:#27ae60">${checked}</b>
-              &nbsp;&nbsp;
-              ⏳ Chưa tham gia: <b style="color:#e67e22">${total - checked}</b>
-            </div>
-
-            <button class="toggle-list-btn" onclick="toggleCard('${ev.t}', this)">
-              ${isOpen ? '🔼 Ẩn danh sách' : '🔽 Xem danh sách'}
-            </button>
-
-            <div class="mini-table-wrap ${isOpen ? 'open' : ''}" id="card-${sanitizeId(ev.t)}">
-              <table class="mini-table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Họ tên</th>
-                    <th>MSSV</th>
-                    <th>Khóa</th>
-                    <th>Ngày đăng ký</th>
-                    <th>Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody>${participantRows}</tbody>
-              </table>
-            </div>
-          </div>`;
-      });
-
-      container.innerHTML = html;
-    }
-
-    function sanitizeId(str) {
-      return str.replace(/[^a-zA-Z0-9]/g, '_');
-    }
-
-    function toggleCard(eventName, btn) {
-      openCards[eventName] = !openCards[eventName];
-      const wrap = document.getElementById('card-' + sanitizeId(eventName));
-      if (openCards[eventName]) {
-        wrap.classList.add('open');
-        btn.textContent = '🔼 Ẩn danh sách';
-      } else {
-        wrap.classList.remove('open');
-        btn.textContent = '🔽 Xem danh sách';
-      }
-    }
-
-    // ===== TOAST =====
-    function showToast(msg, type = 'success') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = `toast ${type} show`;
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    // ===== FLOWER DECO =====
-    setInterval(() => {
-      let f = document.createElement('div');
-      f.className = 'flower';
-      f.innerHTML = '🌸';
-      f.style.left = Math.random() * 100 + 'vw';
-      f.style.animationDuration = (3 + Math.random() * 5) + 's';
-      document.body.appendChild(f);
-      setTimeout(() => f.remove(), 8000);
-    }, 300);
-
-    // ===== START =====
-    init();
-  </script>
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
 </body>
 </html>
