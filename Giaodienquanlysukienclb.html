@@ -1,359 +1,118 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý sự kiện CLB </title>
-
+  <title>Quản lý sự kiện CLB</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Nunito',sans-serif; }
+    body { background:linear-gradient(135deg,#ff9a9e,#fad0c4); min-height:100vh; overflow-x:hidden; }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Nunito', sans-serif;
-    }
+    /* MENU */
+    .menu-toggle { position:fixed; top:15px; left:15px; font-size:26px; background:#ff6a88; color:#fff; padding:8px 13px; border-radius:12px; cursor:pointer; z-index:1000; box-shadow:0 4px 12px rgba(255,106,136,.4); }
+    .menu { position:fixed; top:0; left:-270px; width:240px; height:100%; background:linear-gradient(180deg,#ff6a88,#ff8fab); padding-top:70px; display:flex; flex-direction:column; gap:8px; transition:.3s; z-index:999; overflow-y:auto; }
+    .menu.show { left:0; }
+    .menu button { margin:0 12px; padding:11px 14px; border:none; border-radius:12px; background:rgba(255,255,255,.9); cursor:pointer; text-align:left; font-weight:600; color:#c0395e; transition:.2s; }
+    .menu button:hover { background:#fff; transform:translateX(4px); }
 
-    body {
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* MENU & NAVIGATION */
-    .menu-toggle {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      font-size: 26px;
-      background: #ff6a88;
-      color: #fff;
-      padding: 8px 13px;
-      border-radius: 12px;
-      cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 4px 12px rgba(255, 106, 136, .4);
-    }
-
-    .menu {
-      position: fixed;
-      top: 0;
-      left: -270px;
-      width: 240px;
-      height: 100%;
-      background: linear-gradient(180deg, #ff6a88, #ff8fab);
-      padding-top: 70px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      transition: .3s;
-      z-index: 999;
-    }
-
-    .menu.show {
-      left: 0;
-    }
-
-    .menu button {
-      margin: 0 12px;
-      padding: 11px 14px;
-      border: none;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, .9);
-      cursor: pointer;
-      text-align: left;
-      font-weight: 600;
-      color: #c0395e;
-      transition: .2s;
-    }
-
-    .menu button:hover {
-      background: #fff;
-      transform: translateX(4px);
-    }
+    /* SEARCH BAR */
+    .search-bar { position:fixed; top:15px; left:70px; right:15px; z-index:1000; }
+    .search-bar input { width:100%; padding:10px 15px; border-radius:20px; border:none; box-shadow:0 4px 12px rgba(0,0,0,0.15); outline:none; }
 
     /* LAYOUT */
-    .page {
-      display: none;
-      padding: 80px 20px 40px;
-      animation: fadeIn 0.5s;
-    }
+    .page { display:none; padding:80px 20px 40px; animation:fadeIn 0.5s; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
+    .card { background:rgba(255,255,255,.97); padding:30px; border-radius:24px; max-width:520px; margin:0 auto; box-shadow:0 16px 48px rgba(255,105,180,.2); }
+    h2 { text-align:center; color:#e84393; margin-bottom:20px; font-family:'Quicksand'; }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .card {
-      background: rgba(255, 255, 255, .97);
-      padding: 30px;
-      border-radius: 24px;
-      max-width: 520px;
-      margin: 0 auto;
-      box-shadow: 0 16px 48px rgba(255, 105, 180, .2);
-    }
-
-    h2 {
-      text-align: center;
-      color: #e84393;
-      margin-bottom: 20px;
-      font-family: 'Quicksand';
-    }
-
-    /* FORM ELEMENTS */
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      color: #c0395e;
-      margin-bottom: 5px;
-    }
-
-    input,
-    textarea,
-    select {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #ffe0ea;
-      border-radius: 12px;
-      background: #fff9fb;
-      outline: none;
-      transition: 0.2s;
-    }
-
-    input:focus {
-      border-color: #ff6a88;
-      box-shadow: 0 0 0 3px rgba(255, 106, 136, 0.1);
-    }
-
-    .required {
-      color: #ff4d88;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .char-counter {
-      font-size: 11px;
-      color: #ccc;
-      text-align: right;
-      margin-top: 2px;
-    }
+    /* FORM */
+    .form-group { margin-bottom:15px; text-align:left; }
+    .form-group label { display:block; font-size:13px; font-weight:700; color:#c0395e; margin-bottom:5px; }
+    input, textarea, select { width:100%; padding:12px; border:2px solid #ffe0ea; border-radius:12px; background:#fff9fb; outline:none; transition:0.2s; font-family:'Nunito',sans-serif; }
+    input:focus, textarea:focus, select:focus { border-color:#ff6a88; box-shadow:0 0 0 3px rgba(255,106,136,.1); }
+    .required { color:#ff4d88; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .char-counter { font-size:11px; color:#ccc; text-align:right; margin-top:2px; }
 
     /* STATUS TAGS */
-    .status-options {
-      display: flex;
-      gap: 8px;
-    }
-
-    .status-tag {
-      flex: 1;
-      padding: 8px;
-      border: 2px solid #ffe0ea;
-      border-radius: 10px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      background: #fff;
-    }
-
-    .status-tag.active {
-      background: #ff6a88;
-      color: #fff;
-      border-color: #ff6a88;
-    }
+    .status-options { display:flex; gap:8px; }
+    .status-tag { flex:1; padding:8px; border:2px solid #ffe0ea; border-radius:10px; text-align:center; font-size:12px; font-weight:600; cursor:pointer; background:#fff; }
+    .status-tag.active { background:#ff6a88; color:#fff; border-color:#ff6a88; }
 
     /* BUTTONS */
-    button.main {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #ff6a88, #e84393);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: 0.3s;
-    }
-
-    button.main:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 106, 136, 0.4);
-    }
+    button.main { width:100%; padding:13px; background:linear-gradient(135deg,#ff6a88,#e84393); color:#fff; border:none; border-radius:14px; font-weight:700; cursor:pointer; margin-top:10px; transition:0.3s; }
+    button.main:hover { transform:translateY(-2px); box-shadow:0 5px 15px rgba(255,106,136,.4); }
+    .btn-row { display:flex; gap:10px; margin-top:10px; }
+    .btn-reset { padding:13px 20px; background:#fff0f5; color:#e84393; border:2px solid #ffccd9; border-radius:14px; font-weight:700; cursor:pointer; }
 
     /* TABLE */
-    .table-container {
-      overflow-x: auto;
-      margin-top: 15px;
-    }
+    .table-container { overflow-x:auto; margin-top:15px; border-radius:12px; }
+    table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; }
+    th, td { padding:12px; text-align:center; border-bottom:1px solid #eee; }
+    th { background:#ffe0ea; color:#c0395e; font-weight:700; }
+    tr:hover td { background:#fffafb; }
+    .btn-edit { background:#ff9f43; color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; margin-right:3px; }
+    .btn-del { background:#ff4757; color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    th,
-    td {
-      padding: 12px;
-      text-align: center;
-      border-bottom: 1px solid #eee;
-    }
-
-    th {
-      background: #ffe0ea;
-      color: #c0395e;
-    }
-
-    .btn-edit {
-      background: #ff9f43;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .btn-del {
-      background: #ff4757;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    /* VALIDATION */
+    .err-msg { font-size:12px; color:#ff6b6b; display:none; margin-top:4px; }
+    .err-msg.show { display:block; }
+    input.error, select.error { border-color:#ff6b6b !important; }
 
     /* DECORATION */
-    .flower {
-      position: fixed;
-      top: -50px;
-      font-size: 20px;
-      animation: fall linear infinite;
-      pointer-events: none;
-      z-index: 0;
-    }
+    .flower { position:fixed; top:-50px; font-size:20px; animation:fall linear infinite; pointer-events:none; z-index:0; }
+    @keyframes fall { 0%{transform:translateY(-50px) rotate(0deg)} 100%{transform:translateY(110vh) rotate(360deg)} }
 
-    @keyframes fall {
-      0% {
-        transform: translateY(-50px) rotate(0deg);
-      }
-
-      100% {
-        transform: translateY(110vh) rotate(360deg);
-      }
-    }
-
-    /* VALIDATION & TOAST */
-    .err-msg {
-      font-size: 12px;
-      color: #ff6b6b;
-      display: none;
-      margin-top: 4px;
-    }
-
-    .err-msg.show {
-      display: block;
-    }
-
-    input.error {
-      border-color: #ff6b6b !important;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 25px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      padding: 12px 25px;
-      border-radius: 12px;
-      color: #fff;
-      font-weight: 700;
-      transition: 0.4s;
-      z-index: 10001;
-      opacity: 0;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.success {
-      background: #2ecc71;
-    }
-
-    .toast.error {
-      background: #e74c3c;
-    }
+    /* TOAST */
+    .toast { position:fixed; bottom:25px; left:50%; transform:translateX(-50%) translateY(100px); padding:12px 25px; border-radius:12px; color:#fff; font-weight:700; transition:0.4s; z-index:10001; opacity:0; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.success { background:#2ecc71; }
+    .toast.error { background:#e74c3c; }
+    .toast.info { background:#3498db; }
   </style>
 </head>
-
 <body>
 
   <div class="menu-toggle" onclick="toggleMenu()">☰</div>
 
+  <!-- SEARCH BAR -->
+  <div class="search-bar">
+    <input type="text" id="globalSearch" placeholder="🔍 Tìm kiếm sự kiện, người tham gia..." oninput="globalSearchFunction()">
+  </div>
+
+  <!-- MENU -->
   <div class="menu" id="menu">
+    <!-- ADMIN -->
+    <button onclick="go('home')">🏠 Trang chủ</button>
+    <button onclick="go('create')" class="adminOnly">➕ Tạo sự kiện</button>
+    <button onclick="go('manage')" class="adminOnly">📋 Quản lý sự kiện</button>
+    <button onclick="go('budget')" class="adminOnly">💰 Quản lý ngân sách</button>
+    <button onclick="window.location.href='PhanVaiTroPhuTrachSuKien.html'" class="adminOnly">👥 Phân chia vai trò</button>
+    <button onclick="window.location.href='thongKeSoLuongNguoiThamGia.html'" class="adminOnly">📊 Thống kê người tham gia</button>
+    <button onclick="window.location.href='XemSuaXuatDanhSach.html'" class="adminOnly">🔍 Quản lý chi tiết</button>
+    <button onclick="window.location.href='thongBaoSuKien.html'" class="adminOnly">🔔 Thông báo sự kiện</button>
+    <button onclick="go('checkin')" class="adminOnly">📷 Check-in</button>
+    <button onclick="go('dashboard')" class="adminOnly">📊 Thống kê Check-in</button>
+    <!-- USER -->
+    <button onclick="go('manage')" class="userOnly">📋 Danh sách sự kiện</button>
+    <button onclick="go('join')" class="userOnly">🙋 Tham gia sự kiện</button>
+    <button onclick="go('reminder'); renderReminders()" class="userOnly">🔔 Nhắc hẹn</button>
+    <button onclick="window.location.href='huydangky.html'" class="userOnly">❌ Hủy đăng ký</button>
+    <button onclick="viewGallery()" class="userOnly">🖼 Xem tư liệu</button>
+    <button onclick="window.location.href='thongBaoSuKien.html'" class="userOnly">🔔 Thông báo</button>
+    <!-- AUTH -->
+    <button onclick="go('login')">🔐 Đăng nhập / Đăng ký</button>
+    <button onclick="logout()" class="logoutBtn" style="display:none;">🚪 Đăng xuất</button>
+  </div>
 
-<!-- SEARCH -->
-<div style="position:fixed; top:15px; left:70px; right:15px; z-index:1000;">
-  <input type="text" id="globalSearch"
-    placeholder="🔍 Tìm kiếm..."
-    style="width:100%; padding:10px 15px; border-radius:20px; border:none;"
-    oninput="globalSearchFunction()">
-</div>
-
-<!-- ===== ADMIN ===== -->
-<button onclick="go('home')">🏠 Trang chủ</button>
-<button onclick="go('create')" class="adminOnly">➕ Tạo sự kiện</button>
-<button onclick="window.location.href='quanLyChiTieu.html'" class="adminOnly">💰 Quản lý ngân sách</button>
-<button onclick="go('manage')" class="adminOnly">📋 Quản lý sự kiện</button>
-<button onclick="window.location.href='PhanVaiTroPhuTrachSuKien.html'" class="adminOnly">👥 Phân chia vai trò</button>
-<button onclick="window.location.href='thongKeSoLuongNguoiThamGia.html'" class="adminOnly">📊 Thống kê số lượng người tham gia</button>
-<button onclick="window.location.href='XemSuaXuatDanhSach.html'" class="adminOnly">🔍 Quản lý chi tiết</button>
-<button onclick="window.location.href='thongBaoSuKien.html'" class="adminOnly">🔔 Thông báo sự kiện</button>
-
-<!-- ===== USER ===== -->
-
-<button onclick="go('manage')" class="userOnly">📋 Danh sách sự kiện</button>
-<button onclick="cancelRegister()" class="userOnly">❌ Hủy đăng ký</button>
-<button onclick="go('join')" class="userOnly">🙋 Tham gia</button>
-<button onclick="go('reminder'); renderReminders()" class="userOnly">🔔 Nhắc hẹn</button>
-<button onclick="go('checkin')" class="userOnly">📷 Check-in</button>
-<button onclick="viewGallery()" class="userOnly">🖼 Xem tư liệu</button>
-<button onclick="window.location.href='thongBaoSuKien.html'" class="userOnly">🔔 Thông báo</button>
-
-<!-- ===== AUTH ===== -->
-<button onclick="go('login')">🔐 Đăng nhập / Đăng ký</button>
-<button onclick="logout()">🚪 Đăng xuất</button>
-
-</div>
-
-  <div id="home" class="page" style="display: block;">
+  <!-- PAGES -->
+  <div id="home" class="page" style="display:block;">
     <div class="card">
       <h2>🌸 Quản lý sự kiện CLB 🌸</h2>
-      <p style="text-align: center; color: #ff6a88; font-weight: bold;" id="welcome">Chào mừng bạn!</p>
-      <div style="margin-top: 20px; text-align: center; font-size: 14px; color: #666;">
+      <p style="text-align:center; color:#ff6a88; font-weight:bold;" id="welcome">Chào mừng bạn!</p>
+      <div style="margin-top:20px; text-align:center; font-size:14px; color:#666;">
         Hệ thống quản lý sự kiện dành cho thành viên CLB.
       </div>
     </div>
@@ -364,7 +123,7 @@
       <h2>➕ Tạo sự kiện mới</h2>
       <div class="form-group">
         <label>Tên sự kiện <span class="required">*</span></label>
-        <input id="title" type="text" placeholder="VD: Hội thảo kỹ năng..." maxlength="100">
+        <input id="title" type="text" placeholder="VD: Hội thảo kỹ năng..." maxlength="100" oninput="document.getElementById('titleCount').textContent=this.value.length+' / 100'">
         <div class="char-counter" id="titleCount">0 / 100</div>
         <div class="err-msg" id="titleErr">Vui lòng nhập tên sự kiện!</div>
       </div>
@@ -390,7 +149,6 @@
           <input id="location" type="text" placeholder="VD: Hội trường A">
           <div class="err-msg" id="locationErr">Vui lòng nhập địa điểm!</div>
         </div>
-
         <div class="form-group">
           <label>Số lượng tối đa <span class="required">*</span></label>
           <input id="max" type="number" min="1" placeholder="VD: 50">
@@ -405,63 +163,26 @@
           <div class="status-tag" data-val="Đóng" onclick="selectStatus(this)">🔴 Đóng</div>
         </div>
       </div>
-      <!-- Mô tả -->
       <div class="form-group">
         <label>Mô tả sự kiện</label>
-        <textarea id="desc" placeholder="Mô tả ngắn về nội dung, chương trình sự kiện..." maxlength="300"></textarea>
+        <textarea id="desc" placeholder="Mô tả ngắn..." maxlength="300" oninput="document.getElementById('descCount').textContent=this.value.length+' / 300'"></textarea>
         <div class="char-counter" id="descCount">0 / 300</div>
       </div>
-
-      <!-- Buttons -->
-      <div class="btn-group">
+      <div class="btn-row">
         <button class="btn-reset" onclick="resetForm()">🔄 Nhập lại</button>
-        <button class="btn-submit" onclick="submitEvent()">🌸 Tạo sự kiện</button>
+        <button class="main" onclick="submitEvent()" style="flex:1;">🌸 Tạo sự kiện</button>
       </div>
-
     </div>
   </div>
 
-  <!-- Toast -->
-   <div id="checkin" class="page">
-  <div class="card">
-    <h2>📷 Check-in sự kiện</h2>
-
-    <!-- Camera -->
-    <div id="qrVideo" style="width:100%"></div>
-    <button class="main" onclick="startScan()">📸 Bật camera quét QR</button>
-
-    <hr style="margin:15px 0">
-
-    <!-- Nhập tay -->
-    <input id="manualCode" placeholder="Nhập mã (MSSV|Tên sự kiện)">
-    <button class="main" onclick="manualCheckin()">✅ Check-in thủ công</button>
-  </div>
-</div>
-  <div class="toast" id="toast"></div>
-
-  <div id="reminder" class="page">
-  <div class="card" style="max-width:700px;">
-    <h2>🔔 Sự kiện sắp diễn ra</h2>
-
-    <div id="reminderList"></div>
-
-  </div>
-</div>
-
-
   <div id="manage" class="page">
-    <div class="card" style="max-width: 800px;">
+    <div class="card" style="max-width:900px;">
       <h2>📋 Danh sách sự kiện</h2>
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>Sự kiện</th>
-              <th>Người trực</th>
-              <th>Ngày</th>
-              <th>Địa điểm</th>
-              <th>Số lượng</th>
-              <th>Hành động</th>
+              <th>Sự kiện</th><th>Người trực</th><th>Ngày</th><th>Địa điểm</th><th>Số lượng</th><th>Hành động</th>
             </tr>
           </thead>
           <tbody id="eventTable"></tbody>
@@ -473,50 +194,30 @@
   <div id="join" class="page">
     <div class="card">
       <h2>🙋 Đăng ký tham gia</h2>
+      <div class="form-group"><label>Họ tên <span class="required">*</span></label><input id="pname" placeholder="Nhập họ tên"></div>
+      <div class="form-group"><label>MSSV <span class="required">*</span></label><input id="pmssv" placeholder="Nhập MSSV"></div>
+      <div class="form-group"><label>Email <span class="required">*</span></label><input id="pemail" type="email" placeholder="example@gmail.com"></div>
       <div class="form-group">
-        <label>Họ tên</label>
-        <input id="pname" placeholder="Nhập họ tên của bạn">
-      </div>
-      <div class="form-group">
-        <label>MSSV</label>
-        <input id="pmssv" placeholder="Nhập MSSV">
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input id="pemail" type="email" placeholder="Nhập email @gmail.com">
-      </div>
-      <div class="form-group">
-        <label>Khóa</label>
+        <label>Khóa <span class="required">*</span></label>
         <select id="pkhoa">
           <option value="">-- Chọn khóa --</option>
-          <option>K48</option>
-          <option>K49</option>
-          <option>K50</option>
-          <option>K51</option>
+          <option>K48</option><option>K49</option><option>K50</option><option>K51</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Chọn sự kiện</label>
-        <select id="peventSelect"></select>
-      </div>
+      <div class="form-group"><label>Chọn sự kiện <span class="required">*</span></label><select id="peventSelect"></select></div>
       <button class="main" onclick="addParticipant()">💖 Đăng ký ngay</button>
       <div id="myQR" style="text-align:center; margin-top:15px;"></div>
     </div>
   </div>
 
   <div id="participants" class="page">
-    <div class="card" style="max-width: 800px;">
+    <div class="card" style="max-width:800px;">
       <h2>📑 Danh sách người tham gia</h2>
-      <button onclick="exportCSV()" style="padding: 5px 15px; margin-bottom: 10px; cursor:pointer;">📥 Xuất CSV</button>
+      <button onclick="exportCSV()" style="padding:8px 15px; margin-bottom:10px; cursor:pointer; background:#8e44ad; color:#fff; border:none; border-radius:8px; font-weight:700;">📥 Xuất CSV</button>
       <div class="table-container">
         <table>
           <thead>
-            <tr>
-              <th>Họ tên</th>
-              <th>Sự kiện</th>
-              <th>Trạng thái</th>
-              <th>Hành động</th>
-            </tr>
+            <tr><th>Họ tên</th><th>MSSV</th><th>Email</th><th>Sự kiện</th><th>Trạng thái</th><th>Hành động</th></tr>
           </thead>
           <tbody id="pTable"></tbody>
         </table>
@@ -524,75 +225,141 @@
     </div>
   </div>
 
-  <div id="dashboard" class="page">
-  <div class="card">
-    <h2>📊 Thống kê Check-in</h2>
-
-    <p>👥 Tổng đăng ký: <b id="totalP"></b></p>
-    <p>✅ Đã tham gia: <b id="checkedInP"></b></p>
-    <p>⏳ Chưa tham gia: <b id="notCheckedP"></b></p>
-
-    <hr>
-
-    <div id="eventStats"></div>
+  <div id="checkin" class="page">
+    <div class="card">
+      <h2>📷 Check-in sự kiện</h2>
+      <div id="qrVideo" style="width:100%;"></div>
+      <button class="main" onclick="startScan()">📸 Bật camera quét QR</button>
+      <hr style="margin:15px 0;">
+      <div class="form-group"><label>Nhập mã thủ công (MSSV|Tên sự kiện)</label><input id="manualCode" placeholder="VD: 2151012345|Workshop AI"></div>
+      <button class="main" onclick="manualCheckin()">✅ Check-in thủ công</button>
+    </div>
   </div>
-</div>
+
+  <div id="dashboard" class="page">
+    <div class="card" style="max-width:700px;">
+      <h2>📊 Thống kê Check-in</h2>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-bottom:20px;">
+        <div style="background:#fff0f5; padding:20px; border-radius:16px; text-align:center;">
+          <div style="font-size:28px; font-weight:700; color:#e84393;" id="totalP">0</div>
+          <div style="font-size:12px; color:#aaa;">Tổng đăng ký</div>
+        </div>
+        <div style="background:#e8f8f0; padding:20px; border-radius:16px; text-align:center;">
+          <div style="font-size:28px; font-weight:700; color:#27ae60;" id="checkedInP">0</div>
+          <div style="font-size:12px; color:#aaa;">Đã tham gia</div>
+        </div>
+        <div style="background:#fff9e8; padding:20px; border-radius:16px; text-align:center;">
+          <div style="font-size:28px; font-weight:700; color:#e67e22;" id="notCheckedP">0</div>
+          <div style="font-size:12px; color:#aaa;">Chưa tham gia</div>
+        </div>
+      </div>
+      <div id="eventStats"></div>
+    </div>
+  </div>
+
+  <div id="reminder" class="page">
+    <div class="card" style="max-width:700px;">
+      <h2>🔔 Sự kiện sắp diễn ra</h2>
+      <div id="reminderList"></div>
+    </div>
+  </div>
 
   <div id="login" class="page">
     <div class="card">
       <h2 id="authTitle">🔐 Đăng nhập</h2>
-      <input id="auth_email" placeholder="Email" style="margin-bottom: 10px;">
-      <input id="auth_pass" type="password" placeholder="Mật khẩu" style="margin-bottom: 10px;">
-      <div id="regFields" style="display: none;">
-        <input id="auth_name" placeholder="Họ tên" style="margin-bottom: 10px;">
-        <input id="auth_chucvu" placeholder="Chức vụ trong CLB" style="margin-bottom: 10px;">
-        <select id="auth_role" style="margin-bottom: 10px;">
-          <option value="user">Thành viên</option>
-          <option value="admin">Quản trị viên (Admin)</option>
-        </select>
+      <div class="form-group"><input id="auth_email" placeholder="Email" type="email"></div>
+      <div class="form-group"><input id="auth_pass" type="password" placeholder="Mật khẩu"></div>
+      <div id="regFields" style="display:none;">
+        <div class="form-group"><input id="auth_name" placeholder="Họ tên"></div>
+        <div class="form-group"><input id="auth_chucvu" placeholder="Chức vụ trong CLB"></div>
+        <div class="form-group">
+          <select id="auth_role">
+            <option value="user">Thành viên</option>
+            <option value="admin">Quản trị viên (Admin)</option>
+          </select>
+        </div>
       </div>
+      <div id="login_msg" style="font-size:13px; margin-bottom:8px; display:none;"></div>
       <button class="main" id="btnAuth" onclick="handleAuth()">Đăng nhập</button>
-      <p style="text-align:center; margin-top:10px; font-size:13px; cursor:pointer; color:#3498db"onclick="forgotPassword()">❓ Quên mật khẩu?</p>
-      <p style="text-align:center; margin-top:15px; font-size:13px; cursor:pointer; color:#e84393"
-        onclick="toggleAuthMode()">
+      <p style="text-align:center; margin-top:8px; font-size:13px; cursor:pointer; color:#e84393;" onclick="toggleAuthMode()">
         Chưa có tài khoản? Đăng ký ngay
       </p>
     </div>
   </div>
 
+  <!-- Toast (only one) -->
   <div class="toast" id="toast"></div>
 
-  <script>
-    /* DỮ LIỆU GỐC */
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    let events = JSON.parse(localStorage.getItem("events")) || [];
-    let participants = JSON.parse(localStorage.getItem("participants")) || [];
-    let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-    let notifyEnabled = JSON.parse(localStorage.getItem("notifyEnabled"));
-    if (notifyEnabled === null) notifyEnabled = true;
-    let isLoginMode = true;
-    let selectedStatus = "Mở";
+  <!-- External scripts (load before module so DOMContentLoaded fires after module) -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    /* HIỆU ỨNG HOA RƠI */
+  <!-- MAIN MODULE -->
+  <script type="module">
+    import { db, ref, push, onValue, remove, update } from "./firebase.js";
+
+    // ── State ──────────────────────────────────────────────
+    let users        = [];
+    let events       = [];
+    let participants = [];
+    let currentUser  = JSON.parse(localStorage.getItem("currentUser"));
+    let notifyEnabled= JSON.parse(localStorage.getItem("notifyEnabled"));
+    if (notifyEnabled === null) notifyEnabled = true;
+    let isLoginMode  = true;
+    let selectedStatus = "Mở";
+    let notified     = JSON.parse(localStorage.getItem("notified")) || {};
+
+    // ── Firebase Listeners ─────────────────────────────────
+    onValue(ref(db, "users"), snapshot => {
+      users = [];
+      snapshot.forEach(child => users.push({ id: child.key, ...child.val() }));
+    });
+
+    onValue(ref(db, "events"), snapshot => {
+      events = [];
+      snapshot.forEach(child => events.push({ id: child.key, ...child.val() }));
+      // Sync to localStorage so other pages can use it
+      localStorage.setItem("events", JSON.stringify(events));
+      if (document.getElementById("eventTable")?.offsetParent !== null) renderEvents();
+      updateEventDropdown();
+    });
+
+    onValue(ref(db, "participants"), snapshot => {
+      participants = [];
+      snapshot.forEach(child => participants.push({ id: child.key, ...child.val() }));
+      // Sync to localStorage so checkin.html, thongKe pages can use it
+      localStorage.setItem("participants", JSON.stringify(participants));
+      if (document.getElementById("pTable")?.offsetParent !== null) renderParticipants();
+    });
+
+    // ── Flower Effect ──────────────────────────────────────
     setInterval(() => {
-      let f = document.createElement("div"); f.className = "flower"; f.innerHTML = "🌸";
-      f.style.left = Math.random() * 100 + "vw"; f.style.animationDuration = (3 + Math.random() * 5) + "s";
-      document.body.appendChild(f); setTimeout(() => f.remove(), 8000);
+      const f = document.createElement("div");
+      f.className = "flower"; f.innerHTML = "🌸";
+      f.style.left = Math.random() * 100 + "vw";
+      f.style.animationDuration = (3 + Math.random() * 5) + "s";
+      document.body.appendChild(f);
+      setTimeout(() => f.remove(), 8000);
     }, 300);
 
-    /* ĐIỀU HƯỚNG */
-    function toggleMenu() { document.getElementById("menu").classList.toggle("show"); }
-    function go(id) {
-    if (id === 'dashboard') renderDashboard();
-      document.querySelectorAll(".page").forEach(p => p.style.display = "none");
-      document.getElementById(id).style.display = "block";
-      document.getElementById("menu").classList.remove("show");
-      if (id === 'manage') renderEvents();
-      if (id === 'participants') renderParticipants();
-      if (id === 'join') updateEventDropdown();
+    // ── Navigation ─────────────────────────────────────────
+    function toggleMenu() {
+      document.getElementById("menu").classList.toggle("show");
     }
 
-    /* AUTHENTICATION */
+    function go(id) {
+      document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+      const page = document.getElementById(id);
+      if (!page) { console.warn("Page not found:", id); return; }
+      page.style.display = "block";
+      document.getElementById("menu").classList.remove("show");
+      if (id === "manage")     setTimeout(renderEvents, 50);
+      if (id === "participants") setTimeout(renderParticipants, 50);
+      if (id === "join")       updateEventDropdown();
+      if (id === "dashboard")  renderDashboard();
+    }
+
+    // ── Auth ───────────────────────────────────────────────
     function toggleAuthMode() {
       isLoginMode = !isLoginMode;
       document.getElementById("authTitle").innerText = isLoginMode ? "🔐 Đăng nhập" : "👤 Đăng ký";
@@ -601,554 +368,507 @@
     }
 
     function handleAuth() {
- let email = auth_email.value.trim().toLowerCase();
-  let pass = auth_pass.value.trim();
+      const email = document.getElementById("auth_email").value.trim().toLowerCase();
+      const pass  = document.getElementById("auth_pass").value.trim();
+      const msgEl = document.getElementById("login_msg");
+      msgEl.style.display = "none";
 
-  if (isLoginMode) {
-    // ---- ĐĂNG NHẬP 
-    let u = users.find(x => x.email.toLowerCase() === email.toLowerCase() && x.pass === pass
-);
-    if (!u) return showToast("❌ Sai tài khoản hoặc mật khẩu!", "error");
-
-    currentUser = u;
-    localStorage.setItem("currentUser", JSON.stringify(u));
-    showToast("🎉 Chào mừng quay trở lại!");
-    updateUI();
-    go('home');
-
-  } else {
-    // ---- ĐĂNG KÝ (logic từ dangkitaikhoan) ----
-    let name = auth_name.value.trim();
-    let role = auth_role.value;
-    let chucvu = document.getElementById("auth_chucvu").value.trim();
-    // Kiểm tra nhập đủ thông tin
-    if (!name || !email || !pass || !chucvu) {
-      return showToast("❌ Vui lòng nhập đầy đủ thông tin!", "error");
+      if (isLoginMode) {
+        if (!email || !pass) { showMsg(msgEl, "❌ Vui lòng nhập email và mật khẩu!", true); return; }
+        const u = users.find(x => x.email?.toLowerCase() === email && x.pass === pass);
+        if (!u) { showMsg(msgEl, "❌ Email hoặc mật khẩu không đúng!", true); return; }
+        currentUser = u;
+        localStorage.setItem("currentUser", JSON.stringify(u));
+        showToast("🎉 Chào mừng " + u.name + "!");
+        updateUI();
+        go("home");
+      } else {
+        const name   = document.getElementById("auth_name").value.trim();
+        const chucvu = document.getElementById("auth_chucvu").value.trim();
+        const role   = document.getElementById("auth_role").value;
+        if (!name || !email || !pass || !chucvu) { showMsg(msgEl, "❌ Vui lòng nhập đầy đủ thông tin!", true); return; }
+        if (!(email.endsWith("@gmail.com") || email.endsWith("@student.hcmue.edu.vn")))
+          { showMsg(msgEl, "❌ Email phải là @gmail.com hoặc @student.hcmue.edu.vn!", true); return; }
+        if (pass.length < 6 || !/[a-zA-Z]/.test(pass) || !/[0-9]/.test(pass) || !/^[A-Z]/.test(pass) || !/[!@#$%^&*(),.?":{}|<>]/.test(pass))
+          { showMsg(msgEl, "❌ Mật khẩu ≥6 ký tự, chữ+số+ký tự đặc biệt+viết hoa chữ đầu!", true); return; }
+        if (users.find(u => u.email?.toLowerCase() === email))
+          { showMsg(msgEl, "❌ Email này đã được đăng ký!", true); return; }
+        push(ref(db, "users"), { name, email, pass, role, chucvu });
+        showToast("🎉 Đăng ký thành công! Hãy đăng nhập.");
+        toggleAuthMode();
+      }
     }
 
-    // Kiểm tra email hợp lệ (@gmail.com hoặc @student.hcmue.edu.vn)
-    if (!(email.endsWith("@gmail.com") || email.endsWith("@student.hcmue.edu.vn"))) {
-      return showToast("❌ Email phải là @gmail.com hoặc @student.hcmue.edu.vn!", "error");
+    function showMsg(el, msg, isError) {
+      el.textContent = msg;
+      el.style.color = isError ? "#e74c3c" : "#27ae60";
+      el.style.display = "block";
     }
 
-    // Kiểm tra mật khẩu mạnh
-    if (
-      pass.length < 6 ||
-      !/[a-zA-Z]/.test(pass) ||
-      !/[0-9]/.test(pass) ||
-      !/^[A-Z]/.test(pass) ||
-      !/[!@#$%^&*(),.?":{}|<>]/.test(pass)
-    ) {
-      return showToast("❌ Mật khẩu ≥6 ký tự, có chữ, số, ký tự đặc biệt và viết hoa chữ đầu!", "error");
+    function logout() {
+      localStorage.removeItem("currentUser");
+      currentUser = null;
+      updateUI();
+      go("home");
     }
-
-    // Kiểm tra trùng email
-    let exist = users.find(u => u.email === email);
-    if (exist) {
-      return showToast("❌ Email này đã được sử dụng!", "error");
-    }
-
-    // Lưu tài khoản
-    users.push({ name, email, pass, role, chucvu });
-    localStorage.setItem("users", JSON.stringify(users));
-
-    showToast("🎉 Đăng ký thành công! Hãy đăng nhập.");
-    toggleAuthMode();
-  }
-}
-
-    function logout() { localStorage.removeItem("currentUser"); location.reload(); }
 
     function updateUI() {
-  if (!currentUser) {
-    // CHƯA LOGIN
-    document.querySelectorAll(".adminOnly").forEach(b => b.style.display = "none");
-    document.querySelectorAll(".userOnly").forEach(b => b.style.display = "none");
-
-    welcome.innerText = "Khách (Vui lòng đăng nhập)";
-    return;
-  }
-
-  welcome.innerText = `Xin chào ${currentUser.name} (${currentUser.role})`;
-
-  if (currentUser.role === "admin") {
-    // ADMIN
-    document.querySelectorAll(".adminOnly").forEach(b => b.style.display = "block");
-    document.querySelectorAll(".userOnly").forEach(b => b.style.display = "none");
-  } else {
-    // USER
-    document.querySelectorAll(".adminOnly").forEach(b => b.style.display = "none");
-    document.querySelectorAll(".userOnly").forEach(b => b.style.display = "block");
-  }
-}
-    /* EVENT LOGIC (Tích hợp từ file taosukien.html) */
-    function selectStatus(el) {
-      document.querySelectorAll(".status-tag").forEach(t => t.classList.remove("active"));
-      el.classList.add("active"); selectedStatus = el.dataset.val;
+      const welcome = document.getElementById("welcome");
+      if (!currentUser) {
+        document.querySelectorAll(".adminOnly").forEach(b => b.style.display = "none");
+        document.querySelectorAll(".userOnly").forEach(b => b.style.display = "none");
+        document.querySelectorAll(".logoutBtn").forEach(b => b.style.display = "none");
+        if (welcome) welcome.innerText = "Khách (Vui lòng đăng nhập)";
+        return;
+      }
+      if (welcome) welcome.innerText = `Xin chào ${currentUser.name} (${currentUser.role === "admin" ? "Quản trị viên" : "Thành viên"}) 👋`;
+      document.querySelectorAll(".logoutBtn").forEach(b => b.style.display = "block");
+      if (currentUser.role === "admin") {
+        document.querySelectorAll(".adminOnly").forEach(b => b.style.display = "block");
+        document.querySelectorAll(".userOnly").forEach(b => b.style.display = "none");
+      } else {
+        document.querySelectorAll(".adminOnly").forEach(b => b.style.display = "none");
+        document.querySelectorAll(".userOnly").forEach(b => b.style.display = "block");
+      }
     }
 
-    document.getElementById("title").addEventListener("input", function () {
-      document.getElementById("titleCount").textContent = this.value.length + " / 100";
-    });
+    // ── Events ─────────────────────────────────────────────
+    function selectStatus(el) {
+      document.querySelectorAll(".status-tag").forEach(t => t.classList.remove("active"));
+      el.classList.add("active");
+      selectedStatus = el.dataset.val;
+    }
 
     function submitEvent() {
       document.querySelectorAll(".err-msg").forEach(e => e.classList.remove("show"));
-      document.querySelectorAll("input").forEach(i => i.classList.remove("error"));
+      document.querySelectorAll("input.error, select.error").forEach(i => i.classList.remove("error"));
 
-      let t = title.value.trim();
-      let l = leader.value.trim();
-      let d = date.value;
-      let loc = document.getElementById("location").value.trim();
-      let maxVal = max.value;
+      const t   = document.getElementById("title").value.trim();
+      const l   = document.getElementById("leader").value.trim();
+      const d   = document.getElementById("date").value;
+      const loc = document.getElementById("location").value.trim();
+      const maxVal = document.getElementById("max").value;
+      let valid = true;
 
-      if (!t || !l || !d || !loc || !maxVal) {
-        if (!t) { title.classList.add("error"); titleErr.classList.add("show"); }
-        if (!l) { leader.classList.add("error"); leaderErr.classList.add("show"); }
-        if (!d) { date.classList.add("error"); dateErr.classList.add("show"); }
-        if (!loc) { location.classList.add("error"); locationErr.classList.add("show"); }
-        if (!maxVal) { max.classList.add("error"); maxErr.classList.add("show"); }
-        return;
+      if (!t)      { setErr("title","titleErr"); valid=false; }
+      if (!l)      { setErr("leader","leaderErr"); valid=false; }
+      if (!d)      { setErr("date","dateErr"); valid=false; }
+      if (!loc)    { setErr("location","locationErr"); valid=false; }
+      if (!maxVal) { setErr("max","maxErr"); valid=false; }
+      if (!valid) return;
+
+      // Check duplicate
+      if (events.some(e => e.t?.toLowerCase() === t.toLowerCase() && e.d === d)) {
+        setErr("title","titleErr","Sự kiện này đã tồn tại trong ngày đó!"); return;
       }
 
-      events.push({
-        t,
-        l,
-        d,
-        time: time.value,
+      push(ref(db, "events"), {
+        t, l, d,
+        time: document.getElementById("time").value,
         status: selectedStatus,
         location: loc,
-        max: parseInt(maxVal)
+        max: parseInt(maxVal),
+        desc: document.getElementById("desc")?.value.trim() || "",
+        createdAt: new Date().toISOString()
       });
-
-      localStorage.setItem("events", JSON.stringify(events));
       showToast("🎉 Tạo sự kiện thành công!");
-
-      title.value = "";
-      leader.value = "";
-      document.getElementById("location").value = "";
-      max.value = "";
-
-      go('manage');
+      resetForm();
+      go("manage");
     }
 
-    function renderParticipants() {
-  pTable.innerHTML = participants.map((p, i) => `
-    <tr>
-      <td>${p.name}</td>
-      <td>${p.event}</td>
-      <td>${p.checkedIn ? "✅ Đã tham gia" : "⏳ Chưa"}</td>
-      <td>
-        <button class="btn-del" onclick="delP(${i})">🗑️</button>
-      </td>
-    </tr>
-  `).join("");
-}
-
-    function delEvent(i) {
-      if (confirm("Xóa sự kiện này?")) { events.splice(i, 1); localStorage.setItem("events", JSON.stringify(events)); renderEvents(); }
+    function setErr(inputId, errId, msg) {
+      document.getElementById(inputId)?.classList.add("error");
+      const err = document.getElementById(errId);
+      if (err) { if (msg) err.textContent = msg; err.classList.add("show"); }
     }
 
-    /* PARTICIPANT LOGIC */
+    function renderEvents() {
+      const tbody = document.getElementById("eventTable");
+      if (!tbody) return;
+      if (events.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Chưa có sự kiện nào.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = events.map(e => `
+        <tr>
+          <td style="font-weight:600;">${e.t || ""}</td>
+          <td>${e.l || ""}</td>
+          <td>${e.d || ""}</td>
+          <td>${e.location || ""}</td>
+          <td>${e.max || ""}</td>
+          <td>
+            <button class="btn-edit" onclick="window._openEditModal('${e.id}')">✏️ Sửa</button>
+            <button class="btn-del"  onclick="window.delEvent('${e.id}')">🗑️</button>
+          </td>
+        </tr>`).join("");
+      // Notify external edit script if available
+      if (typeof renderEventsScrum10 === "function") renderEventsScrum10();
+    }
+
+    function delEvent(firebaseId) {
+      if (confirm("Xóa sự kiện này?")) {
+        remove(ref(db, "events/" + firebaseId));
+        showToast("🗑️ Đã xóa sự kiện!");
+      }
+    }
+
+    // Hook for external edit modal (xemVaChinhSuaThongTinSuKien.js)
+    window._openEditModal = function(firebaseId) {
+      const ev = events.find(e => e.id === firebaseId);
+      if (!ev) return;
+      // Find index in current events array for external script compatibility
+      const idx = events.indexOf(ev);
+      if (typeof openEditModal === "function") openEditModal(idx);
+    };
+
+    // ── Participants ────────────────────────────────────────
     function updateEventDropdown() {
-      peventSelect.innerHTML = events.map(e => `<option value="${e.t}">${e.t}</option>`).join("");
+      const sel = document.getElementById("peventSelect");
+      if (!sel) return;
+      sel.innerHTML = events.length
+        ? events.map(e => `<option value="${e.t}">${e.t}</option>`).join("")
+        : `<option value="">-- Chưa có sự kiện --</option>`;
     }
 
-   function addParticipant() {
-  let hoten = document.getElementById("pname").value.trim();
-  let mssv = document.getElementById("pmssv").value.trim();
-  let email = document.getElementById("pemail").value.trim();
-  let khoa = document.getElementById("pkhoa").value;
-  let eventName = peventSelect.value;
+    function addParticipant() {
+      const hoten    = document.getElementById("pname").value.trim();
+      const mssv     = document.getElementById("pmssv").value.trim();
+      const email    = document.getElementById("pemail").value.trim();
+      const khoa     = document.getElementById("pkhoa").value;
+      const eventName= document.getElementById("peventSelect").value;
 
-  // VALIDATION
-  if (!hoten || !mssv || !email || !khoa) {
-    return showToast("❌ Vui lòng nhập đầy đủ thông tin!", "error");
-  }
+      if (!hoten || !mssv || !email || !khoa || !eventName)
+        return showToast("❌ Vui lòng nhập đầy đủ thông tin!", "error");
+      if (!email.endsWith("@gmail.com"))
+        return showToast("❌ Email phải có đuôi @gmail.com!", "error");
+      if (participants.some(p => p.mssv === mssv && p.event === eventName))
+        return showToast("⚠️ MSSV này đã đăng ký sự kiện đó rồi!", "error");
+      if (participants.some(p => p.email === email && p.event === eventName))
+        return showToast("⚠️ Email này đã đăng ký sự kiện đó rồi!", "error");
 
-  if (!email.endsWith("@gmail.com")) {
-    return showToast("❌ Email phải có @gmail.com!", "error");
-  }
+      const selectedEvent = events.find(e => e.t === eventName);
+      const count = participants.filter(p => p.event === eventName).length;
+      if (selectedEvent?.max && count >= selectedEvent.max)
+        return showToast("❌ Sự kiện đã đủ số người tham gia!", "error");
 
-  if (participants.some(p => p.mssv === mssv && p.event === eventName)) {
-    return showToast("❌ MSSV đã đăng ký!", "error");
-  }
+      const qrData = mssv + "|" + eventName;
+      const qrLink = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(qrData);
 
-  if (participants.some(p => p.email === email && p.event === eventName)) {
-    return showToast("❌ Email đã đăng ký!", "error");
-  }
+      push(ref(db, "participants"), {
+        name: hoten, mssv, email, khoa, event: eventName,
+        checkedIn: false, qr: qrData, qrLink,
+        registeredAt: new Date().toISOString()
+      });
+      showToast("🎉 Đăng ký thành công!");
 
-  let selectedEvent = events.find(e => e.t === eventName);
-  let count = participants.filter(p => p.event === eventName).length;
+      // Show QR
+      const qrBox = document.getElementById("myQR");
+      if (qrBox) {
+        qrBox.innerHTML = `
+          <p style="font-weight:700;color:#e84393;">🪪 Mã QR của bạn</p>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}"
+               style="display:block;margin:10px auto;border-radius:12px;">
+          <div><b>${hoten}</b> — MSSV: ${mssv}</div>`;
+      }
+      // Reset
+      ["pname","pmssv","pemail"].forEach(id => document.getElementById(id).value = "");
+      document.getElementById("pkhoa").value = "";
+    }
 
-  if (selectedEvent && count >= selectedEvent.max) {
-    return showToast("❌ Sự kiện đã đủ người!", "error");
-  }
-
-  // LƯU
-  let qrData = mssv + "|" + eventName;
-
-let qrLink = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" 
-              + encodeURIComponent(qrData);
-
-participants.push({
-  name: hoten,
-  mssv,
-  email,
-  khoa,
-  event: eventName,
-  checkedIn: false,
-  qr: qrData,
-  qrLink: qrLink // 
-});
-
-  localStorage.setItem("participants", JSON.stringify(participants));
-
-  showToast("🎉 Đăng ký thành công!");
-
-  // HIỂN QR
-  let qrBox = document.getElementById("myQR");
-
-  if (qrBox) {
-    qrBox.innerHTML = "";
-
-    let title = document.createElement("p");
-    title.innerText = "🪪 Mã QR của bạn";
-    title.style.textAlign = "center";
-    title.style.fontWeight = "bold";
-    qrBox.appendChild(title);
-
-    let imgQR = document.createElement("img");
-    imgQR.src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrData);
-    imgQR.style.display = "block";
-    imgQR.style.margin = "10px auto";
-
-    qrBox.appendChild(imgQR);
-
-    let info = document.createElement("div");
-    info.style.textAlign = "center";
-    info.innerHTML = `<b>${hoten}</b><br>MSSV: ${mssv}`;
-    qrBox.appendChild(info);
-  }
-
-  // RESET
-  document.getElementById("pname").value = "";
-  document.getElementById("pmssv").value = "";
-  document.getElementById("pemail").value = "";
-  document.getElementById("pkhoa").value = "";
-}
     function renderParticipants() {
-  pTable.innerHTML = participants.map((p, i) => `
-    <tr>
-      <td>${p.name}</td>
-      <td>${p.event}</td>
-      <td>${p.checkedIn ? "✅ Đã tham gia" : "⏳ Chưa"}</td>
-      <td>
-        <button class="btn-del" onclick="delP(${i})">🗑️</button>
-      </td>
-    </tr>
-  `).join("");
-}
+      const pTable = document.getElementById("pTable");
+      if (!pTable) return;
+      if (participants.length === 0) {
+        pTable.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Chưa có người đăng ký.</td></tr>`;
+        return;
+      }
+      pTable.innerHTML = participants.map(p => `
+        <tr>
+          <td style="font-weight:600;">${p.name || ""}</td>
+          <td>${p.mssv || ""}</td>
+          <td style="font-size:12px;">${p.email || ""}</td>
+          <td>${p.event || ""}</td>
+          <td>${p.checkedIn ? "✅ Đã tham gia" : "⏳ Chưa"}</td>
+          <td><button class="btn-del" onclick="window.delP('${p.id}')">🗑️</button></td>
+        </tr>`).join("");
+    }
 
-    function delP(i) { participants.splice(i, 1); localStorage.setItem("participants", JSON.stringify(participants)); renderParticipants(); }
-
-    /* UTILS */
-    function showToast(msg, type = "success") {
-      const t = document.getElementById("toast");
-      t.innerText = msg; t.className = `toast ${type} show`;
-      setTimeout(() => t.classList.remove("show"), 3000);
+    function delP(firebaseId) {
+      if (confirm("Xóa người tham gia này?")) {
+        remove(ref(db, "participants/" + firebaseId));
+        showToast("🗑️ Đã xóa!");
+      }
     }
 
     function exportCSV() {
-      let csv = "Tên;Sự kiện\n" + participants.map(p => `"${p.name}";"${p.event}"`).join("\n");
-      let blob = new Blob(["\uFEFF" + csv], { type: "text/csv" });
-      let a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "danhsach.csv"; a.click();
+      if (!participants.length) return showToast("Không có dữ liệu!", "error");
+      let csv = "\uFEFFHọ tên;MSSV;Email;Khóa;Sự kiện;Trạng thái\n";
+      participants.forEach(p => {
+        csv += `"${p.name}";"${p.mssv}";"${p.email}";"${p.khoa}";"${p.event}";"${p.checkedIn ? "Đã tham gia" : "Chưa tham gia"}"\n`;
+      });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+      a.download = "danhsach_thamgia.csv"; a.click();
     }
 
     function resetForm() {
-      title.value = "";
-      leader.value = "";
-      date.value = "";
-      time.value = "08:00";
-      document.getElementById("location").value = "";
-      max.value = "";
-      desc.value = "";
-
-      document.querySelectorAll(".err-msg").forEach(e => e.classList.remove("show"));
-      document.querySelectorAll("input").forEach(i => i.classList.remove("error"));
-
+      ["title","leader","location","max","desc"].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = "";
+      });
+      const dateEl = document.getElementById("date"); if (dateEl) dateEl.value = "";
+      const timeEl = document.getElementById("time"); if (timeEl) timeEl.value = "08:00";
+      document.querySelectorAll(".err-msg").forEach(e => { e.classList.remove("show"); e.textContent = ""; });
+      document.querySelectorAll("input.error, select.error").forEach(i => i.classList.remove("error"));
       document.querySelectorAll(".status-tag").forEach(t => t.classList.remove("active"));
-      document.querySelector(".status-tag").classList.add("active");
-
+      document.querySelector(".status-tag")?.classList.add("active");
       selectedStatus = "Mở";
+      document.getElementById("titleCount").textContent = "0 / 100";
+      document.getElementById("descCount").textContent  = "0 / 300";
     }
 
-    /* INIT */
-    updateUI();
-
-    /* 🔍 SEARCH TOÀN HỆ THỐNG  */
-function globalSearchFunction() {
-  let keyword = document.getElementById("globalSearch").value.toLowerCase().trim();
-
-  if (!keyword) return;
-
-  /* ===== ĐIỀU HƯỚNG ===== */
-  if (keyword === "trang chủ") return go('home');
-  if (keyword.includes("tạo")) return go('create');
-  if (keyword.includes("quản lý")) {
-    go('manage');
-    setTimeout(renderEvents, 100);
-    return;
-  }
-  if (keyword.includes("người tham gia")) {
-    go('participants');
-    setTimeout(renderParticipants, 100);
-    return;
-  }
-  if (keyword === "tham gia") return go('join');
-  if (keyword.includes("đăng nhập")) return go('login');
-
-  /* ===== TÌM EVENT ===== */
-  go('manage');
-  setTimeout(() => {
-    let found = false;
-    let rows = document.querySelectorAll("#eventTable tr");
-
-    rows.forEach(row => {
-      let text = row.innerText.toLowerCase();
-      if (text.includes(keyword)) {
-        row.style.display = "";
-        found = true;
-      } else {
-        row.style.display = "none";
+    // ── Check-in ───────────────────────────────────────────
+    function handleCheckin(code) {
+      // Support both "MSSV|Event" and JSON QR from NhanQRCode.js
+      let mssv, eventName;
+      try {
+        const parsed = JSON.parse(code);
+        mssv = parsed.ticketId ? parsed.name : null; // fallback
+        // Try to match by ticketId in participants via localStorage
+        const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+        const ticket  = tickets.find(t => t.ticketId === parsed.ticketId);
+        if (ticket) {
+          mssv = ticket.name; eventName = ticket.event;
+        }
+      } catch {
+        [mssv, eventName] = code.split("|");
       }
-    });
+      if (!mssv || !eventName) return showToast("❌ Mã QR không hợp lệ!", "error");
 
-    /* ===== NẾU KHÔNG THẤY → TÌM PARTICIPANT ===== */
-    if (!found) {
-      go('participants');
+      const p = participants.find(x => (x.mssv === mssv || x.name === mssv) && x.event === eventName);
+      if (!p) return showToast("❌ Không tìm thấy người đăng ký!", "error");
+      if (p.checkedIn) return showToast("⚠️ Mã QR này đã được sử dụng rồi!", "error");
+
+      update(ref(db, "participants/" + p.id), { checkedIn: true });
+      showToast("✅ Check-in thành công: " + p.name);
+    }
+
+    function manualCheckin() {
+      const code = document.getElementById("manualCode").value.trim();
+      if (!code) return showToast("❌ Vui lòng nhập mã!", "error");
+      handleCheckin(code);
+    }
+
+    let qrScanner;
+    function startScan() {
+      if (qrScanner) {
+        qrScanner.stop().catch(() => {});
+      }
+      qrScanner = new Html5Qrcode("qrVideo");
+      Html5Qrcode.getCameras().then(devices => {
+        if (!devices.length) return showToast("❌ Không tìm thấy camera!", "error");
+        qrScanner.start(devices[0].id, { fps: 10, qrbox: 250 }, qrCodeMessage => {
+          handleCheckin(qrCodeMessage);
+          qrScanner.stop();
+        }).catch(err => showToast("❌ Lỗi camera: " + err, "error"));
+      }).catch(() => showToast("❌ Trình duyệt chặn quyền camera!", "error"));
+    }
+
+    // ── Dashboard ──────────────────────────────────────────
+    function renderDashboard() {
+      const total   = participants.length;
+      const checked = participants.filter(p => p.checkedIn).length;
+      document.getElementById("totalP").innerText    = total;
+      document.getElementById("checkedInP").innerText= checked;
+      document.getElementById("notCheckedP").innerText= total - checked;
+
+      document.getElementById("eventStats").innerHTML = events.map(e => {
+        const totalE   = participants.filter(p => p.event === e.t).length;
+        const checkedE = participants.filter(p => p.event === e.t && p.checkedIn).length;
+        const pct = totalE ? Math.round(checkedE / totalE * 100) : 0;
+        return `<div style="background:#fff0f5;padding:12px;border-radius:12px;margin-bottom:10px;">
+          <b style="color:#e84393;">📌 ${e.t}</b>
+          <div style="margin-top:6px;font-size:13px;">✅ ${checkedE}/${totalE} đã check-in (${pct}%)</div>
+          <div style="background:#ffe0ea;border-radius:999px;height:6px;margin-top:6px;">
+            <div style="background:#e84393;height:100%;width:${pct}%;border-radius:999px;"></div>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    // ── Reminders ──────────────────────────────────────────
+    function renderReminders() {
+      const now = new Date();
+      let html = "";
+      participants.forEach(p => {
+        const ev = events.find(e => e.t === p.event);
+        if (!ev) return;
+        const eventTime = new Date(ev.d + "T" + (ev.time || "00:00"));
+        const hours = (eventTime - now) / 3600000;
+        if (hours > 0 && hours <= 24) {
+          html += `<div style="background:#fff0f6;padding:15px;border-radius:12px;margin-bottom:10px;border-left:4px solid #ff6a88;">
+            <b>📢 ${ev.t}</b><br>⏰ ${ev.d} ${ev.time || ""}<br>📍 ${ev.location || ""}
+            ${p.qrLink ? `<br>🎟 <a href="${p.qrLink}" target="_blank">Xem vé QR</a>` : ""}
+          </div>`;
+        }
+      });
+      document.getElementById("reminderList").innerHTML =
+        html || "<p style='text-align:center;color:#aaa;'>❌ Không có sự kiện nào sắp diễn ra trong 24 giờ tới.</p>";
+    }
+
+    function toggleNotify() {
+      notifyEnabled = !notifyEnabled;
+      localStorage.setItem("notifyEnabled", notifyEnabled);
+      showToast(notifyEnabled ? "🔔 Đã bật thông báo" : "🔕 Đã tắt thông báo");
+    }
+
+    setInterval(() => {
+      if (!notifyEnabled) return;
+      const now = new Date();
+      participants.forEach(p => {
+        const ev = events.find(e => e.t === p.event);
+        if (!ev || !p.mssv) return;
+        const eventTime = new Date(ev.d + "T" + (ev.time || "00:00"));
+        const hours = (eventTime - now) / 3600000;
+        const key24 = p.mssv + "_" + ev.t + "_24";
+        const key1  = p.mssv + "_" + ev.t + "_1";
+        if (hours <= 24 && hours > 23.5 && !notified[key24]) {
+          showToast("⏳ Còn 24 giờ: " + ev.t, "info");
+          notified[key24] = true; localStorage.setItem("notified", JSON.stringify(notified));
+        }
+        if (hours <= 1 && hours > 0.5 && !notified[key1]) {
+          showToast("⚠️ Còn 1 giờ: " + ev.t, "info");
+          notified[key1] = true; localStorage.setItem("notified", JSON.stringify(notified));
+        }
+      });
+    }, 30000);
+
+    // ── Forgot Password ────────────────────────────────────
+    function forgotPassword() {
+      let email = prompt("📧 Nhập email đã đăng ký:");
+      if (!email) return;
+      email = email.trim().toLowerCase();
+      const user = users.find(u => u.email?.toLowerCase() === email);
+      if (!user) { showToast("❌ Email không tồn tại!", "error"); return; }
+      const newPass = prompt("🔑 Nhập mật khẩu mới (≥6 ký tự):");
+      if (!newPass || newPass.length < 6) { showToast("❌ Mật khẩu không hợp lệ!", "error"); return; }
+      update(ref(db, "users/" + user.id), { pass: newPass });
+      showToast("✅ Đổi mật khẩu thành công! Hãy đăng nhập lại.");
+      document.getElementById("auth_pass").value = "";
+    }
+
+    function cancelRegister() {
+      const mssv = prompt("Nhập MSSV để hủy đăng ký:");
+      if (!mssv) return;
+      const p = participants.find(p => p.mssv === mssv);
+      if (!p) { showToast("❌ Không tìm thấy MSSV!", "error"); return; }
+      if (confirm(`Hủy đăng ký của ${p.name} - ${p.event}?`)) {
+        remove(ref(db, "participants/" + p.id));
+        showToast("✅ Đã hủy đăng ký!");
+      }
+    }
+
+    function viewGallery() {
+      window.location.href = "scrum22.html";
+    }
+
+    // ── Global Search ──────────────────────────────────────
+    function globalSearchFunction() {
+      const keyword = document.getElementById("globalSearch").value.toLowerCase().trim();
+      if (!keyword) return;
+      const cmds = {
+        "trang chủ": "home", "tạo sự kiện": "create", "quản lý": "manage",
+        "tham gia": "join", "đăng nhập": "login", "checkin": "checkin",
+        "check-in": "checkin", "dashboard": "dashboard"
+      };
+      for (const [k, v] of Object.entries(cmds)) {
+        if (keyword.includes(k)) { go(v); return; }
+      }
+      // Search in table
+      go("manage");
       setTimeout(() => {
-        let pRows = document.querySelectorAll("#pTable tr");
-
-        pRows.forEach(row => {
-          let text = row.innerText.toLowerCase();
-          row.style.display = text.includes(keyword) ? "" : "none";
+        const rows = document.querySelectorAll("#eventTable tr");
+        let found = false;
+        rows.forEach(row => {
+          const match = row.innerText.toLowerCase().includes(keyword);
+          row.style.display = match ? "" : "none";
+          if (match) found = true;
         });
+        if (!found) {
+          go("participants");
+          setTimeout(() => {
+            document.querySelectorAll("#pTable tr").forEach(row => {
+              row.style.display = row.innerText.toLowerCase().includes(keyword) ? "" : "none";
+            });
+          }, 100);
+        }
       }, 100);
     }
 
-  }, 100);
-}
-
-// ===== CHECK-IN =====
-function handleCheckin(code) {
-  let [mssv, event] = code.split("|");
-
-  if (!mssv || !event) {
-    return showToast("❌ Mã không hợp lệ!", "error");
-  }
-
-  let p = participants.find(x => x.mssv === mssv && x.event === event);
-
-  if (!p) {
-    return showToast("❌ Không tìm thấy người đăng ký!", "error");
-  }
-
-  if (p.checkedIn) {
-    return showToast("⚠️ QR đã được sử dụng!", "error");
-  }
-
-  p.checkedIn = true;
-  localStorage.setItem("participants", JSON.stringify(participants));
-
-  showToast("✅ Check-in thành công: " + p.name);
-}
-
-// nhập tay
-function manualCheckin() {
-  let code = document.getElementById("manualCode").value.trim();
-  handleCheckin(code);
-}
-
-let qrScanner;
-
-function startScan() {
-  qrScanner = new Html5Qrcode("qrVideo");
-
-  Html5Qrcode.getCameras().then(devices => {
-    if (devices.length) {
-      let cameraId = devices[0].id;
-
-      qrScanner.start(
-        cameraId,
-        { fps: 10, qrbox: 250 },
-        qrCodeMessage => {
-          handleCheckin(qrCodeMessage);
-          qrScanner.stop();
-        }
-      );
-    }
-  });
-}
-
-function renderDashboard() {
-  let total = participants.length;
-  let checked = participants.filter(p => p.checkedIn).length;
-  let notChecked = total - checked;
-
-  document.getElementById("totalP").innerText = total;
-  document.getElementById("checkedInP").innerText = checked;
-  document.getElementById("notCheckedP").innerText = notChecked;
-
-  // Thống kê theo từng sự kiện
-  let html = "";
-
-  events.forEach(e => {
-    let totalE = participants.filter(p => p.event === e.t).length;
-    let checkedE = participants.filter(p => p.event === e.t && p.checkedIn).length;
-
-    html += `
-      <p>📌 ${e.t}: ${checkedE}/${totalE} đã check-in</p>
-    `;
-  });
-
-  document.getElementById("eventStats").innerHTML = html;
-}
-// ===== BẬT/TẮT =====
-function toggleNotify() {
-  notifyEnabled = !notifyEnabled;
-  localStorage.setItem("notifyEnabled", notifyEnabled);
-  updateNotifyUI();
-  showToast(notifyEnabled ? "🔔 Đã bật" : "🔕 Đã tắt");
-}
-
-function updateNotifyUI() {
-  let el = document.getElementById("notifyStatus");
-  if (el) el.innerText = notifyEnabled ? "ON" : "OFF";
-}
-updateNotifyUI();
-
-// ===== TẠO NỘI DUNG =====
-function buildMessage(event, p) {
-  return `📢 ${event.t}
-⏰ ${event.d} ${event.time}
-📍 ${event.location}
-🎟 Vé: ${p.qrLink}`;
-}
-
-// ===== NHẮC LỊCH =====
-let notified = JSON.parse(localStorage.getItem("notified")) || {};
-
-setInterval(() => {
-  let now = new Date();
-
-  participants.forEach(p => {
-    let event = events.find(e => e.t === p.event);
-    if (!event) return;
-
-    let eventTime = new Date(event.d + "T" + (event.time || "00:00"));
-    let diff = eventTime - now;
-    let hours = diff / 3600000;
-
-    let key24 = p.mssv + "_" + event.t + "_24";
-    let key1 = p.mssv + "_" + event.t + "_1";
-
-    let msg = buildMessage(event, p);
-
-    //  TEST NHANH 
-    if (hours <= 24 && hours > 23.5) {
-      showToast("⏳ Sắp diễn ra:\n" + msg);
-      notified[key24] = true;
+    // ── Toast ──────────────────────────────────────────────
+    function showToast(msg, type = "success") {
+      const t = document.getElementById("toast");
+      if (!t) return;
+      t.innerText = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove("show"), 3000);
     }
 
-    if (hours <= 1 && hours > 0.5) {
-      showToast("⚠️ Còn 1 phút:\n" + msg);
-      notified[key1] = true;
-    }
-  });
+    // ── Init ───────────────────────────────────────────────
+    updateUI();
 
-  localStorage.setItem("notified", JSON.stringify(notified));
+    // ══════════════════════════════════════════════════════
+    // EXPOSE ALL FUNCTIONS TO GLOBAL SCOPE
+    // Required for: inline onclicks, external JS files,
+    // quanLyChiTieu.js, xemVaChinhSuaThongTinSuKien.js,
+    // NhanQRCode.js, dongBoDuLieuNguoiDung.js, etc.
+    // ══════════════════════════════════════════════════════
+    window.toggleMenu         = toggleMenu;
+    window.go                 = go;
+    window.showToast          = showToast;
+    window.renderEvents       = renderEvents;
+    window.renderParticipants = renderParticipants;
+    window.updateEventDropdown= updateEventDropdown;
+    window.selectStatus       = selectStatus;
+    window.submitEvent        = submitEvent;
+    window.delEvent           = delEvent;
+    window.addParticipant     = addParticipant;
+    window.delP               = delP;
+    window.exportCSV          = exportCSV;
+    window.resetForm          = resetForm;
+    window.handleAuth         = handleAuth;
+    window.toggleAuthMode     = toggleAuthMode;
+    window.logout             = logout;
+    window.globalSearchFunction = globalSearchFunction;
+    window.handleCheckin      = handleCheckin;
+    window.manualCheckin      = manualCheckin;
+    window.startScan          = startScan;
+    window.renderDashboard    = renderDashboard;
+    window.toggleNotify       = toggleNotify;
+    window.renderReminders    = renderReminders;
+    window.forgotPassword     = forgotPassword;
+    window.cancelRegister     = cancelRegister;
+    window.viewGallery        = viewGallery;
 
-}, 30000);
+    // Expose Firebase ref/update/remove for external scripts that need them
+    window._db     = db;
+    window._ref    = ref;
+    window._update = update;
+    window._remove = remove;
+    window._push   = push;
 
-function renderReminders() {
-  let now = new Date();
-  let html = "";
+    // Expose data arrays (read-only references)
+    Object.defineProperty(window, '_events',       { get: () => events });
+    Object.defineProperty(window, '_participants',  { get: () => participants });
+    Object.defineProperty(window, '_users',         { get: () => users });
 
-  participants.forEach(p => {
-    let event = events.find(e => e.t === p.event);
-    if (!event) return;
-
-    let eventTime = new Date(event.d + "T" + (event.time || "00:00"));
-    let diff = eventTime - now;
-    let hours = diff / 3600000;
-
-    // chỉ lấy sự kiện sắp diễn ra (trong 24h)
-    if (hours > 0 && hours <= 24) {
-      html += `
-        <div style="background:#fff0f6; padding:15px; border-radius:12px; margin-bottom:10px;">
-          <b>📢 ${event.t}</b><br>
-          ⏰ ${event.d} ${event.time}<br>
-          📍 ${event.location}<br>
-          🎟 <a href="${p.qrLink}" target="_blank">Xem vé QR</a>
-        </div>
-      `;
-    }
-  });
-
-  if (!html) {
-    html = "<p style='text-align:center'>❌ Không có sự kiện sắp diễn ra</p>";
-  }
-
-  document.getElementById("reminderList").innerHTML = html;
-}
-function forgotPassword() {
-  let email = prompt("📧 Nhập email đã đăng ký:");
-  if (!email) return;
-  email = email.trim().toLowerCase();
-  let usersData = JSON.parse(localStorage.getItem("users")) || [];
-  let userIndex = usersData.findIndex(u => 
-    u.email.toLowerCase() === email
-  );
-  if (userIndex === -1) {
-    showToast("❌ Email không tồn tại!", "error");
-    return;
-  }
-  let newPass = prompt("🔑 Nhập mật khẩu mới (≥6 ký tự):");
-  if (!newPass || newPass.length < 6) {
-    showToast("❌ Mật khẩu không hợp lệ!", "error");
-    return;
-  }
-
-  // CẬP NHẬT
-  usersData[userIndex].pass = newPass;
-  localStorage.setItem("users", JSON.stringify(usersData));
-  showToast("✅ Đổi mật khẩu thành công! Hãy đăng nhập lại.");
-
-  // reset input login 
-  document.getElementById("auth_pass").value = "";
-}
-function cancelRegister() {
-  let mssv = prompt("Nhập MSSV để hủy:");
-
-  let index = participants.findIndex(p => p.mssv === mssv);
-
-  if (index === -1) {
-    return showToast("❌ Không tìm thấy!", "error");
-  }
-
-  participants.splice(index, 1);
-  localStorage.setItem("participants", JSON.stringify(participants));
-
-  showToast("✅ Đã hủy đăng ký!");
-}
-function viewGallery() {
-  alert("📸 Chức năng xem hình ảnh/tư liệu (có thể nối Google Drive hoặc Firebase)");
-}
   </script>
+
+  <!-- External feature scripts — load AFTER module via DOMContentLoaded -->
   <script src="xemVaChinhSuaThongTinSuKien.js"></script>
   <script src="quanLyChiTieu.js"></script>
-  <script src="https://unpkg.com/html5-qrcode"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</body>
+  <script src="NhanQRCode.js"></script>
+  <script src="dongBoDuLieuNguoiDung.js"></script>
+  <script src="quenMatKhau.js"></script>
 
+</body>
 </html>
