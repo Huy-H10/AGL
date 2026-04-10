@@ -9,9 +9,8 @@
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Nunito',sans-serif;}
         body{background:linear-gradient(135deg,#ff9a9e,#fad0c4);min-height:100vh;}
 
-        /* ── HEADER ── */
         .header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(255,106,136,.95);backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(255,106,136,.3);}
-        .back-btn{background:rgba(255,255,255,.25);border:none;color:#fff;font-size:20px;cursor:pointer;border-radius:10px;padding:6px 12px;}
+        .back-btn{background:rgba(255,255,255,.25);border:none;color:#fff;font-size:20px;cursor:pointer;border-radius:10px;padding:6px 12px;transition:.2s;}
         .back-btn:hover{background:rgba(255,255,255,.4);}
         .header-title{color:#fff;font-family:'Quicksand';font-weight:700;font-size:18px;}
         .header-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
@@ -19,28 +18,23 @@
         .logout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;}
         .logout-btn:hover{background:rgba(255,255,255,.3);}
 
-        /* ── CONTENT ── */
         .content{padding:85px 20px 40px;max-width:1100px;margin:0 auto;}
         .dashboard-wrapper{display:flex;gap:22px;align-items:flex-start;}
         .side-info{width:260px;flex-shrink:0;}
         .main-content{flex-grow:1;}
         @media(max-width:800px){.dashboard-wrapper{flex-direction:column;}.side-info{width:100%;}}
 
-        /* ── CARDS ── */
         .card{background:rgba(255,255,255,.97);border-radius:20px;padding:22px;margin-bottom:16px;box-shadow:0 8px 28px rgba(255,105,180,.15);}
         h2,h3{color:#c0395e;font-family:'Quicksand';margin-top:0;}
         h2{font-size:22px;margin-bottom:4px;}
         .subtitle{color:#e84393;font-size:13px;opacity:.8;margin-bottom:16px;}
 
-        /* ── STATS ── */
         .stat-row{display:flex;justify-content:space-between;align-items:center;color:#c0395e;margin:10px 0;font-weight:700;font-size:14px;}
         .stat-num{background:#fff0f5;padding:4px 14px;border-radius:20px;font-size:16px;color:#e84393;}
 
-        /* ── UPLOAD ── */
         .upload-label{display:block;padding:18px;border:2px dashed #ffe0ea;border-radius:14px;text-align:center;cursor:pointer;background:#fff9fb;transition:.3s;color:#c0395e;font-weight:700;}
         .upload-label:hover{background:#ffe0ea;border-color:#ff6a88;}
 
-        /* ── FILTER BUTTONS ── */
         .filter-group{display:flex;gap:8px;flex-wrap:wrap;}
         .f-btn{padding:7px 16px;border-radius:20px;border:2px solid #ffe0ea;background:#fff;cursor:pointer;color:#c0395e;font-weight:700;font-size:13px;transition:.2s;}
         .f-btn.active,.f-btn:hover{background:#ff6a88;color:#fff;border-color:#ff6a88;}
@@ -48,40 +42,62 @@
 
         /* ── GRID ── */
         .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:16px;}
-        .media-item{border:2px solid #ffe0ea;border-radius:18px;overflow:hidden;background:#fff;transition:.3s;cursor:pointer;}
-        .media-item:hover{transform:translateY(-4px);border-color:#ff6a88;box-shadow:0 10px 25px rgba(255,106,136,.2);}
-        .img-box{height:140px;background:#f5f5f5;overflow:hidden;position:relative;}
-        .img-box img{width:100%;height:100%;object-fit:cover;transition:.3s;}
-        .media-item:hover .img-box img{transform:scale(1.05);}
-        .file-box{height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff9fb;gap:6px;}
-        .file-box .file-icon{font-size:44px;}
-        .file-box .file-type{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;}
-        .item-name{padding:10px 12px;font-size:12px;font-weight:700;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:1px solid #fce8f0;}
-        .item-date{padding:0 12px 8px;font-size:11px;color:#bbb;}
 
-        /* ── LIGHTBOX ── */
-        .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px;}
-        .lightbox.open{display:flex;}
+        /* FIX: cursor pointer + position relative để tránh z-index conflict */
+        .media-item{border:2px solid #ffe0ea;border-radius:18px;overflow:hidden;background:#fff;transition:.3s;cursor:pointer;position:relative;}
+        .media-item:hover{transform:translateY(-4px);border-color:#ff6a88;box-shadow:0 10px 25px rgba(255,106,136,.2);}
+
+        .img-box{height:140px;background:#f5f5f5;overflow:hidden;position:relative;}
+        .img-box img{width:100%;height:100%;object-fit:cover;transition:.3s;
+          /* FIX: pointer-events none trên img để click bubble lên media-item */
+          pointer-events:none;}
+        .media-item:hover .img-box img{transform:scale(1.05);}
+
+        .file-box{height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff9fb;gap:6px;}
+        .file-box .file-icon{font-size:44px;pointer-events:none;}
+        .file-box .file-type{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;pointer-events:none;}
+        .item-name{padding:10px 12px;font-size:12px;font-weight:700;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:1px solid #fce8f0;pointer-events:none;}
+        .item-date{padding:0 12px 8px;font-size:11px;color:#bbb;pointer-events:none;}
+
+        /* ── LIGHTBOX FIX ── */
+        /* Dùng class thay vì display:none/flex để tránh specificity issue */
+        .lightbox{
+          position:fixed;inset:0;
+          background:rgba(0,0,0,.85);
+          z-index:9999;
+          display:flex;           /* luôn flex */
+          align-items:center;
+          justify-content:center;
+          padding:20px;
+          opacity:0;
+          pointer-events:none;    /* ẩn bằng opacity + pointer-events */
+          transition:opacity .25s;
+        }
+        .lightbox.open{
+          opacity:1;
+          pointer-events:all;
+        }
         .lightbox-inner{background:#fff;border-radius:20px;overflow:hidden;max-width:80vw;max-height:85vh;display:flex;flex-direction:column;}
         .lightbox-img{max-width:100%;max-height:70vh;object-fit:contain;display:block;}
         .lightbox-footer{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;}
         .lightbox-name{font-weight:700;color:#333;font-size:14px;}
         .lightbox-close{background:#ff6a88;color:#fff;border:none;border-radius:10px;padding:7px 16px;cursor:pointer;font-weight:700;}
 
-        /* ── ACCESS DENIED ── */
         .access-denied{text-align:center;padding:60px 20px;}
         .access-denied .lock{font-size:56px;margin-bottom:14px;}
         .access-denied h3{color:#e84393;font-family:'Quicksand';margin-bottom:8px;}
         .access-denied p{color:#aaa;font-size:14px;}
         .access-denied a{color:#ff6a88;font-weight:700;text-decoration:none;}
 
-        /* ── EMPTY ── */
         .empty-grid{text-align:center;padding:50px 20px;color:#bbb;}
         .empty-grid .icon{font-size:48px;margin-bottom:12px;}
 
-        /* ── FLOWER ── */
         .flower{position:fixed;top:-50px;font-size:18px;animation:fall linear infinite;pointer-events:none;z-index:0;}
         @keyframes fall{0%{transform:translateY(-50px) rotate(0)}100%{transform:translateY(110vh) rotate(360deg)}}
+
+        /* toast */
+        #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:11px 22px;border-radius:12px;color:#fff;font-weight:700;font-size:14px;opacity:0;transition:.3s;z-index:99999;pointer-events:none;}
+        #toast.show{opacity:1;}
     </style>
 </head>
 <body>
@@ -96,13 +112,13 @@
     </div>
 </div>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
-    <div class="lightbox-inner">
+<!-- LIGHTBOX — FIX: dùng opacity thay vì display:none/flex -->
+<div class="lightbox" id="lightbox" id="lightboxOverlay">
+    <div class="lightbox-inner" id="lightboxInner">
         <img class="lightbox-img" id="lightboxImg" src="" alt="">
         <div class="lightbox-footer">
             <span class="lightbox-name" id="lightboxName"></span>
-            <button class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('open')">✕ Đóng</button>
+            <button class="lightbox-close" id="lightboxCloseBtn">✕ Đóng</button>
         </div>
     </div>
 </div>
@@ -110,7 +126,6 @@
 <!-- CONTENT -->
 <div class="content">
     <div class="dashboard-wrapper">
-        <!-- SIDEBAR -->
         <aside class="side-info">
             <div class="card">
                 <h3>📊 Thống kê</h3>
@@ -118,23 +133,20 @@
                 <div class="stat-row"><span>📄 File</span><span class="stat-num" id="fileCount">0</span></div>
                 <div class="stat-row"><span>📁 Tổng</span><span class="stat-num" id="totalCount">0</span></div>
             </div>
-            <!-- Upload – chỉ admin -->
             <div class="card" id="uploadCard" style="display:none;">
                 <h3>📤 Tải lên</h3>
                 <label class="upload-label">
                     ➕ Chọn ảnh / file
-                    <input type="file" id="fileInput" hidden accept="image/*,.pdf,.doc,.docx,.pptx,.xlsx" onchange="handleUpload(this)" multiple>
+                    <input type="file" id="fileInput" hidden accept="image/*,.pdf,.doc,.docx,.pptx,.xlsx" multiple>
                 </label>
                 <p style="font-size:11px;color:#aaa;margin-top:8px;text-align:center;">Hỗ trợ: ảnh, PDF, Office</p>
             </div>
-            <!-- User hint -->
             <div class="card" id="userHint" style="display:none;">
                 <h3>💡 Ghi chú</h3>
                 <p style="font-size:13px;color:#888;">Bạn đang xem tư liệu CLB ở chế độ <b>chỉ xem</b>.<br>Liên hệ Admin để thêm tư liệu mới.</p>
             </div>
         </aside>
 
-        <!-- MAIN -->
         <main class="main-content">
             <div class="card">
                 <div class="gallery-header">
@@ -142,10 +154,10 @@
                         <h2>🌸 Thư Viện Kỷ Niệm</h2>
                         <p class="subtitle">Lưu giữ những khoảnh khắc tuyệt vời của CLB</p>
                     </div>
-                    <div class="filter-group">
-                        <button class="f-btn active" onclick="filterGallery('all',this)">Tất cả</button>
-                        <button class="f-btn" onclick="filterGallery('image',this)">🖼 Ảnh</button>
-                        <button class="f-btn" onclick="filterGallery('file',this)">📄 File</button>
+                    <div class="filter-group" id="filterGroup">
+                        <button class="f-btn active" data-filter="all">Tất cả</button>
+                        <button class="f-btn" data-filter="image">🖼 Ảnh</button>
+                        <button class="f-btn" data-filter="file">📄 File</button>
                     </div>
                 </div>
                 <div id="mediaGrid" class="media-grid"></div>
@@ -154,63 +166,122 @@
     </div>
 </div>
 
+<div id="toast"></div>
+
 <script>
-// ── Auth ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════════════════
 function getCurrentUser() {
-    try { return JSON.parse(localStorage.getItem("currentUser") || "null"); }
-    catch { return null; }
+    try { return JSON.parse(localStorage.getItem('currentUser') || 'null'); } catch { return null; }
 }
-function isAdmin() { return getCurrentUser()?.role === "admin"; }
+function isAdmin()    { return getCurrentUser()?.role === 'admin'; }
 function isLoggedIn() { return !!getCurrentUser(); }
 
 function doLogout() {
-    localStorage.removeItem("currentUser");
-    window.location.href = "Giaodienquanlysukienclb.html";
+    localStorage.removeItem('currentUser');
+    window.location.href = 'Giaodienquanlysukienclb.html';
 }
 
-// ── Init header ───────────────────────────────────────
 function initHeader() {
     const u = getCurrentUser();
-    const headerUser = document.getElementById("headerUser");
-    const logoutBtn  = document.getElementById("logoutBtn");
     if (u) {
-        const roleLabel = u.role === "admin" ? "👑 Admin" : "👤 Thành viên";
-        headerUser.textContent = `${roleLabel}: ${u.name || u.email}`;
-        logoutBtn.style.display = "block";
-        // Show upload only for admin
-        document.getElementById("uploadCard").style.display = isAdmin() ? "block" : "none";
-        document.getElementById("userHint").style.display  = !isAdmin() ? "block" : "none";
+        document.getElementById('headerUser').textContent =
+            (u.role === 'admin' ? '👑 Admin: ' : '👤 ') + (u.name || u.email);
+        document.getElementById('logoutBtn').style.display = 'block';
+        document.getElementById('uploadCard').style.display = isAdmin() ? 'block' : 'none';
+        document.getElementById('userHint').style.display   = !isAdmin() ? 'block' : 'none';
     } else {
-        headerUser.textContent = "Khách";
+        document.getElementById('headerUser').textContent = 'Khách';
     }
 }
 
-// ── Demo data (có thể mở rộng lưu Firebase sau) ───────
-let galleryData = JSON.parse(localStorage.getItem("galleryData_v2") || "null") || [
-    { id:1, type:"image", name:"Lễ khai mạc CLB",    url:"https://picsum.photos/600/400?random=1",  date:"2025-01-10" },
-    { id:2, type:"image", name:"Team Building 2025",  url:"https://picsum.photos/600/400?random=2",  date:"2025-02-14" },
-    { id:3, type:"image", name:"Workshop Kỹ năng",    url:"https://picsum.photos/600/400?random=3",  date:"2025-03-05" },
-    { id:4, type:"file",  name:"Kế hoạch Q1 2025.pdf",url:"#",                                       date:"2025-01-01" },
-    { id:5, type:"image", name:"Gala Cuối Năm",       url:"https://picsum.photos/600/400?random=5",  date:"2024-12-31" },
-    { id:6, type:"image", name:"Tuyển thành viên",    url:"https://picsum.photos/600/400?random=6",  date:"2025-04-01" },
-    { id:7, type:"file",  name:"Báo cáo hoạt động.docx",url:"#",                                    date:"2025-03-31" },
-    { id:8, type:"image", name:"Sự kiện từ thiện",    url:"https://picsum.photos/600/400?random=8",  date:"2025-02-28" },
+// ══════════════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════════════
+let galleryData = JSON.parse(localStorage.getItem('galleryData_v2') || 'null') || [
+    { id:1, type:'image', name:'Lễ khai mạc CLB',     url:'https://picsum.photos/600/400?random=1',  date:'2025-01-10' },
+    { id:2, type:'image', name:'Team Building 2025',   url:'https://picsum.photos/600/400?random=2',  date:'2025-02-14' },
+    { id:3, type:'image', name:'Workshop Kỹ năng',     url:'https://picsum.photos/600/400?random=3',  date:'2025-03-05' },
+    { id:4, type:'file',  name:'Kế hoạch Q1 2025.pdf', url:'#',                                       date:'2025-01-01' },
+    { id:5, type:'image', name:'Gala Cuối Năm',        url:'https://picsum.photos/600/400?random=5',  date:'2024-12-31' },
+    { id:6, type:'image', name:'Tuyển thành viên',     url:'https://picsum.photos/600/400?random=6',  date:'2025-04-01' },
+    { id:7, type:'file',  name:'Báo cáo hoạt động.docx', url:'#',                                    date:'2025-03-31' },
+    { id:8, type:'image', name:'Sự kiện từ thiện',     url:'https://picsum.photos/600/400?random=8',  date:'2025-02-28' },
 ];
 
-let currentFilter = "all";
+let currentFilter = 'all';
 
-// ── Filter ────────────────────────────────────────────
-window.filterGallery = (type, btn) => {
-    document.querySelectorAll(".f-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentFilter = type;
+// ══════════════════════════════════════════════════════════
+//  LIGHTBOX  — FIX: dùng opacity + pointer-events, không dùng display toggle
+// ══════════════════════════════════════════════════════════
+const lightbox     = document.getElementById('lightbox');
+const lightboxImg  = document.getElementById('lightboxImg');
+const lightboxName = document.getElementById('lightboxName');
+
+function openLightbox(url, name) {
+    lightboxImg.src = '';           // reset trước để tránh flash ảnh cũ
+    lightboxImg.alt = name;
+    lightboxName.textContent = name;
+    lightboxImg.src = url;
+    lightbox.classList.add('open');
+}
+
+function closeLightbox() {
+    lightbox.classList.remove('open');
+    setTimeout(() => { lightboxImg.src = ''; }, 300); // xoá src sau khi fade out
+}
+
+// Đóng khi click overlay (không phải inner)
+lightbox.addEventListener('click', function(e) {
+    if (e.target === lightbox) closeLightbox();
+});
+document.getElementById('lightboxCloseBtn').addEventListener('click', closeLightbox);
+
+// ESC để đóng
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+});
+
+// ══════════════════════════════════════════════════════════
+//  FILTER — event delegation thay vì inline onclick
+// ══════════════════════════════════════════════════════════
+document.getElementById('filterGroup').addEventListener('click', function(e) {
+    const btn = e.target.closest('.f-btn');
+    if (!btn) return;
+    document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
     renderGallery();
-};
+});
 
-// ── Render ────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  GALLERY CLICK — FIX: event delegation, KHÔNG dùng inline onclick
+// ══════════════════════════════════════════════════════════
+document.getElementById('mediaGrid').addEventListener('click', function(e) {
+    const item = e.target.closest('.media-item');
+    if (!item) return;
+
+    const type = item.dataset.type;
+    const url  = item.dataset.url;
+    const name = item.dataset.name;
+
+    if (type === 'image') {
+        openLightbox(url, name);
+    } else if (url && url !== '#') {
+        window.open(url, '_blank');
+    }
+});
+
+// ══════════════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════════════
+function escAttr(s) {
+    return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function renderGallery() {
-    const grid = document.getElementById("mediaGrid");
-    const u    = getCurrentUser();
+    const grid = document.getElementById('mediaGrid');
 
     if (!isLoggedIn()) {
         grid.innerHTML = `
@@ -219,101 +290,153 @@ function renderGallery() {
                 <h3>Nội dung bị giới hạn</h3>
                 <p>Vui lòng <a href="Giaodienquanlysukienclb.html">đăng nhập</a> để xem thư viện CLB.</p>
             </div>`;
-        document.getElementById("uploadCard").style.display = "none";
-        document.getElementById("userHint").style.display   = "none";
+        document.getElementById('uploadCard').style.display = 'none';
+        document.getElementById('userHint').style.display   = 'none';
         updateStats(0, 0);
         return;
     }
 
-    const list = currentFilter === "all"
+    const list = currentFilter === 'all'
         ? galleryData
         : galleryData.filter(i => i.type === currentFilter);
 
     if (!list.length) {
-        grid.innerHTML = `<div class="empty-grid" style="grid-column:1/-1;">
-            <div class="icon">📭</div>
-            <p>Chưa có tư liệu nào trong danh mục này.</p>
-        </div>`;
+        grid.innerHTML = `<div class="empty-grid" style="grid-column:1/-1;"><div class="icon">📭</div><p>Chưa có tư liệu nào trong danh mục này.</p></div>`;
         return;
     }
 
+    // FIX: dùng data-* attributes thay vì inline onclick
     grid.innerHTML = list.map(item => {
-        const formattedDate = item.date ? new Date(item.date + "T00:00:00").toLocaleDateString("vi-VN") : "";
-        if (item.type === "image") {
+        const dateStr = item.date ? new Date(item.date + 'T00:00:00').toLocaleDateString('vi-VN') : '';
+        const safeName = escAttr(item.name);
+        const safeUrl  = escAttr(item.url);
+
+        if (item.type === 'image') {
             return `
-                <div class="media-item" onclick="openLightbox('${item.url}','${escHtml(item.name)}')">
-                    <div class="img-box"><img src="${item.url}" loading="lazy" alt="${escHtml(item.name)}"></div>
-                    <div class="item-name" title="${escHtml(item.name)}">${escHtml(item.name)}</div>
-                    <div class="item-date">${formattedDate}</div>
+                <div class="media-item" data-type="image" data-url="${safeUrl}" data-name="${safeName}" title="Click để xem ảnh">
+                    <div class="img-box">
+                        <img src="${safeUrl}" loading="lazy" alt="${safeName}">
+                    </div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-date">${dateStr}</div>
                 </div>`;
         } else {
-            const ext = item.name.split(".").pop().toLowerCase();
-            const icon = ext === "pdf" ? "📕" : ext === "pptx" ? "📊" : ext === "xlsx" ? "📗" : "📄";
-            const onclick = item.url !== "#" ? `onclick="window.open('${item.url}','_blank')"` : "";
+            const ext  = (item.name.split('.').pop() || '').toLowerCase();
+            const icon = ext === 'pdf' ? '📕' : ext === 'pptx' ? '📊' : ext === 'xlsx' ? '📗' : '📄';
             return `
-                <div class="media-item" ${onclick} style="${item.url === '#' ? 'cursor:default;' : ''}">
-                    <div class="file-box"><div class="file-icon">${icon}</div><div class="file-type">${ext}</div></div>
-                    <div class="item-name" title="${escHtml(item.name)}">${escHtml(item.name)}</div>
-                    <div class="item-date">${formattedDate}</div>
+                <div class="media-item" data-type="file" data-url="${safeUrl}" data-name="${safeName}" title="${safeUrl !== '#' ? 'Click để mở file' : 'File chưa có link'}">
+                    <div class="file-box">
+                        <div class="file-icon">${icon}</div>
+                        <div class="file-type">${ext}</div>
+                    </div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-date">${dateStr}</div>
                 </div>`;
         }
-    }).join("");
+    }).join('');
 
     updateStats(
-        galleryData.filter(i => i.type === "image").length,
-        galleryData.filter(i => i.type === "file").length
+        galleryData.filter(i => i.type === 'image').length,
+        galleryData.filter(i => i.type === 'file').length
     );
 }
 
 function updateStats(imgs, files) {
-    document.getElementById("imgCount").textContent   = imgs;
-    document.getElementById("fileCount").textContent  = files;
-    document.getElementById("totalCount").textContent = imgs + files;
+    document.getElementById('imgCount').textContent   = imgs;
+    document.getElementById('fileCount').textContent  = files;
+    document.getElementById('totalCount').textContent = imgs + files;
 }
 
-function escHtml(s) {
-    return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
+// ══════════════════════════════════════════════════════════
+//  UPLOAD — FIX: đọc file thành dataURL để persist sau reload
+// ══════════════════════════════════════════════════════════
+document.getElementById('fileInput').addEventListener('change', function() {
+    if (!isAdmin()) {
+        showToast('⚠️ Chỉ Admin mới được tải lên tư liệu!');
+        this.value = '';
+        return;
+    }
 
-// ── Upload (admin only) ───────────────────────────────
-window.handleUpload = (input) => {
-    if (!isAdmin()) { alert("Chỉ Admin mới được tải lên tư liệu!"); input.value = ""; return; }
-    const files = Array.from(input.files || []);
+    const files = Array.from(this.files || []);
     if (!files.length) return;
 
+    let processed = 0;
     files.forEach(f => {
-        const isImg  = f.type.startsWith("image/");
-        const url    = isImg ? URL.createObjectURL(f) : "#";
-        const today  = new Date().toISOString().substring(0,10);
-        galleryData.unshift({ id: Date.now() + Math.random(), type: isImg ? "image" : "file", name: f.name, url, date: today });
+        const isImg = f.type.startsWith('image/');
+        const today = new Date().toISOString().substring(0, 10);
+
+        if (isImg) {
+            // FIX: dùng FileReader → dataURL thay vì blob URL
+            // → URL vẫn hợp lệ sau khi reload trang
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                galleryData.unshift({
+                    id   : Date.now() + Math.random(),
+                    type : 'image',
+                    name : f.name,
+                    url  : ev.target.result, // dataURL
+                    date : today
+                });
+                processed++;
+                trySave(processed, files.length);
+            };
+            reader.readAsDataURL(f);
+        } else {
+            // File không phải ảnh → không có URL xem trực tiếp
+            galleryData.unshift({
+                id   : Date.now() + Math.random(),
+                type : 'file',
+                name : f.name,
+                url  : '#',
+                date : today
+            });
+            processed++;
+            trySave(processed, files.length);
+        }
     });
 
-    try { localStorage.setItem("galleryData_v2", JSON.stringify(galleryData)); } catch {}
+    this.value = ''; // reset input
+});
+
+function trySave(done, total) {
+    if (done < total) return;
+    try {
+        localStorage.setItem('galleryData_v2', JSON.stringify(galleryData));
+    } catch (e) {
+        // localStorage có thể full nếu nhiều ảnh lớn
+        showToast('⚠️ Không thể lưu một số ảnh (dung lượng localStorage đầy)');
+    }
     renderGallery();
-};
+    showToast('✅ Tải lên thành công!');
+}
 
-// ── Lightbox ──────────────────────────────────────────
-window.openLightbox = (url, name) => {
-    document.getElementById("lightboxImg").src  = url;
-    document.getElementById("lightboxName").textContent = name;
-    document.getElementById("lightbox").classList.add("open");
-};
-window.closeLightbox = (e) => {
-    if (e.target === document.getElementById("lightbox"))
-        document.getElementById("lightbox").classList.remove("open");
-};
+// ══════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════
+function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = color || '#ff6a88';
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 2800);
+}
 
-// ── Flower ────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  FLOWER
+// ══════════════════════════════════════════════════════════
 setInterval(() => {
-    const f = document.createElement("div");
-    f.className = "flower"; f.innerHTML = "🌸";
-    f.style.left = Math.random() * 100 + "vw";
-    f.style.animationDuration = (3 + Math.random() * 5) + "s";
+    const f = document.createElement('div');
+    f.className = 'flower'; f.innerHTML = '🌸';
+    f.style.left = Math.random() * 100 + 'vw';
+    f.style.animationDuration = (3 + Math.random() * 5) + 's';
     document.body.appendChild(f);
     setTimeout(() => f.remove(), 8000);
-}, 400);
+}, 500);
 
-// ── Init ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
 initHeader();
 renderGallery();
 </script>

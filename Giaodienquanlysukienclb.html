@@ -8,26 +8,18 @@
     @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
     *{margin:0;padding:0;box-sizing:border-box;font-family:'Nunito',sans-serif;}
     body{background:linear-gradient(135deg,#ff9a9e,#fad0c4);min-height:100vh;overflow-x:hidden;}
-
-    /* ── MENU ── */
     .menu-toggle{position:fixed;top:15px;left:15px;font-size:26px;background:#ff6a88;color:#fff;padding:8px 13px;border-radius:12px;cursor:pointer;z-index:1000;box-shadow:0 4px 12px rgba(255,106,136,.4);}
     .menu{position:fixed;top:0;left:-270px;width:240px;height:100%;background:linear-gradient(180deg,#ff6a88,#ff8fab);padding-top:70px;display:flex;flex-direction:column;gap:6px;transition:.3s;z-index:999;overflow-y:auto;}
     .menu.show{left:0;}
     .menu button{margin:0 12px;padding:11px 14px;border:none;border-radius:12px;background:rgba(255,255,255,.9);cursor:pointer;text-align:left;font-weight:600;color:#c0395e;transition:.2s;}
     .menu button:hover{background:#fff;transform:translateX(4px);}
     .menu .menu-section{margin:4px 12px 0;font-size:10px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:1px;padding:4px 2px;}
-
-    /* ── SEARCH BAR ── */
     .search-bar{position:fixed;top:15px;left:70px;right:15px;z-index:999;}
     .search-bar input{width:100%;padding:10px 15px;border-radius:20px;border:none;box-shadow:0 4px 12px rgba(0,0,0,.15);outline:none;font-family:'Nunito',sans-serif;font-size:14px;}
-
-    /* ── LAYOUT ── */
     .page{display:none;padding:80px 20px 40px;animation:fadeIn .5s;}
     @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .card{background:rgba(255,255,255,.97);padding:30px;border-radius:24px;max-width:520px;margin:0 auto;box-shadow:0 16px 48px rgba(255,105,180,.2);}
     h2{text-align:center;color:#e84393;margin-bottom:20px;font-family:'Quicksand';}
-
-    /* ── ADMIN DASHBOARD GRID ── */
     .dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;max-width:860px;margin:20px auto 0;}
     .dash-card{background:rgba(255,255,255,.97);border-radius:20px;padding:22px 14px;text-align:center;cursor:pointer;transition:.25s;box-shadow:0 8px 24px rgba(255,105,180,.15);}
     .dash-card:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(255,105,180,.3);}
@@ -35,8 +27,6 @@
     .dash-card .dc-label{font-size:13px;font-weight:700;color:#c0395e;}
     .dash-welcome{text-align:center;color:#fff;font-family:'Quicksand';font-weight:700;font-size:18px;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.15);}
     .dash-sub{text-align:center;color:rgba(255,255,255,.85);font-size:13px;margin-bottom:20px;}
-
-    /* ── FORM ── */
     .form-group{margin-bottom:15px;text-align:left;}
     .form-group label{display:block;font-size:13px;font-weight:700;color:#c0395e;margin-bottom:5px;}
     input,textarea,select{width:100%;padding:12px;border:2px solid #ffe0ea;border-radius:12px;background:#fff9fb;outline:none;transition:.2s;font-family:'Nunito',sans-serif;}
@@ -44,19 +34,13 @@
     .required{color:#ff4d88;}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     .char-counter{font-size:11px;color:#ccc;text-align:right;margin-top:2px;}
-
-    /* ── STATUS TAGS ── */
     .status-options{display:flex;gap:8px;}
     .status-tag{flex:1;padding:8px;border:2px solid #ffe0ea;border-radius:10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff;}
     .status-tag.active{background:#ff6a88;color:#fff;border-color:#ff6a88;}
-
-    /* ── BUTTONS ── */
     button.main{width:100%;padding:13px;background:linear-gradient(135deg,#ff6a88,#e84393);color:#fff;border:none;border-radius:14px;font-weight:700;cursor:pointer;margin-top:10px;transition:.3s;font-family:'Nunito',sans-serif;}
     button.main:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(255,106,136,.4);}
     .btn-row{display:flex;gap:10px;margin-top:10px;}
     .btn-reset{padding:13px 20px;background:#fff0f5;color:#e84393;border:2px solid #ffccd9;border-radius:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
-
-    /* ── TABLE ── */
     .table-container{overflow-x:auto;margin-top:15px;border-radius:12px;}
     table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;}
     th,td{padding:12px;text-align:center;border-bottom:1px solid #eee;}
@@ -64,20 +48,12 @@
     tr:hover td{background:#fffafb;}
     .btn-edit{background:#ff9f43;color:white;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;margin-right:3px;}
     .btn-del{background:#ff4757;color:white;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;}
-
-    /* ── VALIDATION ── */
     .err-msg{font-size:12px;color:#ff6b6b;display:none;margin-top:4px;}
     .err-msg.show{display:block;}
     input.error,select.error{border-color:#ff6b6b!important;}
-
-    /* ── DECORATION ── */
     .flower{position:fixed;top:-50px;font-size:20px;animation:fall linear infinite;pointer-events:none;z-index:0;}
     @keyframes fall{0%{transform:translateY(-50px) rotate(0)}100%{transform:translateY(110vh) rotate(360deg)}}
-
-    /* ── TOAST ── */
     #toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(100px);padding:12px 25px;border-radius:12px;color:#fff;font-weight:700;transition:.4s;z-index:10001;opacity:0;text-align:center;max-width:90vw;pointer-events:none;}
-
-    /* ── LOADING ── */
     #fbLoadingOverlay{position:fixed;inset:0;background:rgba(255,154,158,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;font-family:'Quicksand',sans-serif;gap:14px;}
     @keyframes fbSpin{to{transform:rotate(360deg)}}
     .fb-spinner{width:44px;height:44px;border:5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:fbSpin .8s linear infinite;}
@@ -85,25 +61,19 @@
 </head>
 <body>
 
-<!-- LOADING OVERLAY -->
 <div id="fbLoadingOverlay">
   <div class="fb-spinner"></div>
   <p style="color:#fff;font-size:16px;font-weight:700;">⏳ Đang kết nối dữ liệu...</p>
 </div>
 
 <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-
-<!-- SEARCH BAR -->
 <div class="search-bar">
   <input type="text" id="globalSearch" placeholder="🔍 Tìm kiếm sự kiện, người tham gia..." oninput="globalSearchFunction()">
 </div>
 
-<!-- ── MENU ── -->
 <div class="menu" id="menu">
   <button onclick="go('home')">🏠 Trang chủ</button>
   <button onclick="window.location.href='TimKiemVaLoc.html'">🔍 Tìm kiếm sự kiện</button>
-
-  <!-- ADMIN ONLY -->
   <div class="menu-section adminOnly" style="display:none;">Quản trị</div>
   <button class="adminOnly" style="display:none;" onclick="go('create')">➕ Tạo sự kiện</button>
   <button class="adminOnly" style="display:none;" onclick="go('manage')">📋 Quản lý sự kiện</button>
@@ -115,8 +85,6 @@
   <button class="adminOnly" style="display:none;" onclick="go('checkin')">📷 Check-in QR</button>
   <button class="adminOnly" style="display:none;" onclick="window.location.href='PHANHOIVADANHGIA.html'">⭐ Đánh giá</button>
   <button class="adminOnly" style="display:none;" onclick="viewGallery()">🖼 Tư liệu</button>
-
-  <!-- USER ONLY -->
   <div class="menu-section userOnly" style="display:none;">Thành viên</div>
   <button class="userOnly" style="display:none;" onclick="go('manage')">📋 Danh sách sự kiện</button>
   <button class="userOnly" style="display:none;" onclick="go('join')">🙋 Đăng ký tham gia</button>
@@ -125,27 +93,20 @@
   <button class="userOnly" style="display:none;" onclick="window.location.href='PHANHOIVADANHGIA.html'">⭐ Đánh giá sự kiện</button>
   <button class="userOnly" style="display:none;" onclick="viewGallery()">🖼 Tư liệu CLB</button>
   <button class="userOnly" style="display:none;" onclick="window.location.href='thongBaoSuKien.html'">🔔 Thông báo</button>
-
-  <!-- AUTH -->
   <div style="flex:1;"></div>
   <button class="guestOnly" onclick="go('login')" style="background:linear-gradient(135deg,#ff6a88,#e84393)!important;color:#fff!important;">🔐 Đăng nhập / Đăng ký</button>
   <button class="logoutBtn" style="display:none;background:#fff0f5!important;color:#e84393!important;" onclick="logout()">🚪 Đăng xuất</button>
 </div>
 
-<!-- ════════════════════════════════════════════ PAGES ══ -->
-
 <!-- HOME -->
 <div id="home" class="page" style="display:block;">
-  <!-- Guest -->
   <div class="card guestOnly">
     <h2>🌸 AGL – Quản lý sự kiện CLB 🌸</h2>
     <p style="text-align:center;color:#ff6a88;font-weight:700;margin-bottom:16px;" id="welcome">Đang tải...</p>
     <p style="text-align:center;color:#888;font-size:14px;margin-bottom:20px;">Hệ thống quản lý sự kiện dành cho thành viên CLB AGL.</p>
     <button class="main" onclick="go('login')">🔐 Đăng nhập để tiếp tục</button>
   </div>
-
-  <!-- ADMIN DASHBOARD -->
-  <div id="adminHomeSection" style="display:none; padding:0 10px;">
+  <div id="adminHomeSection" style="display:none;padding:0 10px;">
     <div class="dash-welcome" id="adminWelcomeTxt">Xin chào, Admin 👋</div>
     <div class="dash-sub">Chọn chức năng để bắt đầu quản lý</div>
     <div class="dash-grid">
@@ -161,9 +122,7 @@
       <div class="dash-card" onclick="viewGallery()"><div class="dc-icon">🖼</div><div class="dc-label">Tư liệu CLB</div></div>
     </div>
   </div>
-
-  <!-- USER DASHBOARD -->
-  <div id="userHomeSection" style="display:none; padding:0 10px;">
+  <div id="userHomeSection" style="display:none;padding:0 10px;">
     <div class="dash-welcome" id="userWelcomeTxt">Xin chào, Thành viên 👋</div>
     <div class="dash-sub">Khám phá các sự kiện của CLB</div>
     <div class="dash-grid">
@@ -179,7 +138,7 @@
   </div>
 </div>
 
-<!-- CREATE EVENT -->
+<!-- CREATE -->
 <div id="create" class="page">
   <div class="card">
     <h2>➕ Tạo sự kiện mới</h2>
@@ -237,7 +196,7 @@
   </div>
 </div>
 
-<!-- MANAGE / EVENT LIST -->
+<!-- MANAGE -->
 <div id="manage" class="page">
   <div class="card" style="max-width:900px;">
     <h2>📋 Danh sách sự kiện</h2>
@@ -261,10 +220,7 @@
     <div class="form-group"><label>Email <span class="required">*</span></label><input id="pemail" type="email" placeholder="example@gmail.com"></div>
     <div class="form-group">
       <label>Khóa <span class="required">*</span></label>
-      <select id="pkhoa">
-        <option value="">-- Chọn khóa --</option>
-        <option>K48</option><option>K49</option><option>K50</option><option>K51</option>
-      </select>
+      <select id="pkhoa"><option value="">-- Chọn khóa --</option><option>K48</option><option>K49</option><option>K50</option><option>K51</option></select>
     </div>
     <div class="form-group"><label>Chọn sự kiện <span class="required">*</span></label><select id="peventSelect"></select></div>
     <button class="main" onclick="addParticipant()">💖 Đăng ký ngay</button>
@@ -279,7 +235,7 @@
     <div id="qrVideo" style="width:100%;"></div>
     <button class="main" onclick="startScan()">📸 Bật camera quét QR</button>
     <hr style="margin:15px 0;">
-    <div class="form-group"><label>Nhập mã thủ công (MSSV|Tên sự kiện)</label><input id="manualCode" placeholder="VD: 2151012345|Workshop AI"></div>
+    <div class="form-group"><label>Nhập mã thủ công</label><input id="manualCode" placeholder="VD: 2151012345|Workshop AI"></div>
     <button class="main" onclick="manualCheckin()">✅ Check-in thủ công</button>
   </div>
 </div>
@@ -306,9 +262,7 @@
 </div>
 
 <!-- BUDGET -->
-<div id="budget" class="page">
-  <div id="budgetPage"></div>
-</div>
+<div id="budget" class="page"><div id="budgetPage"></div></div>
 
 <!-- LOGIN -->
 <div id="login" class="page">
@@ -334,39 +288,45 @@
 
 <div id="toast"></div>
 
-<!-- QR libs -->
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-<!-- ════ MAIN MODULE – chỉ dùng FS từ firebase-sync ════ -->
 <script type="module">
 import { FS } from "./firebase-sync.js";
 
-// ── State ──────────────────────────────────────────
 let currentUser    = null;
 let isLoginMode    = true;
 let selectedStatus = "Mở";
-let notifyEnabled  = JSON.parse(localStorage.getItem("notifyEnabled")) ?? true;
-let notified       = JSON.parse(localStorage.getItem("notified")) || {};
 
-// ── Khởi động – chờ Firebase ───────────────────────
+// ── Expose FS NGAY LẬP TỨC cho external scripts ────────
+// Phải làm TRƯỚC await FS.ready để xemVaChinhSuaThongTinSuKien.js dùng được
+window.FS      = FS;
+window._db     = FS.db;
+window._ref    = FS.ref;
+window._update = FS.update;
+window._remove = FS.remove;
+window._push   = FS.push;
+
+// Reactive getters - KHÔNG gán trực tiếp window._events = [] nữa
+Object.defineProperty(window, "_events",      { get: () => FS.getEvents(),       configurable: true });
+Object.defineProperty(window, "_participants", { get: () => FS.getParticipants(), configurable: true });
+Object.defineProperty(window, "_users",        { get: () => FS.getAllAccounts(),  configurable: true });
+
+// ── Chờ Firebase load xong ─────────────────────────────
 await FS.ready;
 document.getElementById("fbLoadingOverlay").style.display = "none";
 try { currentUser = JSON.parse(localStorage.getItem("currentUser")); } catch {}
 updateUI();
 
-// ── Lắng nghe real-time events ─────────────────────
-window.addEventListener("fs:events", () => {
-  if (document.getElementById("manage")?.style.display !== "none") renderEvents();
-  updateEventDropdown();
-  renderDashboard();
-});
-window.addEventListener("fs:participants", () => {
-  if (document.getElementById("manage")?.style.display !== "none") renderEvents();
-  renderDashboard();
-});
+// ── Sau khi ready: render ngay nếu đang ở trang manage ─
+const managePage = document.getElementById("manage");
+if (managePage && managePage.style.display !== "none") {
+  renderEvents();
+}
+updateEventDropdown();
+renderDashboard();
 
-// ── Hoa rơi ────────────────────────────────────────
+// ── Hoa rơi ─────────────────────────────────────────────
 setInterval(() => {
   const f = document.createElement("div");
   f.className = "flower"; f.innerHTML = "🌸";
@@ -376,7 +336,7 @@ setInterval(() => {
   setTimeout(() => f.remove(), 8000);
 }, 300);
 
-// ── Navigation ─────────────────────────────────────
+// ── Navigation ──────────────────────────────────────────
 function toggleMenu() { document.getElementById("menu").classList.toggle("show"); }
 
 function go(id) {
@@ -385,56 +345,47 @@ function go(id) {
   if (!page) return;
   page.style.display = "block";
   document.getElementById("menu").classList.remove("show");
-  if (id === "manage")    setTimeout(renderEvents, 50);
+  if (id === "manage")    renderEvents();
   if (id === "join")      updateEventDropdown();
   if (id === "dashboard") renderDashboard();
-  if (id === "budget")    { if (typeof renderBudgetPage === "function") renderBudgetPage(); }
-  if (id === "home")      ; // dashboard handled by updateUI
+  if (id === "budget")    { if (typeof window.renderBudgetPage === "function") window.renderBudgetPage(); }
 }
 
-// ── SHA-256 ────────────────────────────────────────
 async function sha256(text) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
 }
 
-// ── AUTH ───────────────────────────────────────────
 async function handleAuth() {
   const email = document.getElementById("auth_email").value.trim().toLowerCase();
   const pass  = document.getElementById("auth_pass").value;
   const msgEl = document.getElementById("login_msg");
   msgEl.style.display = "none";
-
   if (isLoginMode) {
     if (!email || !pass) { showMsg(msgEl,"❌ Vui lòng nhập email và mật khẩu!",true); return; }
     if (!email.includes("@")) { showMsg(msgEl,"❌ Email không hợp lệ!",true); return; }
-
     const allUsers = FS.getAllAccounts();
     const u = allUsers.find(x => (x.email||"").toLowerCase() === email);
     if (!u) { showMsg(msgEl,"❌ Email chưa được đăng ký!",true); return; }
-
     if (u.passHash) {
       const hash = await sha256(pass);
       if (hash !== u.passHash && u.pass !== pass) { showMsg(msgEl,"❌ Mật khẩu không đúng!",true); return; }
     } else if (u.pass !== pass) { showMsg(msgEl,"❌ Mật khẩu không đúng!",true); return; }
-
     _doLogin(u);
   } else {
     const name   = document.getElementById("auth_name").value.trim();
     const chucvu = document.getElementById("auth_chucvu").value.trim();
     const role   = document.getElementById("auth_role").value;
-
     if (!name)  { showMsg(msgEl,"❌ Vui lòng nhập họ tên!",true); return; }
     if (!email) { showMsg(msgEl,"❌ Vui lòng nhập email!",true); return; }
     if (!pass)  { showMsg(msgEl,"❌ Vui lòng nhập mật khẩu!",true); return; }
     if (!(email.endsWith("@gmail.com") || email.endsWith("@student.hcmue.edu.vn")))
       { showMsg(msgEl,"❌ Email phải là @gmail.com hoặc @student.hcmue.edu.vn!",true); return; }
-    if (pass.length < 6)         { showMsg(msgEl,"❌ Mật khẩu phải có ít nhất 6 ký tự!",true); return; }
-    if (!/[a-zA-Z]/.test(pass))  { showMsg(msgEl,"❌ Mật khẩu phải có ít nhất 1 chữ cái!",true); return; }
-    if (!/[0-9]/.test(pass))     { showMsg(msgEl,"❌ Mật khẩu phải có ít nhất 1 chữ số!",true); return; }
+    if (pass.length < 6)        { showMsg(msgEl,"❌ Mật khẩu ít nhất 6 ký tự!",true); return; }
+    if (!/[a-zA-Z]/.test(pass)) { showMsg(msgEl,"❌ Mật khẩu phải có chữ cái!",true); return; }
+    if (!/[0-9]/.test(pass))    { showMsg(msgEl,"❌ Mật khẩu phải có chữ số!",true); return; }
     if (FS.getAllAccounts().find(u => (u.email||"").toLowerCase() === email))
       { showMsg(msgEl,"❌ Email này đã được đăng ký!",true); return; }
-
     const hash = await sha256(pass);
     const node = role === "admin" ? "admins" : "users";
     await FS.push(FS.ref(FS.db, node), { name, email, pass, passHash: hash, role, chucvu, createdAt: new Date().toISOString() });
@@ -463,96 +414,94 @@ function toggleAuthMode() {
 }
 
 function showMsg(el, msg, isError) {
-  el.textContent = msg;
-  el.style.color = isError ? "#e74c3c" : "#27ae60";
-  el.style.display = "block";
+  el.textContent = msg; el.style.color = isError ? "#e74c3c" : "#27ae60"; el.style.display = "block";
 }
 
 function logout() {
-  localStorage.removeItem("currentUser");
-  currentUser = null;
-  updateUI();
-  go("home");
+  localStorage.removeItem("currentUser"); currentUser = null; updateUI(); go("home");
 }
 
-// ── UpdateUI ───────────────────────────────────────
 function updateUI() {
   const show = sel => document.querySelectorAll(sel).forEach(b => b.style.display = "block");
   const hide = sel => document.querySelectorAll(sel).forEach(b => b.style.display = "none");
-
   const adminHome = document.getElementById("adminHomeSection");
   const userHome  = document.getElementById("userHomeSection");
   const guestCard = document.querySelector(".card.guestOnly");
-
   if (!currentUser) {
-    hide(".adminOnly"); hide(".userOnly"); hide(".logoutBtn");
-    show(".guestOnly");
+    hide(".adminOnly"); hide(".userOnly"); hide(".logoutBtn"); show(".guestOnly");
     if (adminHome) adminHome.style.display = "none";
     if (userHome)  userHome.style.display  = "none";
     if (guestCard) guestCard.style.display = "block";
     return;
   }
-
   hide(".guestOnly"); show(".logoutBtn");
   if (guestCard) guestCard.style.display = "none";
-
   const name = currentUser.name || currentUser.email;
   if (currentUser.role === "admin") {
     show(".adminOnly"); hide(".userOnly");
-    if (adminHome) {
-      adminHome.style.display = "block";
-      document.getElementById("adminWelcomeTxt").textContent = `Xin chào, ${name} (Quản trị viên) 👋`;
-    }
+    if (adminHome) { adminHome.style.display = "block"; document.getElementById("adminWelcomeTxt").textContent = `Xin chào, ${name} (Quản trị viên) 👋`; }
     if (userHome) userHome.style.display = "none";
   } else {
     hide(".adminOnly"); show(".userOnly");
-    if (userHome) {
-      userHome.style.display = "block";
-      document.getElementById("userWelcomeTxt").textContent = `Xin chào, ${name} (Thành viên) 👋`;
-    }
+    if (userHome) { userHome.style.display = "block"; document.getElementById("userWelcomeTxt").textContent = `Xin chào, ${name} (Thành viên) 👋`; }
     if (adminHome) adminHome.style.display = "none";
   }
 }
 
-// ── Events ─────────────────────────────────────────
 function selectStatus(el) {
   document.querySelectorAll(".status-tag").forEach(t => t.classList.remove("active"));
   el.classList.add("active");
   selectedStatus = el.dataset.val;
 }
 
-function submitEvent() {
+async function submitEvent() {
   document.querySelectorAll(".err-msg").forEach(e => e.classList.remove("show"));
   document.querySelectorAll("input.error,select.error").forEach(i => i.classList.remove("error"));
-
-  const t   = document.getElementById("title").value.trim();
-  const l   = document.getElementById("leader").value.trim();
-  const d   = document.getElementById("date").value;
+  
+  const t = document.getElementById("title").value.trim();
+  const l = document.getElementById("leader").value.trim();
+  const d = document.getElementById("date").value;
   const loc = document.getElementById("location").value.trim();
   const maxVal = document.getElementById("max").value;
+  
   let valid = true;
-  if (!t)      { setErr("title","titleErr"); valid=false; }
-  if (!l)      { setErr("leader","leaderErr"); valid=false; }
-  if (!d)      { setErr("date","dateErr"); valid=false; }
-  if (!loc)    { setErr("location","locationErr"); valid=false; }
+  if (!t) { setErr("title","titleErr"); valid=false; }
+  if (!l) { setErr("leader","leaderErr"); valid=false; }
+  if (!d) { setErr("date","dateErr"); valid=false; }
+  if (!loc) { setErr("location","locationErr"); valid=false; }
   if (!maxVal) { setErr("max","maxErr"); valid=false; }
+  
   if (!valid) return;
 
-  if (FS.getEvents().some(e => e.t?.toLowerCase() === t.toLowerCase() && e.d === d))
-    { setErr("title","titleErr","Sự kiện này đã tồn tại trong ngày đó!"); return; }
+  if (FS.getEvents().some(e => e.t?.toLowerCase() === t.toLowerCase() && e.d === d)) {
+    setErr("title","titleErr","Sự kiện này đã tồn tại trong ngày đó!");
+    return;
+  }
 
-  FS.addEvent({
-    t, l, d,
-    time    : document.getElementById("time").value,
-    status  : selectedStatus,
-    location: loc,
-    max     : parseInt(maxVal),
-    desc    : document.getElementById("desc")?.value.trim() || "",
-    createdAt: new Date().toISOString()
-  });
-  showToast("🎉 Tạo sự kiện thành công!");
-  resetForm();
-  go("manage");
+  try {
+    await FS.addEvent({ 
+      t, 
+      l, 
+      d, 
+      time: document.getElementById("time").value, 
+      status: selectedStatus, 
+      location: loc, 
+      max: parseInt(maxVal), 
+      desc: document.getElementById("desc")?.value.trim() || "", 
+      createdAt: new Date().toISOString() 
+    });
+
+    showToast("🎉 Tạo sự kiện thành công!");
+    resetForm();
+
+    // === FIX SIÊU MẠNH ===
+    go("manage");
+    setTimeout(renderEvents, 150);   // render ngay sau khi trang hiện
+    setTimeout(renderEvents, 400);   // render lần 2 để chắc chắn listener realtime đã cập nhật
+
+  } catch (error) {
+    showToast("❌ Lỗi: " + error.message, "error");
+  }
 }
 
 function setErr(inputId, errId, msg) {
@@ -561,30 +510,36 @@ function setErr(inputId, errId, msg) {
   if (err) { if (msg) err.textContent = msg; err.classList.add("show"); }
 }
 
-// ── Render Events (dùng FS.getEvents()) ───────────
 function renderEvents() {
   const tbody = document.getElementById("eventTable");
   if (!tbody) return;
-  const events  = FS.getEvents();
-  const isAdmin = currentUser?.role === "admin";
 
-  if (!events.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px;">Chưa có sự kiện nào.</td></tr>`;
+  // Luôn lấy dữ liệu mới nhất từ FS
+  const events = FS.getEvents();
+  
+  console.log("🔥 renderEvents() được gọi - Số sự kiện trong FS:", events.length);
+  console.table(events);   // Xem chi tiết từng sự kiện
+
+  if (!events || events.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#aaa;">Chưa có sự kiện nào. Hãy tạo sự kiện mới.</td></tr>`;
     return;
   }
+
+  const isAdmin = currentUser?.role === "admin";
+
   tbody.innerHTML = events.map(e => {
-    const statusColor = e.status === "Mở" ? "#2ecc71" : e.status === "Đóng" ? "#e74c3c" : "#f39c12";
+    const sc = e.status === "Mở" ? "#2ecc71" : e.status === "Đóng" ? "#e74c3c" : "#f39c12";
     return `<tr>
-      <td style="font-weight:600;">${e.t||""}</td>
-      <td>${e.l||""}</td>
-      <td>${e.d||""}</td>
-      <td>${e.location||""}</td>
-      <td>${e.max||""}</td>
-      <td><span style="background:${statusColor}22;color:${statusColor};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">${e.status||""}</span></td>
+      <td style="font-weight:600;">${e.t || ""}</td>
+      <td>${e.l || ""}</td>
+      <td>${e.d || ""}</td>
+      <td>${e.location || ""}</td>
+      <td>${e.max || ""}</td>
+      <td><span style="background:${sc}22;color:${sc};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">${e.status || ""}</span></td>
       <td>
-        ${isAdmin
+        ${isAdmin 
           ? `<button class="btn-edit" onclick="window._openEditModal('${e.id}')">✏️ Sửa</button>
-             <button class="btn-del"  onclick="window.delEvent('${e.id}')">🗑️</button>`
+             <button class="btn-del" onclick="window.delEvent('${e.id}')">🗑️</button>` 
           : `<span style="color:#aaa;font-size:12px;">Chỉ xem</span>`}
       </td>
     </tr>`;
@@ -592,20 +547,15 @@ function renderEvents() {
 }
 
 function delEvent(firebaseId) {
-  if (confirm("Xóa sự kiện này?")) {
-    FS.deleteEvent(firebaseId);
-    showToast("🗑️ Đã xóa sự kiện!");
-  }
+  if (confirm("Xóa sự kiện này?")) { FS.deleteEvent(firebaseId); showToast("🗑️ Đã xóa sự kiện!"); }
 }
 
 window._openEditModal = function(firebaseId) {
-  const events = FS.getEvents();
-  const idx = events.findIndex(e => e.id === firebaseId);
+  const idx = FS.getEvents().findIndex(e => e.id === firebaseId);
   if (idx === -1) return;
   if (typeof openEditModal === "function") openEditModal(idx);
 };
 
-// ── Participants ────────────────────────────────────
 function updateEventDropdown() {
   const sel = document.getElementById("peventSelect");
   if (!sel) return;
@@ -616,227 +566,156 @@ function updateEventDropdown() {
 }
 
 function addParticipant() {
-  const hoten     = document.getElementById("pname").value.trim();
-  const mssv      = document.getElementById("pmssv").value.trim();
-  const email     = document.getElementById("pemail").value.trim();
-  const khoa      = document.getElementById("pkhoa").value;
+  const hoten = document.getElementById("pname").value.trim();
+  const mssv  = document.getElementById("pmssv").value.trim();
+  const email = document.getElementById("pemail").value.trim();
+  const khoa  = document.getElementById("pkhoa").value;
   const eventName = document.getElementById("peventSelect").value;
-
-  if (!hoten || !mssv || !email || !khoa || !eventName)
-    return showToast("❌ Vui lòng nhập đầy đủ thông tin!", "error");
-  if (!email.endsWith("@gmail.com"))
-    return showToast("❌ Email phải có đuôi @gmail.com!", "error");
-
-  const participants = FS.getParticipants();
-  if (participants.some(p => p.mssv === mssv && p.event === eventName))
-    return showToast("⚠️ MSSV này đã đăng ký sự kiện đó rồi!", "error");
-  if (participants.some(p => p.email === email && p.event === eventName))
-    return showToast("⚠️ Email này đã đăng ký sự kiện đó rồi!", "error");
-
-  const selectedEvent = FS.getEvents().find(e => e.t === eventName);
-  const count = participants.filter(p => p.event === eventName).length;
-  if (selectedEvent?.max && count >= selectedEvent.max)
-    return showToast("❌ Sự kiện đã đủ số người tham gia!", "error");
-
-  const qrData = mssv + "|" + eventName;
-  const qrLink = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(qrData);
-
-  FS.addParticipant({
-    name: hoten, mssv, email, khoa, event: eventName,
-    checkedIn: false, qr: qrData, qrLink,
-    status: "active",
-    registeredAt: new Date().toISOString()
-  });
+  if (!hoten||!mssv||!email||!khoa||!eventName) return showToast("❌ Vui lòng nhập đầy đủ!","error");
+  if (!email.endsWith("@gmail.com")) return showToast("❌ Email phải có đuôi @gmail.com!","error");
+  const parts = FS.getParticipants();
+  if (parts.some(p=>p.mssv===mssv&&p.event===eventName)) return showToast("⚠️ MSSV đã đăng ký!","error");
+  if (parts.some(p=>p.email===email&&p.event===eventName)) return showToast("⚠️ Email đã đăng ký!","error");
+  const ev = FS.getEvents().find(e=>e.t===eventName);
+  if (ev?.max && parts.filter(p=>p.event===eventName).length >= ev.max) return showToast("❌ Sự kiện đã đủ người!","error");
+  const qrData = mssv+"|"+eventName;
+  const qrLink = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+encodeURIComponent(qrData);
+  FS.addParticipant({name:hoten,mssv,email,khoa,event:eventName,checkedIn:false,qr:qrData,qrLink,status:"active",registeredAt:new Date().toISOString()});
   showToast("🎉 Đăng ký thành công!");
-
   const qrBox = document.getElementById("myQR");
-  if (qrBox) {
-    qrBox.innerHTML = `
-      <p style="font-weight:700;color:#e84393;">🪪 Mã QR của bạn</p>
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}"
-           style="display:block;margin:10px auto;border-radius:12px;">
-      <div><b>${hoten}</b> — MSSV: ${mssv}</div>`;
-  }
-  ["pname","pmssv","pemail"].forEach(id => { const el = document.getElementById(id); if(el) el.value=""; });
-  document.getElementById("pkhoa").value = "";
+  if (qrBox) qrBox.innerHTML=`<p style="font-weight:700;color:#e84393;">🪪 Mã QR của bạn</p><img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}" style="display:block;margin:10px auto;border-radius:12px;"><div><b>${hoten}</b> — MSSV: ${mssv}</div>`;
+  ["pname","pmssv","pemail"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  document.getElementById("pkhoa").value="";
 }
 
 function resetForm() {
-  ["title","leader","location","max","desc"].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = "";
-  });
-  const dateEl = document.getElementById("date"); if (dateEl) dateEl.value = "";
-  const timeEl = document.getElementById("time"); if (timeEl) timeEl.value = "08:00";
-  document.querySelectorAll(".err-msg").forEach(e => e.classList.remove("show"));
-  document.querySelectorAll("input.error,select.error").forEach(i => i.classList.remove("error"));
-  document.querySelectorAll(".status-tag").forEach(t => t.classList.remove("active"));
+  ["title","leader","location","max","desc"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  const d=document.getElementById("date");if(d)d.value="";
+  const t=document.getElementById("time");if(t)t.value="08:00";
+  document.querySelectorAll(".err-msg").forEach(e=>e.classList.remove("show"));
+  document.querySelectorAll("input.error,select.error").forEach(i=>i.classList.remove("error"));
+  document.querySelectorAll(".status-tag").forEach(t=>t.classList.remove("active"));
   document.querySelector(".status-tag")?.classList.add("active");
-  selectedStatus = "Mở";
-  document.getElementById("titleCount").textContent = "0 / 100";
-  document.getElementById("descCount").textContent  = "0 / 300";
+  selectedStatus="Mở";
+  document.getElementById("titleCount").textContent="0 / 100";
+  document.getElementById("descCount").textContent="0 / 300";
 }
 
-// ── Check-in ───────────────────────────────────────
 function handleCheckin(code) {
-  let mssv, eventName;
-  try {
-    const parsed = JSON.parse(code);
-    const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
-    const ticket  = tickets.find(t => t.ticketId === parsed.ticketId);
-    if (ticket) { mssv = ticket.name; eventName = ticket.event; }
-  } catch { [mssv, eventName] = code.split("|"); }
-
-  if (!mssv || !eventName) return showToast("❌ Mã QR không hợp lệ!", "error");
-  const participants = FS.getParticipants();
-  const p = participants.find(x => (x.mssv === mssv || x.name === mssv) && x.event === eventName);
-  if (!p) return showToast("❌ Không tìm thấy người đăng ký!", "error");
-  if (p.checkedIn) return showToast("⚠️ Mã QR này đã được sử dụng rồi!", "error");
-  FS.updateParticipant(p.id, { checkedIn: true });
-  showToast("✅ Check-in thành công: " + p.name);
+  let mssv,eventName;
+  try{const p=JSON.parse(code);const t=JSON.parse(localStorage.getItem("tickets")||"[]").find(t=>t.ticketId===p.ticketId);if(t){mssv=t.name;eventName=t.event;}}catch{[mssv,eventName]=code.split("|");}
+  if(!mssv||!eventName) return showToast("❌ Mã QR không hợp lệ!","error");
+  const p=FS.getParticipants().find(x=>(x.mssv===mssv||x.name===mssv)&&x.event===eventName);
+  if(!p) return showToast("❌ Không tìm thấy người đăng ký!","error");
+  if(p.checkedIn) return showToast("⚠️ Mã QR này đã dùng rồi!","error");
+  FS.updateParticipant(p.id,{checkedIn:true});
+  showToast("✅ Check-in thành công: "+p.name);
 }
 
 function manualCheckin() {
-  const code = document.getElementById("manualCode").value.trim();
-  if (!code) return showToast("❌ Vui lòng nhập mã!", "error");
+  const code=document.getElementById("manualCode").value.trim();
+  if(!code) return showToast("❌ Vui lòng nhập mã!","error");
   handleCheckin(code);
 }
 
 let qrScanner;
 function startScan() {
-  if (qrScanner) qrScanner.stop().catch(()=>{});
-  qrScanner = new Html5Qrcode("qrVideo");
-  Html5Qrcode.getCameras().then(devices => {
-    if (!devices.length) return showToast("❌ Không tìm thấy camera!", "error");
-    qrScanner.start(devices[0].id, { fps:10, qrbox:250 }, qrCodeMessage => {
-      handleCheckin(qrCodeMessage);
-      qrScanner.stop();
-    }).catch(err => showToast("❌ Lỗi camera: " + err, "error"));
-  }).catch(() => showToast("❌ Trình duyệt chặn quyền camera!", "error"));
+  if(qrScanner)qrScanner.stop().catch(()=>{});
+  qrScanner=new Html5Qrcode("qrVideo");
+  Html5Qrcode.getCameras().then(devices=>{
+    if(!devices.length)return showToast("❌ Không tìm thấy camera!","error");
+    qrScanner.start(devices[0].id,{fps:10,qrbox:250},msg=>{handleCheckin(msg);qrScanner.stop();}).catch(err=>showToast("❌ Lỗi: "+err,"error"));
+  }).catch(()=>showToast("❌ Trình duyệt chặn camera!","error"));
 }
 
-// ── Dashboard ──────────────────────────────────────
 function renderDashboard() {
-  const participants = FS.getParticipants();
-  const events = FS.getEvents();
-  const total   = participants.length;
-  const checked = participants.filter(p => p.checkedIn).length;
-  const totalEl = document.getElementById("totalP");
-  const checkedEl = document.getElementById("checkedInP");
-  const notCheckedEl = document.getElementById("notCheckedP");
-  if (totalEl) totalEl.innerText = total;
-  if (checkedEl) checkedEl.innerText = checked;
-  if (notCheckedEl) notCheckedEl.innerText = total - checked;
-
-  const statsEl = document.getElementById("eventStats");
-  if (!statsEl) return;
-  statsEl.innerHTML = events.map(e => {
-    const totalE   = participants.filter(p => p.event === e.t).length;
-    const checkedE = participants.filter(p => p.event === e.t && p.checkedIn).length;
-    const pct = totalE ? Math.round(checkedE / totalE * 100) : 0;
-    return `<div style="background:#fff0f5;padding:12px;border-radius:12px;margin-bottom:10px;">
-      <b style="color:#e84393;">📌 ${e.t}</b>
-      <div style="margin-top:6px;font-size:13px;">✅ ${checkedE}/${totalE} đã check-in (${pct}%)</div>
-      <div style="background:#ffe0ea;border-radius:999px;height:6px;margin-top:6px;">
-        <div style="background:#e84393;height:100%;width:${pct}%;border-radius:999px;"></div>
-      </div>
-    </div>`;
+  const parts=FS.getParticipants(),evs=FS.getEvents();
+  const total=parts.length,checked=parts.filter(p=>p.checkedIn).length;
+  const tp=document.getElementById("totalP"),cp=document.getElementById("checkedInP"),np=document.getElementById("notCheckedP");
+  if(tp)tp.innerText=total;if(cp)cp.innerText=checked;if(np)np.innerText=total-checked;
+  const st=document.getElementById("eventStats");if(!st)return;
+  st.innerHTML=evs.map(e=>{
+    const tot=parts.filter(p=>p.event===e.t).length,chk=parts.filter(p=>p.event===e.t&&p.checkedIn).length;
+    const pct=tot?Math.round(chk/tot*100):0;
+    return`<div style="background:#fff0f5;padding:12px;border-radius:12px;margin-bottom:10px;"><b style="color:#e84393;">📌 ${e.t}</b><div style="margin-top:6px;font-size:13px;">✅ ${chk}/${tot} đã check-in (${pct}%)</div><div style="background:#ffe0ea;border-radius:999px;height:6px;margin-top:6px;"><div style="background:#e84393;height:100%;width:${pct}%;border-radius:999px;"></div></div></div>`;
   }).join("");
 }
 
-// ── Reminders ──────────────────────────────────────
 function renderReminders() {
-  const now = new Date();
-  let html = "";
-  FS.getParticipants().forEach(p => {
-    if (currentUser && p.email !== currentUser.email) return;
-    const ev = FS.getEvents().find(e => e.t === p.event);
-    if (!ev) return;
-    const eventTime = new Date(ev.d + "T" + (ev.time || "00:00"));
-    const hours = (eventTime - now) / 3600000;
-    if (hours > 0 && hours <= 24) {
-      html += `<div style="background:#fff0f6;padding:15px;border-radius:12px;margin-bottom:10px;border-left:4px solid #ff6a88;">
-        <b>📢 ${ev.t}</b><br>⏰ ${ev.d} ${ev.time||""}<br>📍 ${ev.location||""}
-        ${p.qrLink ? `<br>🎟 <a href="${p.qrLink}" target="_blank">Xem vé QR</a>` : ""}
-      </div>`;
-    }
+  const now=new Date();let html="";
+  FS.getParticipants().forEach(p=>{
+    if(currentUser&&p.email!==currentUser.email)return;
+    const ev=FS.getEvents().find(e=>e.t===p.event);if(!ev)return;
+    const hours=(new Date(ev.d+"T"+(ev.time||"00:00"))-now)/3600000;
+    if(hours>0&&hours<=24)html+=`<div style="background:#fff0f6;padding:15px;border-radius:12px;margin-bottom:10px;border-left:4px solid #ff6a88;"><b>📢 ${ev.t}</b><br>⏰ ${ev.d} ${ev.time||""}<br>📍 ${ev.location||""}${p.qrLink?`<br>🎟 <a href="${p.qrLink}" target="_blank">Xem vé QR</a>`:""}</div>`;
   });
-  const reminderEl = document.getElementById("reminderList");
-  if (reminderEl) reminderEl.innerHTML = html || "<p style='text-align:center;color:#aaa;'>❌ Không có sự kiện nào sắp diễn ra trong 24 giờ tới.</p>";
+  const el=document.getElementById("reminderList");
+  if(el)el.innerHTML=html||"<p style='text-align:center;color:#aaa;'>❌ Không có sự kiện sắp diễn ra trong 24 giờ tới.</p>";
 }
 
-// ── Global Search ──────────────────────────────────
 function globalSearchFunction() {
-  const keyword = document.getElementById("globalSearch").value.toLowerCase().trim();
-  if (!keyword) return;
-  const cmds = {
-    "trang chủ":"home","tạo sự kiện":"create","quản lý":"manage",
-    "tham gia":"join","đăng nhập":"login","checkin":"checkin",
-    "check-in":"checkin","dashboard":"dashboard","ngân sách":"budget"
-  };
-  for (const [k,v] of Object.entries(cmds)) {
-    if (keyword.includes(k)) { go(v); return; }
-  }
+  const kw=document.getElementById("globalSearch").value.toLowerCase().trim();if(!kw)return;
+  const cmds={"trang chủ":"home","tạo sự kiện":"create","quản lý":"manage","tham gia":"join","đăng nhập":"login","checkin":"checkin","check-in":"checkin","dashboard":"dashboard","ngân sách":"budget"};
+  for(const[k,v]of Object.entries(cmds)){if(kw.includes(k)){go(v);return;}}
   go("manage");
-  setTimeout(() => {
-    document.querySelectorAll("#eventTable tr").forEach(row => {
-      row.style.display = row.innerText.toLowerCase().includes(keyword) ? "" : "none";
-    });
-  }, 100);
+  setTimeout(()=>{document.querySelectorAll("#eventTable tr").forEach(r=>{r.style.display=r.innerText.toLowerCase().includes(kw)?"":"none";});},100);
 }
 
-function viewGallery() { window.location.href = "scrum22.html"; }
+function viewGallery(){window.location.href="scrum22.html";}
 
-// ── Toast ──────────────────────────────────────────
-function showToast(msg, type = "success") {
-  const colors = { success:"#2ecc71", error:"#e74c3c", info:"#3498db", warning:"#f39c12" };
-  const t = document.getElementById("toast");
-  if (!t) return;
-  t.textContent = msg;
-  t.style.background = colors[type] || colors.success;
-  t.style.opacity = "1";
-  t.style.transform = "translateX(-50%) translateY(0)";
+function showToast(msg,type="success"){
+  const colors={success:"#2ecc71",error:"#e74c3c",info:"#3498db",warning:"#f39c12"};
+  const t=document.getElementById("toast");if(!t)return;
+  t.textContent=msg;t.style.background=colors[type]||colors.success;
+  t.style.opacity="1";t.style.transform="translateX(-50%) translateY(0)";
   clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.style.opacity="0"; t.style.transform="translateX(-50%) translateY(100px)"; }, 3000);
+  t._timer=setTimeout(()=>{t.style.opacity="0";t.style.transform="translateX(-50%) translateY(100px)";},3000);
 }
 
-// ── EXPOSE GLOBALS ─────────────────────────────────
-window.toggleMenu          = toggleMenu;
-window.go                  = go;
-window.showToast           = showToast;
-window.renderEvents        = renderEvents;
-window.updateEventDropdown = updateEventDropdown;
-window.selectStatus        = selectStatus;
-window.submitEvent         = submitEvent;
-window.delEvent            = delEvent;
-window.addParticipant      = addParticipant;
-window.resetForm           = resetForm;
-window.handleAuth          = handleAuth;
-window.toggleAuthMode      = toggleAuthMode;
-window.logout              = logout;
-window.globalSearchFunction= globalSearchFunction;
-window.handleCheckin       = handleCheckin;
-window.manualCheckin       = manualCheckin;
-window.startScan           = startScan;
-window.renderDashboard     = renderDashboard;
-window.renderReminders     = renderReminders;
-window.viewGallery         = viewGallery;
+// ── Expose globals ──────────────────────────────────────
+window.toggleMenu=toggleMenu; window.go=go; window.showToast=showToast;
+window.renderEvents=renderEvents; window.updateEventDropdown=updateEventDropdown;
+window.selectStatus=selectStatus; window.submitEvent=submitEvent;
+window.delEvent=delEvent; window.addParticipant=addParticipant;
+window.resetForm=resetForm; window.handleAuth=handleAuth;
+window.toggleAuthMode=toggleAuthMode; window.logout=logout;
+window.globalSearchFunction=globalSearchFunction; window.handleCheckin=handleCheckin;
+window.manualCheckin=manualCheckin; window.startScan=startScan;
+window.renderDashboard=renderDashboard; window.renderReminders=renderReminders;
+window.viewGallery=viewGallery;
+window.addEventListener("fs:participants", () => {
+  const mp = document.getElementById("manage");
+  if (mp && mp.style.display !== "none") renderEvents();
+  renderDashboard();
+});
+window.addEventListener('fs:events', () => {
+  console.log(`🔥 fs:events TRIGGERED → ${FS.getEvents().length} sự kiện`);
+  const managePage = document.getElementById("manage");
+  if (managePage && managePage.style.display === "block") {
+    console.log("→ Đang renderEvents() từ listener");
+    renderEvents();
+  }
+});
 
-// Expose FS refs cho external scripts
-window.FS       = FS;
-window._db      = FS.db;
-window._ref     = FS.ref;
-window._update  = FS.update;
-window._remove  = FS.remove;
-window._push    = FS.push;
-window._events  = FS.getEvents();   // non-reactive snapshot (for compat)
-
-// Reactive getters for external scripts
-Object.defineProperty(window, "_events",       { get: () => FS.getEvents(),      configurable: true });
-Object.defineProperty(window, "_participants",  { get: () => FS.getParticipants(), configurable: true });
-Object.defineProperty(window, "_users",         { get: () => FS.getAllAccounts(),  configurable: true });
+// Override go() để đảm bảo render khi chuyển trang
+const originalGo = window.go || function(){};
+window.go = function(id) {
+  originalGo(id);
+  if (id === "manage") {
+    console.log("→ go('manage') được gọi");
+    setTimeout(() => {
+      console.log("→ Force renderEvents() sau go('manage')");
+      renderEvents();
+    }, 200);
+    setTimeout(() => {
+      console.log("→ Force renderEvents() lần 2");
+      renderEvents();
+    }, 600);
+  }
+};
 </script>
 
-<!-- External feature scripts -->
+<!-- External scripts – KHÔNG có fix_submitEvent.js nữa -->
 <script src="xemVaChinhSuaThongTinSuKien.js"></script>
 <script src="quanLyChiTieu.js"></script>
 <script src="NhanQRCode.js"></script>

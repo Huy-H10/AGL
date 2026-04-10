@@ -17,27 +17,28 @@
     .tab-btn.active,.tab-btn:hover{background:rgba(255,255,255,.9);color:#e84393;}
     .content{padding:90px 20px 40px;max-width:700px;margin:0 auto;}
     .section{display:none;} .section.active{display:block;}
-    .card{background:rgba(255,255,255,.97);border-radius:20px;padding:24px;margin-bottom:16px;box-shadow:0 8px 28px rgba(255,105,180,.15);animation:slideIn .3s ease;}
-    @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .card{background:rgba(255,255,255,.97);border-radius:20px;padding:24px;margin-bottom:16px;box-shadow:0 8px 28px rgba(255,105,180,.15);}
     .card h3{color:#e84393;font-family:'Quicksand',sans-serif;font-size:16px;margin-bottom:16px;}
     .form-group{margin-bottom:14px;}
     .form-group label{display:block;font-size:12px;font-weight:700;color:#c0395e;margin-bottom:5px;}
     .form-group input,.form-group textarea,.form-group select{width:100%;padding:11px 14px;border:2px solid #ffe0ea;border-radius:12px;background:#fff9fb;outline:none;font-size:14px;transition:.2s;font-family:'Nunito',sans-serif;}
     .form-group textarea{resize:vertical;min-height:100px;}
+    .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#ff6a88;}
     .recipient-info{background:#fff0f5;border:1.5px solid #ffe0ea;border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#c0395e;}
     .recipient-info b{color:#e84393;font-size:18px;}
     .toggle-email{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff0f5;border:1.5px solid #ffe0ea;border-radius:12px;margin-bottom:14px;cursor:pointer;}
     .toggle-email input[type="checkbox"]{width:18px;height:18px;accent-color:#e84393;cursor:pointer;}
     .toggle-email span{font-size:13px;font-weight:700;color:#c0395e;}
     .toggle-email .sub{font-size:11px;font-weight:400;color:#aaa;display:block;}
-    .btn-send{width:100%;padding:14px;background:linear-gradient(135deg,#ff6a88,#e84393);color:#fff;border:none;border-radius:14px;font-weight:700;font-size:15px;cursor:pointer;transition:.3s;}
+    .email-unavail{font-size:12px;color:#e74c3c;margin-top:4px;display:none;}
+    .btn-send{width:100%;padding:14px;background:linear-gradient(135deg,#ff6a88,#e84393);color:#fff;border:none;border-radius:14px;font-weight:700;font-size:15px;cursor:pointer;transition:.3s;font-family:'Nunito';}
     .btn-send:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(255,106,136,.4);}
     .btn-send:disabled{opacity:.6;cursor:not-allowed;transform:none;}
     .top-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
     .section-label{color:#fff;font-family:'Quicksand';font-weight:700;font-size:15px;text-shadow:0 2px 6px rgba(0,0,0,.1);}
     .btn-mark-all{background:rgba(255,255,255,.3);border:none;color:#fff;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;transition:.2s;}
     .btn-mark-all:hover{background:rgba(255,255,255,.5);}
-    .notif-item{background:rgba(255,255,255,.97);border-radius:16px;padding:16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(255,105,180,.12);border-left:4px solid #ff6a88;animation:slideIn .3s ease;}
+    .notif-item{background:rgba(255,255,255,.97);border-radius:16px;padding:16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(255,105,180,.12);border-left:4px solid #ff6a88;}
     .notif-item.unread{border-left-color:#e84393;background:#fff5f9;}
     .notif-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
     .notif-title{font-weight:700;color:#333;font-size:14px;}
@@ -47,10 +48,11 @@
     .notif-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
     .email-badge{font-size:11px;background:#d4f7e7;color:#27ae60;padding:2px 8px;border-radius:6px;font-weight:700;}
     .unread-dot{width:8px;height:8px;background:#e84393;border-radius:50%;display:inline-block;margin-right:6px;}
-    .btn-del-notif{background:none;border:none;color:#ddd;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:6px;transition:.2s;}
-    .btn-del-notif:hover{color:#ff4757;background:#fff0f0;}
+    .btn-icon{background:none;border:none;color:#ddd;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:6px;transition:.2s;}
+    .btn-icon:hover{color:#ff4757;background:#fff0f0;}
     .empty-state{text-align:center;padding:50px 20px;background:rgba(255,255,255,.97);border-radius:20px;}
-    .empty-state .icon{font-size:52px;margin-bottom:12px;} .empty-state p{color:#bbb;font-weight:600;}
+    .empty-state .icon{font-size:52px;margin-bottom:12px;}
+    .empty-state p{color:#bbb;font-weight:600;}
     .send-progress{display:none;margin-top:10px;background:#fff0f5;border-radius:12px;padding:12px 16px;}
     .send-progress.show{display:block;}
     .progress-bar-bg{background:#ffe0ea;border-radius:999px;height:8px;margin:8px 0;overflow:hidden;}
@@ -73,8 +75,8 @@
   <button class="back-btn" onclick="history.back()">←</button>
   <div class="header-title">🔔 Thông báo sự kiện</div>
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('send',this)">📢 Gửi</button>
-    <button class="tab-btn" onclick="switchTab('inbox',this)">📬 Trung tâm</button>
+    <button class="tab-btn active" id="tabSend">📢 Gửi</button>
+    <button class="tab-btn" id="tabInbox">📬 Trung tâm</button>
   </div>
 </div>
 
@@ -85,11 +87,9 @@
       <h3>📢 Gửi thông báo đến người tham gia</h3>
       <div class="form-group">
         <label>Chọn sự kiện</label>
-        <select id="selectEvent" onchange="updateRecipientCount()">
-          <option value="">-- Tất cả sự kiện --</option>
-        </select>
+        <select id="selectEvent"></select>
       </div>
-      <div class="recipient-info" id="recipientInfo">
+      <div class="recipient-info">
         👥 Sẽ gửi đến: <b id="recipientCount">0</b> người đăng ký
       </div>
       <div class="form-group">
@@ -107,7 +107,8 @@
           <span class="sub">Gửi email thật đến từng người đăng ký</span>
         </div>
       </label>
-      <button class="btn-send" id="btnSend" onclick="sendNotification()">🚀 Gửi thông báo</button>
+      <p class="email-unavail" id="emailUnavail">⚠️ EmailJS chưa được cấu hình — chỉ lưu thông báo nội bộ.</p>
+      <button class="btn-send" id="btnSend">🚀 Gửi thông báo</button>
       <div class="send-progress" id="sendProgress">
         <div class="progress-text" id="progressText">Đang gửi...</div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
@@ -115,11 +116,11 @@
     </div>
   </div>
 
-  <!-- TRUNG TÂM THÔNG BÁO -->
+  <!-- INBOX -->
   <div id="section-inbox" class="section">
     <div class="top-actions">
       <div class="section-label">📬 Thông báo của bạn</div>
-      <button class="btn-mark-all" onclick="markAllRead()">✅ Đánh dấu đã đọc</button>
+      <button class="btn-mark-all" id="btnMarkAll">✅ Đánh dấu đã đọc</button>
     </div>
     <div id="notifList"></div>
   </div>
@@ -127,32 +128,72 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- EmailJS -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- FIX: EmailJS loaded TRƯỚC module, có fallback nếu CDN lỗi -->
+<script>
+// Stub phòng trường hợp EmailJS CDN fail
+window._emailjsReady = false;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
+        onload="window._emailjsReady=true;"
+        onerror="console.warn('[thongBao] EmailJS CDN không load được — tính năng gửi email bị tắt.')">
+</script>
 
 <script type="module">
-import { FS } from "./firebase-sync.js";
+import { FS } from './firebase-sync.js';
 
+// ── Hoa rơi ────────────────────────────────────────
+setInterval(() => {
+  const f = document.createElement('div');
+  f.className = 'flower'; f.innerHTML = '🌸';
+  f.style.left = Math.random() * 100 + 'vw';
+  f.style.animationDuration = (3 + Math.random() * 5) + 's';
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 8000);
+}, 400);
+
+// ── FIX: khởi tạo EmailJS an toàn ─────────────────
 const EMAILJS_SERVICE_ID  = 'service_lzo2lnw';
 const EMAILJS_TEMPLATE_ID = 'template_sp70x7i';
 const EMAILJS_PUBLIC_KEY  = 'sG_TiXIGwxdu_0RRx';
-emailjs.init(EMAILJS_PUBLIC_KEY);
 
-// Hoa rơi
-setInterval(() => {
-  const f = document.createElement('div');
-  f.className='flower'; f.innerHTML='🌸';
-  f.style.left = Math.random()*100+'vw';
-  f.style.animationDuration = (3+Math.random()*5)+'s';
-  document.body.appendChild(f);
-  setTimeout(()=>f.remove(), 8000);
-}, 400);
+let emailjsAvailable = false;
+try {
+  if (window._emailjsReady && typeof emailjs !== 'undefined') {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailjsAvailable = true;
+  }
+} catch (e) {
+  console.warn('[thongBao] Không thể khởi tạo EmailJS:', e);
+}
 
-// Chờ Firebase
+// Thông báo nếu email không khả dụng
+if (!emailjsAvailable) {
+  document.getElementById('emailUnavail').style.display = 'block';
+  document.getElementById('sendEmail').checked = false;
+  document.getElementById('sendEmail').disabled = true;
+}
+
+// ── Chờ Firebase ───────────────────────────────────
 await FS.ready;
 document.getElementById('loadingOverlay').classList.add('hidden');
 
-// Điền dropdown
+// ── TABS ───────────────────────────────────────────
+document.getElementById('tabSend').addEventListener('click', function() {
+  switchTab('send', this);
+});
+document.getElementById('tabInbox').addEventListener('click', function() {
+  switchTab('inbox', this);
+});
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + tab).classList.add('active');
+  btn.classList.add('active');
+  if (tab === 'inbox') renderInbox();
+}
+
+// ── DROPDOWN SỰ KIỆN ──────────────────────────────
 function populateEventDropdown() {
   const sel = document.getElementById('selectEvent');
   const cur = sel.value;
@@ -167,34 +208,31 @@ function populateEventDropdown() {
   updateRecipientCount();
 }
 
-window.addEventListener('fs:events', populateEventDropdown);
+function updateRecipientCount() {
+  const name = document.getElementById('selectEvent').value;
+  const list = name
+    ? FS.getParticipants().filter(p => p.event === name)
+    : FS.getParticipants();
+  document.getElementById('recipientCount').textContent = list.length;
+}
+
+document.getElementById('selectEvent').addEventListener('change', updateRecipientCount);
+
+window.addEventListener('fs:events',        populateEventDropdown);
 window.addEventListener('fs:notifications', () => {
   if (document.getElementById('section-inbox').classList.contains('active')) renderInbox();
 });
 
 populateEventDropdown();
 
-window.updateRecipientCount = () => {
-  const eventName = document.getElementById('selectEvent').value;
-  const targets = eventName
-    ? FS.getParticipants().filter(p => p.event === eventName)
-    : FS.getParticipants();
-  document.getElementById('recipientCount').textContent = targets.length;
-};
+// ── GỬI THÔNG BÁO ─────────────────────────────────
+document.getElementById('btnSend').addEventListener('click', sendNotification);
 
-window.switchTab = (tab, btn) => {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('section-'+tab).classList.add('active');
-  btn.classList.add('active');
-  if (tab === 'inbox') renderInbox();
-};
-
-window.sendNotification = async () => {
+async function sendNotification() {
   const eventName = document.getElementById('selectEvent').value;
   const title     = document.getElementById('notifTitle').value.trim();
   const message   = document.getElementById('notifMessage').value.trim();
-  const doEmail   = document.getElementById('sendEmail').checked;
+  const doEmail   = emailjsAvailable && document.getElementById('sendEmail').checked;
   const cu        = FS.getCurrentUser();
 
   if (!title)   return showToast('❌ Vui lòng nhập tiêu đề!', 'error');
@@ -203,104 +241,151 @@ window.sendNotification = async () => {
   const targets = eventName
     ? FS.getParticipants().filter(p => p.event === eventName)
     : FS.getParticipants();
-  if (!targets.length) return showToast('❌ Không có người đăng ký nào!', 'error');
+
+  if (!targets.length) return showToast('❌ Không có người đăng ký!', 'error');
 
   // Lưu vào Firebase
   const notif = {
     title, message,
-    event: eventName || 'Tất cả sự kiện',
-    time: new Date().toISOString(),
-    sentBy: cu?.name || 'Ban tổ chức',
+    event    : eventName || 'Tất cả sự kiện',
+    time     : new Date().toISOString(),
+    sentBy   : cu?.name || 'Ban tổ chức',
     emailSent: doEmail,
-    read: false
+    read     : false
   };
-  await FS.addNotification(notif);
+
+  try {
+    await FS.addNotification(notif);
+  } catch (err) {
+    showToast('❌ Không thể lưu thông báo: ' + err.message, 'error');
+    return;
+  }
 
   if (doEmail) {
-    const btn = document.getElementById('btnSend');
-    btn.disabled = true; btn.textContent = '⏳ Đang gửi...';
+    const btn      = document.getElementById('btnSend');
     const progress = document.getElementById('sendProgress');
+    btn.disabled = true; btn.textContent = '⏳ Đang gửi...';
     progress.classList.add('show');
-    let sent=0, failed=0;
-    for (let i=0; i<targets.length; i++) {
+
+    let sent = 0, failed = 0;
+    for (let i = 0; i < targets.length; i++) {
       const p = targets[i];
-      document.getElementById('progressText').textContent = `Đang gửi... ${i}/${targets.length}`;
-      document.getElementById('progressFill').style.width = Math.round(i/targets.length*100)+'%';
+      document.getElementById('progressText').textContent  = `Đang gửi... ${i + 1}/${targets.length}`;
+      document.getElementById('progressFill').style.width  = Math.round((i + 1) / targets.length * 100) + '%';
+
       if (p.email) {
         try {
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            to_email: p.email, subject: title, message,
+            to_email : p.email,
+            subject  : title,
+            message,
             from_name: cu?.name || 'Ban tổ chức AGL'
           });
           sent++;
         } catch { failed++; }
       } else { failed++; }
+
+      // Delay nhỏ tránh spam
       await new Promise(r => setTimeout(r, 300));
     }
-    document.getElementById('progressFill').style.width = '100%';
-    document.getElementById('progressText').textContent = `✅ Hoàn tất! Đã gửi: ${sent} | Lỗi: ${failed}`;
+
+    document.getElementById('progressFill').style.width    = '100%';
+    document.getElementById('progressText').textContent    = `✅ Hoàn tất! Đã gửi: ${sent} | Lỗi: ${failed}`;
     btn.disabled = false; btn.textContent = '🚀 Gửi thông báo';
     showToast(`🎉 Gửi xong! ${sent}/${targets.length} email thành công`);
   } else {
     showToast('🔔 Đã lưu thông báo vào Trung tâm!');
   }
 
-  document.getElementById('notifTitle').value = '';
+  document.getElementById('notifTitle').value   = '';
   document.getElementById('notifMessage').value = '';
-};
+  updateRecipientCount();
+}
 
+// ── INBOX ──────────────────────────────────────────
 function renderInbox() {
-  const notifs = FS.getNotifications().slice().reverse(); // mới nhất lên đầu — đã sort bởi Firebase key
   const container = document.getElementById('notifList');
+  const notifs    = FS.getNotifications().slice().reverse();
+
   if (!notifs.length) {
     container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Chưa có thông báo nào</p></div>`;
     return;
   }
+
+  // FIX: dùng data-id thay vì inline onclick với string interpolation
   container.innerHTML = notifs.map(n => `
-    <div class="notif-item ${n.read?'':'unread'}">
+    <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}">
       <div class="notif-header">
-        <div class="notif-title">${n.read?'':`<span class="unread-dot"></span>`}${n.title}</div>
+        <div class="notif-title">
+          ${n.read ? '' : '<span class="unread-dot"></span>'}${escHtml(n.title)}
+        </div>
         <div class="notif-time">${formatTime(n.time)}</div>
       </div>
-      <div class="notif-event">📌 ${n.event}</div>
-      <div class="notif-body">${n.message}</div>
+      <div class="notif-event">📌 ${escHtml(n.event || '')}</div>
+      <div class="notif-body">${escHtml(n.message || '')}</div>
       <div class="notif-footer">
         <div>
-          ${n.emailSent?`<span class="email-badge">📧 Đã gửi email</span>`:''}
-          <span style="font-size:11px;color:#bbb;margin-left:6px;">Bởi: ${n.sentBy||'Ban tổ chức'}</span>
+          ${n.emailSent ? '<span class="email-badge">📧 Đã gửi email</span>' : ''}
+          <span style="font-size:11px;color:#bbb;margin-left:6px;">Bởi: ${escHtml(n.sentBy || 'Ban tổ chức')}</span>
         </div>
         <div style="display:flex;gap:6px;">
-          ${!n.read?`<button class="btn-del-notif" onclick="markRead('${n.id}')" title="Đã đọc">✓</button>`:''}
-          <button class="btn-del-notif" onclick="deleteNotif('${n.id}')" title="Xóa">🗑️</button>
+          ${!n.read ? `<button class="btn-icon btn-mark-read" data-id="${n.id}" title="Đánh dấu đã đọc">✓</button>` : ''}
+          <button class="btn-icon btn-delete-notif" data-id="${n.id}" title="Xóa">🗑️</button>
         </div>
       </div>
     </div>
   `).join('');
 }
 
-window.markRead = async (id) => {
-  await FS.update(FS.ref(FS.db, `notifications/${id}`), { read: true });
-};
-window.markAllRead = async () => {
-  const promises = FS.getNotifications().filter(n=>!n.read).map(n =>
-    FS.update(FS.ref(FS.db, `notifications/${n.id}`), { read: true })
-  );
-  await Promise.all(promises);
-  showToast('✅ Đã đánh dấu tất cả đã đọc!');
-};
-window.deleteNotif = async (id) => {
-  await FS.deleteNotification(id);
-};
+// FIX: event delegation cho inbox buttons
+document.getElementById('notifList').addEventListener('click', async function(e) {
+  const markBtn = e.target.closest('.btn-mark-read');
+  const delBtn  = e.target.closest('.btn-delete-notif');
+
+  if (markBtn) {
+    const id = markBtn.dataset.id;
+    try {
+      await FS.update(FS.ref(FS.db, `notifications/${id}`), { read: true });
+    } catch(err) { showToast('❌ Lỗi: ' + err.message, 'error'); }
+  }
+
+  if (delBtn) {
+    const id = delBtn.dataset.id;
+    try {
+      await FS.deleteNotification(id);
+    } catch(err) { showToast('❌ Lỗi: ' + err.message, 'error'); }
+  }
+});
+
+document.getElementById('btnMarkAll').addEventListener('click', async function() {
+  const unread = FS.getNotifications().filter(n => !n.read);
+  if (!unread.length) { showToast('Tất cả đã đọc rồi!', 'info'); return; }
+  try {
+    await Promise.all(unread.map(n =>
+      FS.update(FS.ref(FS.db, `notifications/${n.id}`), { read: true })
+    ));
+    showToast('✅ Đã đánh dấu tất cả đã đọc!');
+  } catch(err) { showToast('❌ Lỗi: ' + err.message, 'error'); }
+});
+
+// ── HELPERS ────────────────────────────────────────
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 function formatTime(iso) {
   if (!iso) return '';
-  return new Date(iso).toLocaleString('vi-VN', { day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit' });
+  return new Date(iso).toLocaleString('vi-VN', {
+    day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
 }
 
-function showToast(msg, type='success') {
+function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.className = `toast ${type} show`;
-  setTimeout(()=>t.classList.remove('show'), 3500);
+  t.textContent = msg;
+  t.className   = `toast ${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
 }
 </script>
 </body>

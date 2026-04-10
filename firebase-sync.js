@@ -3,7 +3,6 @@ import { initializeApp, getApps, getApp }
 import { getDatabase, ref, push, onValue, remove, update, set }
   from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
-// ── CONFIG ─────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyD1AjKDBaul5KmFQYdGOmQs0wPkcVVo9VI",
   authDomain: "agl-qlclb.firebaseapp.com",
@@ -14,7 +13,6 @@ const firebaseConfig = {
   appId: "1:141206426649:web:7fc9b098a48322b652c688"
 };
 
-// ── SAFE INIT: tránh duplicate app error ───────────────
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
@@ -41,63 +39,72 @@ function _checkReady(nodeName) {
   }
 }
 
+// ── DISPATCH helper: đảm bảo fire sau khi DOM sẵn sàng ─
+function _dispatch(name, detail) {
+  // Dùng setTimeout(0) để đảm bảo listeners đã được đăng ký
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent(name, { detail }));
+  }, 0);
+}
+
 // ── REALTIME LISTENERS ─────────────────────────────────
 onValue(ref(db, "events"), snap => {
   _events = [];
-  snap.forEach(c => _events.push({ id: c.key, ...c.val() }));
+  // Thêm { } để không return giá trị độ dài mảng
+  snap.forEach(c => { _events.push({ id: c.key, ...c.val() }); }); 
   localStorage.setItem("events", JSON.stringify(_events));
-  window.dispatchEvent(new CustomEvent("fs:events", { detail: _events }));
+  _dispatch("fs:events", _events);
   _checkReady("events");
 });
 
 onValue(ref(db, "participants"), snap => {
   _participants = [];
-  snap.forEach(c => _participants.push({ id: c.key, ...c.val() }));
+  snap.forEach(c => { _participants.push({ id: c.key, ...c.val() }); });
   localStorage.setItem("participants", JSON.stringify(_participants));
-  window.dispatchEvent(new CustomEvent("fs:participants", { detail: _participants }));
+  _dispatch("fs:participants", _participants);
   _checkReady("participants");
 });
 
 onValue(ref(db, "users"), snap => {
   _users = [];
-  snap.forEach(c => _users.push({ id: c.key, role: "user", ...c.val() }));
-  window.dispatchEvent(new CustomEvent("fs:users", { detail: _users }));
+  snap.forEach(c => { _users.push({ id: c.key, role: "user", ...c.val() }); });
+  _dispatch("fs:users", _users);
   _checkReady("users");
 });
 
 onValue(ref(db, "admins"), snap => {
   _admins = [];
-  snap.forEach(c => _admins.push({ id: c.key, role: "admin", ...c.val() }));
-  window.dispatchEvent(new CustomEvent("fs:admins", { detail: _admins }));
+  snap.forEach(c => { _admins.push({ id: c.key, role: "admin", ...c.val() }); });
+  _dispatch("fs:admins", _admins);
   _checkReady("admins");
 });
 
 onValue(ref(db, "assignments"), snap => {
   _assignments = [];
-  snap.forEach(c => _assignments.push({ id: c.key, ...c.val() }));
+  snap.forEach(c => { _assignments.push({ id: c.key, ...c.val() }); });
   localStorage.setItem("assignments", JSON.stringify(_assignments));
-  window.dispatchEvent(new CustomEvent("fs:assignments", { detail: _assignments }));
+  _dispatch("fs:assignments", _assignments);
   _checkReady("assignments");
 });
 
 onValue(ref(db, "notifications"), snap => {
   _notifications = [];
-  snap.forEach(c => _notifications.push({ id: c.key, ...c.val() }));
+  snap.forEach(c => { _notifications.push({ id: c.key, ...c.val() }); });
   localStorage.setItem("notifications", JSON.stringify(_notifications));
-  window.dispatchEvent(new CustomEvent("fs:notifications", { detail: _notifications }));
+  _dispatch("fs:notifications", _notifications);
 });
 
 onValue(ref(db, "reviews"), snap => {
   _reviews = [];
-  snap.forEach(c => _reviews.push({ id: c.key, ...c.val() }));
-  window.dispatchEvent(new CustomEvent("fs:reviews", { detail: _reviews }));
+  snap.forEach(c => { _reviews.push({ id: c.key, ...c.val() }); });
+  _dispatch("fs:reviews", _reviews);
 });
 
 onValue(ref(db, "budgets"), snap => {
   _budgets = [];
-  snap.forEach(c => _budgets.push({ id: c.key, ...c.val() }));
+  snap.forEach(c => { _budgets.push({ id: c.key, ...c.val() }); });
   localStorage.setItem("budgets", JSON.stringify(_budgets));
-  window.dispatchEvent(new CustomEvent("fs:budgets", { detail: _budgets }));
+  _dispatch("fs:budgets", _budgets);
 });
 
 // ── TOAST HELPER ──────────────────────────────────────
@@ -130,20 +137,15 @@ function showToast(msg, type = "success") {
 
 // ── PUBLIC API ────────────────────────────────────────
 const FS = {
-  // Firebase primitives
   db, ref, push, update, remove, set, onValue,
-
-  // Lifecycle
   ready,
   showToast,
 
-  // Getters – luôn trả về bản mới nhất từ cache
   getEvents:        () => _events,
   getParticipants:  () => _participants,
   getUsers:         () => _users,
   getAdmins:        () => _admins,
 
-  // Gộp users + admins, loại trùng theo email
   getAllAccounts: () => {
     const map = new Map();
     [..._users, ..._admins].forEach(u => {
@@ -151,7 +153,6 @@ const FS = {
       if (!map.has(key)) {
         map.set(key, u);
       } else {
-        // Ưu tiên bản có passHash
         if (u.passHash && !map.get(key).passHash) map.set(key, u);
       }
     });
@@ -163,7 +164,6 @@ const FS = {
   getReviews:       () => _reviews,
   getBudgets:       () => _budgets,
 
-  // Auth helpers
   getCurrentUser: () => {
     try { return JSON.parse(localStorage.getItem("currentUser") || "null"); }
     catch { return null; }
@@ -179,7 +179,6 @@ const FS = {
     catch { return false; }
   },
 
-  // ── Shortcuts ghi dữ liệu ──
   addEvent        : (d) => push(ref(db, "events"),        d),
   addParticipant  : (d) => push(ref(db, "participants"),  d),
   addAssignment   : (d) => push(ref(db, "assignments"),   d),
@@ -187,11 +186,11 @@ const FS = {
   addReview       : (d) => push(ref(db, "reviews"),       d),
   addBudget       : (d) => push(ref(db, "budgets"),       d),
 
-  updateEvent       : (id, d) => update(ref(db, `events/${id}`),       d),
-  updateParticipant : (id, d) => update(ref(db, `participants/${id}`), d),
-  updateAssignment  : (id, d) => update(ref(db, `assignments/${id}`),  d),
-  updateBudget      : (id, d) => update(ref(db, `budgets/${id}`),      d),
-  updateNotification: (id, d) => update(ref(db, `notifications/${id}`),d),
+  updateEvent       : (id, d) => update(ref(db, `events/${id}`),        d),
+  updateParticipant : (id, d) => update(ref(db, `participants/${id}`),  d),
+  updateAssignment  : (id, d) => update(ref(db, `assignments/${id}`),   d),
+  updateBudget      : (id, d) => update(ref(db, `budgets/${id}`),       d),
+  updateNotification: (id, d) => update(ref(db, `notifications/${id}`), d),
 
   deleteEvent       : (id) => remove(ref(db, `events/${id}`)),
   deleteParticipant : (id) => remove(ref(db, `participants/${id}`)),

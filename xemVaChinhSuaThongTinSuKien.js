@@ -1,7 +1,9 @@
 // ── Helpers ───────────────────────────────────────────────
 function getEvents_S10() {
-  // Ưu tiên lấy từ window._events (Firebase realtime)
-  if (window._events && Array.isArray(window._events)) return window._events;
+  // LUÔN lấy từ FS realtime - không dùng snapshot cũ
+  if (window.FS && typeof window.FS.getEvents === "function") {
+    return window.FS.getEvents();
+  }
   return JSON.parse(localStorage.getItem("events") || "[]");
 }
 
@@ -10,49 +12,18 @@ function getCurrentUser_S10() {
 }
 
 function isAdmin_S10() {
-  const u = getCurrentUser_S10();
-  return u?.role === "admin";
+  return getCurrentUser_S10()?.role === "admin";
 }
 
 function _toast(msg, type) {
   if (typeof window.showToast === "function") window.showToast(msg, type || "success");
-  else console.log(msg);
 }
 
-// ── RENDER DANH SÁCH ─────────────────────────────────────
+// ── RENDER: delegate sang renderEvents() của main module ──
 function renderEventsScrum10() {
-  const events = getEvents_S10();
-  const tbody  = document.getElementById("eventTable");
-  if (!tbody) return;
-
-  tbody.innerHTML = "";
-
-  if (!events.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Chưa có sự kiện nào.</td></tr>`;
-    return;
+  if (typeof window.renderEvents === "function") {
+    window.renderEvents();
   }
-
-  events.forEach((e, i) => {
-    const firebaseId = e.id || null;
-
-    const editBtn = isAdmin_S10()
-      ? `<button class="btn-edit" onclick="openEditModal(${i})">✏️ Sửa</button>`
-      : `<span style="color:#aaa;font-size:12px;">Chỉ xem</span>`;
-
-    const delBtn = isAdmin_S10() && firebaseId
-      ? `<button class="btn-del" onclick="window.delEvent('${firebaseId}')" style="margin-left:5px;">🗑️</button>`
-      : "";
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${e.t||""}</td>
-        <td>${e.l||""}</td>
-        <td>${e.d||""}</td>
-        <td>${e.location||""}</td>
-        <td>${e.max||""}</td>
-        <td>${editBtn}${delBtn}</td>
-      </tr>`;
-  });
 }
 
 // ── MỞ MODAL CHỈNH SỬA ───────────────────────────────────
@@ -78,20 +49,16 @@ function openEditModal(index) {
   document.getElementById("editModal").style.display = "flex";
 }
 
-// ── ĐÓNG MODAL ────────────────────────────────────────────
 function closeEditModal() {
   document.getElementById("editModal").style.display = "none";
-  
   clearEditErrors();
 }
 
-// ── CHỌN TRẠNG THÁI ──────────────────────────────────────
 function selectEditStatus(el) {
   document.querySelectorAll(".edit-status-tag").forEach(t => t.classList.remove("active"));
   el.classList.add("active");
 }
 
-// ── VALIDATE ─────────────────────────────────────────────
 function validateEditForm() {
   let valid = true;
   clearEditErrors();
@@ -149,29 +116,20 @@ function saveEditEvent() {
 
   const firebaseId = events[index]?.id;
 
-  if (firebaseId && window._db && window._ref && window._update) {
-    // FIX: Cập nhật Firebase trực tiếp
-    window._update(window._ref(window._db, "events/" + firebaseId), updatedData)
-      .then(() => {
-        _toast("✅ Cập nhật sự kiện thành công!");
+  if (!firebaseId) { _toast("❌ Không tìm thấy ID sự kiện!", "error"); return; }
 
-        closeEditModal();
-        // renderEvents() sẽ tự được gọi qua onValue listener
-        if (typeof window.renderEvents === "function") window.renderEvents();
-      })
-      .catch(err => _toast("❌ Lỗi: " + err.message, "error"));
-  } else {
-    // Fallback localStorage
-    const lsEvents = JSON.parse(localStorage.getItem("events") || "[]");
-    if (lsEvents[index]) {
-      lsEvents[index] = { ...lsEvents[index], ...updatedData };
-      localStorage.setItem("events", JSON.stringify(lsEvents));
-    }
-    closeEditModal();
-    renderEventsScrum10();
-    if (typeof window.renderEvents === "function") window.renderEvents();
-    _toast("✅ Cập nhật sự kiện thành công!");
-  }
+  // Dùng FS.updateEvent (ưu tiên) hoặc fallback _update
+  const updateFn = window.FS?.updateEvent
+    ? (id, data) => window.FS.updateEvent(id, data)
+    : (id, data) => window._update(window._ref(window._db, "events/" + id), data);
+
+  updateFn(firebaseId, updatedData)
+    .then(() => {
+      _toast("✅ Cập nhật sự kiện thành công!");
+      closeEditModal();
+      // fs:events listener sẽ tự gọi renderEvents()
+    })
+    .catch(err => _toast("❌ Lỗi: " + err.message, "error"));
 }
 
 // ── INJECT MODAL ──────────────────────────────────────────
@@ -190,7 +148,6 @@ function injectEditModal() {
       box-shadow:0 16px 48px rgba(255,105,180,.3);">
       <h2 style="text-align:center;color:#e84393;font-family:'Quicksand';margin-bottom:20px;">✏️ Chỉnh sửa sự kiện</h2>
       <input type="hidden" id="edit_index">
-
       <div class="form-group">
         <label>Tên sự kiện <span style="color:#ff4d88">*</span></label>
         <input id="edit_title" type="text" placeholder="Tên sự kiện..." maxlength="100">
@@ -227,9 +184,9 @@ function injectEditModal() {
       <div class="form-group">
         <label>Trạng thái</label>
         <div style="display:flex;gap:8px;">
-          <div class="status-tag edit-status-tag active" data-val="Mở"     onclick="selectEditStatus(this)" style="flex:1;padding:8px;border:2px solid #ffe0ea;border-radius:10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff;">🟢 Mở</div>
-          <div class="status-tag edit-status-tag"        data-val="Sắp mở" onclick="selectEditStatus(this)" style="flex:1;padding:8px;border:2px solid #ffe0ea;border-radius:10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff;">🟡 Sắp mở</div>
-          <div class="status-tag edit-status-tag"        data-val="Đóng"   onclick="selectEditStatus(this)" style="flex:1;padding:8px;border:2px solid #ffe0ea;border-radius:10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff;">🔴 Đóng</div>
+          <div class="status-tag edit-status-tag active" data-val="Mở" onclick="selectEditStatus(this)" style="flex:1;padding:8px;border:2px solid #ffe0ea;border-radius:10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff;">🟢 Mở</div>
+          <div class="status-tag edit-status-tag" data-val="Sắp mở" onclick="selectEditStatus(this)" style="flex:1;padding:8px;border:2px solid #ffe0ea;border-radius:10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff;">🟡 Sắp mở</div>
+          <div class="status-tag edit-status-tag" data-val="Đóng" onclick="selectEditStatus(this)" style="flex:1;padding:8px;border:2px solid #ffe0ea;border-radius:10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff;">🔴 Đóng</div>
         </div>
       </div>
       <div class="form-group">
@@ -245,6 +202,6 @@ function injectEditModal() {
 }
 
 // ── KHỞI CHẠY ─────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   injectEditModal();
 });
