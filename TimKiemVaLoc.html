@@ -1,82 +1,197 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<title>Tìm kiếm sự kiện</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Nunito',sans-serif; }
-  body { background:linear-gradient(135deg,#ff9a9e,#fad0c4); min-height:100vh; padding:40px 20px; }
-  h2 { text-align:center; color:#e84393; margin-bottom:20px; font-family:'Quicksand'; }
-  .card { background:rgba(255,255,255,.97); padding:30px; border-radius:24px; max-width:600px; margin:0 auto; box-shadow:0 16px 48px rgba(255,105,180,.2); }
-  input,select { width:100%; padding:12px; border:2px solid #ffe0ea; border-radius:12px; background:#fff9fb; outline:none; margin-bottom:12px; }
-  input:focus { border-color:#ff6a88; }
-  button.main { width:100%; padding:13px; background:linear-gradient(135deg,#ff6a88,#e84393); color:#fff; border:none; border-radius:14px; font-weight:700; cursor:pointer; margin-bottom:15px; }
-  button.main:hover { transform:translateY(-2px); }
-  .event-card { background:#fff0f5; padding:15px; margin-top:10px; border-radius:14px; border-left:4px solid #ff6a88; text-align:left; }
-  .event-card b { color:#e84393; font-size:16px; }
-  .event-card span { font-size:13px; color:#888; }
-  .back { display:inline-block; margin-bottom:20px; color:#e84393; cursor:pointer; font-weight:700; }
-  .tag { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; margin-top:5px; }
-  .tag.Mo { background:#d5f5e3; color:#27ae60; }
-  .tag.Dong { background:#fadbd8; color:#e74c3c; }
-  .tag.SapMo { background:#fef9e7; color:#f39c12; }
-</style>
+  <meta charset="UTF-8">
+  <title>Tìm kiếm sự kiện</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #e84393;
+      margin-bottom: 20px;
+      font-family: 'Quicksand';
+    }
+
+    .card {
+      background: rgba(255, 255, 255, .97);
+      padding: 30px;
+      border-radius: 24px;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 0 16px 48px rgba(255, 105, 180, .2);
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ffe0ea;
+      border-radius: 12px;
+      background: #fff9fb;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    input:focus {
+      border-color: #ff6a88;
+    }
+
+    button.main {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #ff6a88, #e84393);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    button.main:hover {
+      transform: translateY(-2px);
+    }
+
+    .event-card {
+      background: #fff0f5;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 14px;
+      border-left: 4px solid #ff6a88;
+      text-align: left;
+    }
+
+    .event-card b {
+      color: #e84393;
+      font-size: 16px;
+    }
+
+    .event-card span {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #e84393;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .tag.Mo {
+      background: #d5f5e3;
+      color: #27ae60;
+    }
+
+    .tag.Dong {
+      background: #fadbd8;
+      color: #e74c3c;
+    }
+
+    .tag.SapMo {
+      background: #fef9e7;
+      color: #f39c12;
+    }
+  </style>
 </head>
+
 <body>
 
-<div style="max-width:600px; margin:0 auto;">
-  <p class="back" onclick="window.location.href='Giaodienquanlysukienclb.html'">← Quay về trang chủ</p>
+  <div style="max-width:600px; margin:0 auto;">
+    <p class="back" onclick="window.location.href='Giaodienquanlysukienclb.html'">← Quay về trang chủ</p>
 
-  <div class="card">
-    <h2>🔍 Tìm kiếm sự kiện</h2>
-    <input type="text" id="search" placeholder="Nhập tên sự kiện...">
-    <select id="filterStatus">
-      <option value="">-- Lọc theo trạng thái --</option>
-      <option value="Mở">🟢 Đang mở</option>
-      <option value="Sắp mở">🟡 Sắp mở</option>
-      <option value="Đóng">🔴 Đã đóng</option>
-    </select>
-    <button class="main" onclick="timKiem()">🔍 Tìm kiếm</button>
-    <div id="ketqua"></div>
+    <div class="card">
+      <h2>🔍 Tìm kiếm sự kiện</h2>
+      <input type="text" id="search" placeholder="Nhập tên sự kiện...">
+      <select id="filterStatus">
+        <option value="">-- Lọc theo trạng thái --</option>
+        <option value="Mở">🟢 Đang mở</option>
+        <option value="Sắp mở">🟡 Sắp mở</option>
+        <option value="Đóng">🔴 Đã đóng</option>
+      </select>
+      <button class="main" onclick="timKiem()">🔍 Tìm kiếm</button>
+      <div id="ketqua"></div>
+    </div>
   </div>
-</div>
 
-<script type="module">
-import { db, ref, onValue } from "./firebase.js";
+  <script type="module">
+    import { FS } from "./firebase-sync.js";
 
-let events = [];
+    await FS.ready;
 
-onValue(ref(db, "events"), snapshot => {
-  events = [];
-  snapshot.forEach(child => events.push({ id: child.key, ...child.val() }));
-  timKiem(); // Hiển thị tất cả khi load
-});
+    function timKiem() {
+      const keyword = (document.getElementById("search").value || "").toLowerCase().trim();
+      const filterStatus = document.getElementById("filterStatus").value;
+      const ketqua = document.getElementById("ketqua");
 
-window.timKiem = function() {
-  let keyword = document.getElementById("search").value.toLowerCase();
-  let filterStatus = document.getElementById("filterStatus").value;
-  let ketqua = document.getElementById("ketqua");
+      const allEvents = FS.getEvents();
 
-  let result = events.filter(e => {
-    let matchName = e.t.toLowerCase().includes(keyword);
-    let matchStatus = filterStatus === "" || e.status === filterStatus;
-    return matchName && matchStatus;
-  });
+      const result = allEvents.filter(e => {
+        const matchName = (e.t || "").toLowerCase().includes(keyword);
+        const matchStatus = !filterStatus || (e.status || "") === filterStatus;
+        return matchName && matchStatus;
+      });
 
-  if (result.length === 0) {
-    ketqua.innerHTML = "<p style='text-align:center;color:#aaa;margin-top:10px'>❌ Không tìm thấy sự kiện</p>";
-    return;
-  }
+      if (result.length === 0) {
+        ketqua.innerHTML = `<p style="text-align:center;color:#aaa;margin-top:20px;">❌ Không tìm thấy sự kiện nào phù hợp.</p>`;
+        return;
+      }
 
-  ketqua.innerHTML = result.map(e => `
-    <div class="event-card">
-      <b>${e.t}</b>
-      <span class="tag ${e.status?.replace(' ','')}">${e.status}</span><br>
-      <span>👤 ${e.l} &nbsp;|&nbsp; 📅 ${e.d} &nbsp;|&nbsp; 📍 ${e.location}</span><br>
-      <span>👥 Tối đa: ${e.max} người</span>
-    </div>`).join("");
-}
-</script>
+      ketqua.innerHTML = result.map(e => `
+      <div class="event-card" style="margin-bottom:12px;">
+        <b>${e.t || 'Không tên'}</b>
+        <span class="tag ${(e.status || 'Mở').replace(/\s+/g, '')}" 
+              style="margin-left:8px;">
+          ${e.status || 'Mở'}
+        </span><br>
+        <span style="font-size:13px;color:#666;">
+          👤 ${e.l || '—'} &nbsp;|&nbsp; 
+          📅 ${e.d || '—'} &nbsp;|&nbsp; 
+          📍 ${e.location || '—'}<br>
+          👥 Tối đa: ${e.max || 'Không giới hạn'} người
+        </span>
+      </div>
+    `).join('');
+    }
+
+    // Gọi ngay khi load
+    timKiem();
+
+    // Lắng nghe realtime — gọi lại hàm tìm kiếm mỗi khi có thay đổi
+    window.addEventListener("fs:events", timKiem);
+
+    // Tìm kiếm realtime khi gõ hoặc thay đổi bộ lọc
+    document.getElementById("search").addEventListener("input", timKiem);
+    document.getElementById("filterStatus").addEventListener("change", timKiem);
+
+    // Export hàm để gọi từ ngoài nếu cần
+    window.timKiem = timKiem;
+  </script>
 </body>
+
 </html>

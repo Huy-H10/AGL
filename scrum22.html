@@ -82,6 +82,12 @@
         .lightbox-footer{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;}
         .lightbox-name{font-weight:700;color:#333;font-size:14px;}
         .lightbox-close{background:#ff6a88;color:#fff;border:none;border-radius:10px;padding:7px 16px;cursor:pointer;font-weight:700;}
+        /* Nav buttons */
+        .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.25);border:none;color:#fff;font-size:48px;line-height:1;cursor:pointer;border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;transition:.2s;z-index:10000;}
+        .lb-nav:hover{background:rgba(255,255,255,.45);}
+        .lb-prev{left:12px;}
+        .lb-next{right:12px;}
+        .lb-nav:disabled{opacity:.2;cursor:default;}
 
         .access-denied{text-align:center;padding:60px 20px;}
         .access-denied .lock{font-size:56px;margin-bottom:14px;}
@@ -91,6 +97,25 @@
 
         .empty-grid{text-align:center;padding:50px 20px;color:#bbb;}
         .empty-grid .icon{font-size:48px;margin-bottom:12px;}
+
+        /* ── FILE MODAL ── */
+        .file-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+        .file-modal.open{opacity:1;pointer-events:all;}
+        .fm-box{background:#fff;border-radius:20px;overflow:hidden;width:min(780px,92vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+        .fm-header{display:flex;align-items:center;gap:12px;padding:16px 20px;background:linear-gradient(135deg,#ff6a88,#ff8e53);color:#fff;}
+        .fm-icon{font-size:28px;flex-shrink:0;}
+        .fm-title{font-weight:700;font-size:15px;flex-grow:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Quicksand';}
+        .fm-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+        .fm-preview{flex:1;border:none;min-height:0;}
+        .fm-nopreview{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:50px 20px;flex:1;}
+        .fm-nopreview .np-icon{font-size:64px;}
+        .fm-nopreview p{color:#999;font-size:14px;text-align:center;}
+        .fm-footer{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid #fce8f0;flex-shrink:0;}
+        .fm-btn{border:none;border-radius:10px;padding:9px 20px;cursor:pointer;font-weight:700;font-size:13px;transition:.2s;}
+        .fm-btn-dl{background:#ff6a88;color:#fff;}
+        .fm-btn-dl:hover{background:#e84393;}
+        .fm-btn-close{background:#f0f0f0;color:#555;}
+        .fm-btn-close:hover{background:#e0e0e0;}
 
         .flower{position:fixed;top:-50px;font-size:18px;animation:fall linear infinite;pointer-events:none;z-index:0;}
         @keyframes fall{0%{transform:translateY(-50px) rotate(0)}100%{transform:translateY(110vh) rotate(360deg)}}
@@ -112,13 +137,35 @@
     </div>
 </div>
 
-<!-- LIGHTBOX — FIX: dùng opacity thay vì display:none/flex -->
-<div class="lightbox" id="lightbox" id="lightboxOverlay">
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+    <button class="lb-nav lb-prev" id="lightboxPrev">&#8249;</button>
     <div class="lightbox-inner" id="lightboxInner">
         <img class="lightbox-img" id="lightboxImg" src="" alt="">
         <div class="lightbox-footer">
             <span class="lightbox-name" id="lightboxName"></span>
-            <button class="lightbox-close" id="lightboxCloseBtn">✕ Đóng</button>
+            <div style="display:flex;gap:8px;">
+                <button class="lightbox-close" id="lightboxDownloadBtn">⬇ Tải về</button>
+                <button class="lightbox-close" id="lightboxCloseBtn">✕ Đóng</button>
+            </div>
+        </div>
+    </div>
+    <button class="lb-nav lb-next" id="lightboxNext">&#8250;</button>
+</div>
+
+<!-- FILE MODAL -->
+<div class="file-modal" id="fileModal">
+    <div class="fm-box">
+        <div class="fm-header">
+            <div class="fm-icon" id="fmIcon">📄</div>
+            <div class="fm-title" id="fmTitle">Tên file</div>
+        </div>
+        <div class="fm-body" id="fmBody">
+            <!-- nội dung động -->
+        </div>
+        <div class="fm-footer">
+            <button class="fm-btn fm-btn-dl" id="fmDownloadBtn">⬇ Tải về máy</button>
+            <button class="fm-btn fm-btn-close" id="fmCloseBtn">✕ Đóng</button>
         </div>
     </div>
 </div>
@@ -213,36 +260,76 @@ let galleryData = JSON.parse(localStorage.getItem('galleryData_v2') || 'null') |
 let currentFilter = 'all';
 
 // ══════════════════════════════════════════════════════════
-//  LIGHTBOX  — FIX: dùng opacity + pointer-events, không dùng display toggle
+//  LIGHTBOX  — prev/next + download
 // ══════════════════════════════════════════════════════════
 const lightbox     = document.getElementById('lightbox');
 const lightboxImg  = document.getElementById('lightboxImg');
 const lightboxName = document.getElementById('lightboxName');
 
+let currentImageList  = [];   // danh sách ảnh hiện đang hiển thị
+let currentImageIndex = 0;
+
+function getImageList() {
+    const filtered = currentFilter === 'all' ? galleryData : galleryData.filter(i => i.type === currentFilter);
+    return filtered.filter(i => i.type === 'image');
+}
+
 function openLightbox(url, name) {
-    lightboxImg.src = '';           // reset trước để tránh flash ảnh cũ
-    lightboxImg.alt = name;
-    lightboxName.textContent = name;
-    lightboxImg.src = url;
+    currentImageList  = getImageList();
+    currentImageIndex = currentImageList.findIndex(i => i.url === url);
+    if (currentImageIndex < 0) currentImageIndex = 0;
+    showLightboxItem(currentImageIndex);
     lightbox.classList.add('open');
+}
+
+function showLightboxItem(idx) {
+    const item = currentImageList[idx];
+    if (!item) return;
+    lightboxImg.src = '';
+    lightboxImg.alt = item.name;
+    lightboxName.textContent = item.name;
+    lightboxImg.src = item.url;
+    // update nav
+    document.getElementById('lightboxPrev').disabled = idx === 0;
+    document.getElementById('lightboxNext').disabled = idx === currentImageList.length - 1;
+    // update download button
+    document.getElementById('lightboxDownloadBtn').onclick = function() {
+        downloadFile(item.url, item.name);
+    };
 }
 
 function closeLightbox() {
     lightbox.classList.remove('open');
-    setTimeout(() => { lightboxImg.src = ''; }, 300); // xoá src sau khi fade out
+    setTimeout(() => { lightboxImg.src = ''; }, 300);
 }
 
-// Đóng khi click overlay (không phải inner)
+document.getElementById('lightboxPrev').addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (currentImageIndex > 0) {
+        currentImageIndex--;
+        showLightboxItem(currentImageIndex);
+    }
+});
+
+document.getElementById('lightboxNext').addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (currentImageIndex < currentImageList.length - 1) {
+        currentImageIndex++;
+        showLightboxItem(currentImageIndex);
+    }
+});
+
 lightbox.addEventListener('click', function(e) {
     if (e.target === lightbox) closeLightbox();
 });
 document.getElementById('lightboxCloseBtn').addEventListener('click', closeLightbox);
 
-// ESC để đóng
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeLightbox();
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape')      closeLightbox();
+    if (e.key === 'ArrowLeft')   { if (currentImageIndex > 0) { currentImageIndex--; showLightboxItem(currentImageIndex); } }
+    if (e.key === 'ArrowRight')  { if (currentImageIndex < currentImageList.length - 1) { currentImageIndex++; showLightboxItem(currentImageIndex); } }
 });
-
 // ══════════════════════════════════════════════════════════
 //  FILTER — event delegation thay vì inline onclick
 // ══════════════════════════════════════════════════════════
@@ -269,7 +356,7 @@ document.getElementById('mediaGrid').addEventListener('click', function(e) {
     if (type === 'image') {
         openLightbox(url, name);
     } else if (url && url !== '#') {
-        window.open(url, '_blank');
+        openFileModal(url, name, item.dataset.ext || '');
     }
 });
 
@@ -322,15 +409,19 @@ function renderGallery() {
                 </div>`;
         } else {
             const ext  = (item.name.split('.').pop() || '').toLowerCase();
-            const icon = ext === 'pdf' ? '📕' : ext === 'pptx' ? '📊' : ext === 'xlsx' ? '📗' : '📄';
+            const icon = ext === 'pdf' ? '📕' : ext === 'pptx' ? '📊' : ext === 'xlsx' ? '📗' : ext === 'docx' || ext === 'doc' ? '📝' : '📄';
+            const hasData = safeUrl && safeUrl !== '#';
             return `
-                <div class="media-item" data-type="file" data-url="${safeUrl}" data-name="${safeName}" title="${safeUrl !== '#' ? 'Click để mở file' : 'File chưa có link'}">
+                <div class="media-item" data-type="file" data-url="${safeUrl}" data-name="${safeName}" data-ext="${ext}" title="${hasData ? 'Click để xem / tải file' : 'File chưa có dữ liệu'}">
                     <div class="file-box">
                         <div class="file-icon">${icon}</div>
-                        <div class="file-type">${ext}</div>
+                        <div class="file-type">${ext.toUpperCase()}</div>
                     </div>
                     <div class="item-name">${item.name}</div>
-                    <div class="item-date">${dateStr}</div>
+                    <div class="item-date" style="display:flex;justify-content:space-between;align-items:center;padding:0 12px 10px;">
+                        <span>${dateStr}</span>
+                        ${hasData ? `<span style="font-size:10px;color:#ff6a88;font-weight:700;">👁 Xem / ⬇</span>` : `<span style="font-size:10px;color:#ccc;">Chưa có file</span>`}
+                    </div>
                 </div>`;
         }
     }).join('');
@@ -348,7 +439,64 @@ function updateStats(imgs, files) {
 }
 
 // ══════════════════════════════════════════════════════════
-//  UPLOAD — FIX: đọc file thành dataURL để persist sau reload
+//  DOWNLOAD HELPER
+// ══════════════════════════════════════════════════════════
+function downloadFile(url, name) {
+    if (!url || url === '#') { showToast('⚠️ File chưa có dữ liệu để tải!'); return; }
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// ══════════════════════════════════════════════════════════
+//  FILE MODAL — xem + tải
+// ══════════════════════════════════════════════════════════
+const fileModal = document.getElementById('fileModal');
+
+function openFileModal(url, name, ext) {
+    const iconMap = { pdf:'📕', pptx:'📊', xlsx:'📗', xls:'📗', doc:'📝', docx:'📝' };
+    document.getElementById('fmIcon').textContent  = iconMap[ext] || '📄';
+    document.getElementById('fmTitle').textContent = name;
+
+    const body = document.getElementById('fmBody');
+
+    if (ext === 'pdf') {
+        // PDF → nhúng trực tiếp vào iframe
+        body.innerHTML = `<iframe class="fm-preview" src="${url}" style="width:100%;height:60vh;border:none;"></iframe>`;
+    } else if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
+        body.innerHTML = `<img src="${url}" style="max-width:100%;max-height:60vh;object-fit:contain;display:block;margin:auto;padding:12px;">`;
+    } else {
+        // Các định dạng Office, v.v. — không xem được trực tiếp trong browser
+        const labels = { docx:'Word', doc:'Word', pptx:'PowerPoint', xlsx:'Excel', xls:'Excel' };
+        const label  = labels[ext] || ext.toUpperCase();
+        body.innerHTML = `
+            <div class="fm-nopreview">
+                <div class="np-icon">${iconMap[ext] || '📄'}</div>
+                <p>File <b>${label}</b> không thể xem trực tiếp trên trình duyệt.<br>
+                   Vui lòng tải về máy rồi mở bằng ứng dụng tương ứng.</p>
+            </div>`;
+    }
+
+    document.getElementById('fmDownloadBtn').onclick = () => downloadFile(url, name);
+    fileModal.classList.add('open');
+}
+
+function closeFileModal() {
+    fileModal.classList.remove('open');
+    setTimeout(() => { document.getElementById('fmBody').innerHTML = ''; }, 300);
+}
+
+document.getElementById('fmCloseBtn').addEventListener('click', closeFileModal);
+fileModal.addEventListener('click', e => { if (e.target === fileModal) closeFileModal(); });
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeFileModal(); closeLightbox(); }
+});
+
+// ══════════════════════════════════════════════════════════
+//  UPLOAD — lưu CẢ file thường thành dataURL để tải được
 // ══════════════════════════════════════════════════════════
 document.getElementById('fileInput').addEventListener('change', function() {
     if (!isAdmin()) {
@@ -382,16 +530,20 @@ document.getElementById('fileInput').addEventListener('change', function() {
             };
             reader.readAsDataURL(f);
         } else {
-            // File không phải ảnh → không có URL xem trực tiếp
-            galleryData.unshift({
-                id   : Date.now() + Math.random(),
-                type : 'file',
-                name : f.name,
-                url  : '#',
-                date : today
-            });
-            processed++;
-            trySave(processed, files.length);
+            // FIX: đọc file thành dataURL để có thể tải về sau
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                galleryData.unshift({
+                    id   : Date.now() + Math.random(),
+                    type : 'file',
+                    name : f.name,
+                    url  : ev.target.result,   // dataURL → tải được
+                    date : today
+                });
+                processed++;
+                trySave(processed, files.length);
+            };
+            reader.readAsDataURL(f);
         }
     });
 
